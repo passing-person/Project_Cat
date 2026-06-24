@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 001494ffb8ad7ac4981e4877edfb84de, type: 3}
   m_Name: StageData_CoreSmoke
   m_EditorClassIdentifier: 
-  stageId: Office
+  stageId: CoreSmoke
   nextStageId: 
-  objectiveType: 2
-  targetScore: 300
+  objectiveType: 0
+  targetScore: 100
   survivalTime: 30
-  caughtRule: 0
+  caughtRule: 2
   baseScoreRate: 10
   maxScoreMultiplierBonus: 12
   securityMultiplierOverride: 13

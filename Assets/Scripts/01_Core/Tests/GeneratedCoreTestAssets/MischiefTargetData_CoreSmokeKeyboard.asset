@@ -15,7 +15,7 @@ MonoBehaviour:
   targetId: Keyboard
   mischiefType: 0
   instantScoreBonus: 0
-  baseRageAmount: 5
+  baseRageAmount: 50
   rageRadius: 5
   primaryNpcId: Supervisor
   canBeLocked: 1

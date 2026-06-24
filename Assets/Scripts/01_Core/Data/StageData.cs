@@ -18,6 +18,11 @@ public class StageData : ScriptableObject
     public float maxScoreMultiplierBonus = 12f;
     public float securityMultiplierOverride = 13f;
 
+    [Header("Hiding")]
+    public float maxHideDuration = 10f;
+    public float hiddenMultiplierScale = 0.1f;
+    public int hideSpotUsesPerStage = 1;
+
     public void NormalizeValues()
     {
         if (string.IsNullOrWhiteSpace(stageId))
@@ -30,6 +35,9 @@ public class StageData : ScriptableObject
         baseScoreRate = Mathf.Max(0f, baseScoreRate);
         maxScoreMultiplierBonus = Mathf.Max(0f, maxScoreMultiplierBonus);
         securityMultiplierOverride = Mathf.Max(0f, securityMultiplierOverride);
+        maxHideDuration = Mathf.Max(0f, maxHideDuration);
+        hiddenMultiplierScale = Mathf.Clamp01(hiddenMultiplierScale);
+        hideSpotUsesPerStage = Mathf.Max(1, hideSpotUsesPerStage);
     }
 
     public bool IsValid(out string message)
@@ -61,6 +69,24 @@ public class StageData : ScriptableObject
         if (maxScoreMultiplierBonus < 0f)
         {
             message = "StageData.maxScoreMultiplierBonus cannot be negative.";
+            return false;
+        }
+
+        if (maxHideDuration < 0f)
+        {
+            message = "StageData.maxHideDuration cannot be negative.";
+            return false;
+        }
+
+        if (hiddenMultiplierScale < 0f || hiddenMultiplierScale > 1f)
+        {
+            message = "StageData.hiddenMultiplierScale must be between 0 and 1.";
+            return false;
+        }
+
+        if (hideSpotUsesPerStage <= 0)
+        {
+            message = "StageData.hideSpotUsesPerStage must be greater than zero.";
             return false;
         }
 

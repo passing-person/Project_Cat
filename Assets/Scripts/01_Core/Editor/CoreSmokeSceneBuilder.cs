@@ -34,6 +34,7 @@ public static class CoreSmokeSceneBuilder
         RageManager rageManager = CreateComponentObject<RageManager>("RageManager", systems.transform, Vector3.zero);
         ObjectiveManager objectiveManager = CreateComponentObject<ObjectiveManager>("ObjectiveManager", systems.transform, Vector3.zero);
         FailManager failManager = CreateComponentObject<FailManager>("FailManager", systems.transform, Vector3.zero);
+        HidingManager hidingManager = CreateComponentObject<HidingManager>("HidingManager", systems.transform, Vector3.zero);
         MischiefManager mischiefManager = CreateComponentObject<MischiefManager>("MischiefManager", systems.transform, Vector3.zero);
         CoreFacade coreFacade = CreateComponentObject<CoreFacade>("CoreFacade", systems.transform, Vector3.zero);
         CoreReferenceValidator referenceValidator = CreateComponentObject<CoreReferenceValidator>("CoreReferenceValidator", systems.transform, Vector3.zero);
@@ -66,6 +67,7 @@ public static class CoreSmokeSceneBuilder
             objectiveManager,
             failManager,
             mischiefManager,
+            hidingManager,
             coreFacade,
             referenceValidator,
             uiBridge,
@@ -76,6 +78,7 @@ public static class CoreSmokeSceneBuilder
             gameManager,
             stageManager,
             mischiefManager,
+            hidingManager,
             scoreManager,
             rageManager,
             objectiveManager,
@@ -100,6 +103,7 @@ public static class CoreSmokeSceneBuilder
         ObjectiveManager objectiveManager,
         FailManager failManager,
         MischiefManager mischiefManager,
+        HidingManager hidingManager,
         CoreFacade coreFacade,
         CoreReferenceValidator referenceValidator,
         MockUIBridge uiBridge,
@@ -133,6 +137,12 @@ public static class CoreSmokeSceneBuilder
         mischiefManager.scoreManager = scoreManager;
         mischiefManager.objectiveManager = objectiveManager;
         mischiefManager.uiBridgeBehaviour = uiBridge;
+        mischiefManager.autoTickTargetCooldowns = false;
+
+        hidingManager.scoreManager = scoreManager;
+        hidingManager.uiBridgeBehaviour = uiBridge;
+        hidingManager.autoTick = false;
+        hidingManager.ConfigureFromStageData(stageData);
 
         coreFacade.gameManager = gameManager;
         coreFacade.stageManager = stageManager;
@@ -141,6 +151,7 @@ public static class CoreSmokeSceneBuilder
         coreFacade.rageManager = rageManager;
         coreFacade.objectiveManager = objectiveManager;
         coreFacade.failManager = failManager;
+        coreFacade.hidingManager = hidingManager;
         coreFacade.uiBridgeBehaviour = uiBridge;
         coreFacade.cuteActionRadius = 5f;
         coreFacade.cuteActionRageReduction = 20f;
@@ -156,6 +167,7 @@ public static class CoreSmokeSceneBuilder
         referenceValidator.rageManager = rageManager;
         referenceValidator.objectiveManager = objectiveManager;
         referenceValidator.failManager = failManager;
+        referenceValidator.hidingManager = hidingManager;
         referenceValidator.uiBridgeBehaviour = uiBridge;
         referenceValidator.autoResolveOnAwake = false;
         referenceValidator.logValidationOnStart = false;
@@ -166,6 +178,7 @@ public static class CoreSmokeSceneBuilder
         GameManager gameManager,
         StageManager stageManager,
         MischiefManager mischiefManager,
+        HidingManager hidingManager,
         ScoreManager scoreManager,
         RageManager rageManager,
         ObjectiveManager objectiveManager,
@@ -180,6 +193,7 @@ public static class CoreSmokeSceneBuilder
         runner.gameManager = gameManager;
         runner.stageManager = stageManager;
         runner.mischiefManager = mischiefManager;
+        runner.hidingManager = hidingManager;
         runner.scoreManager = scoreManager;
         runner.rageManager = rageManager;
         runner.objectiveManager = objectiveManager;
@@ -248,6 +262,9 @@ public static class CoreSmokeSceneBuilder
         data.baseScoreRate = 10f;
         data.maxScoreMultiplierBonus = 12f;
         data.securityMultiplierOverride = 13f;
+        data.maxHideDuration = 10f;
+        data.hiddenMultiplierScale = 0.1f;
+        data.hideSpotUsesPerStage = 1;
         data.caughtRule = CaughtRule.AlwaysFail;
         EditorUtility.SetDirty(data);
         return data;

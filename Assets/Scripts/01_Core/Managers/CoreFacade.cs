@@ -11,6 +11,7 @@ public class CoreFacade : MonoBehaviour
     public RageManager rageManager;
     public ObjectiveManager objectiveManager;
     public FailManager failManager;
+    public HidingManager hidingManager;
 
     [Header("External Bridge")]
     public MonoBehaviour uiBridgeBehaviour;
@@ -33,6 +34,7 @@ public class CoreFacade : MonoBehaviour
     public int CurrentScore => scoreManager != null ? scoreManager.CurrentScore : 0;
     public float CurrentScoreFloat => scoreManager != null ? scoreManager.CurrentScoreFloat : 0f;
     public float CurrentMultiplier => scoreManager != null ? scoreManager.CurrentMultiplier : 1f;
+    public bool IsPlayerHidden => hidingManager != null && hidingManager.IsHidden;
     public bool IsStageFinished => stageManager != null && stageManager.IsStageFinished;
     public bool StageCleared => stageManager != null && stageManager.StageCleared;
     public bool StageFailed => stageManager != null && stageManager.StageFailed;
@@ -60,6 +62,7 @@ public class CoreFacade : MonoBehaviour
         if (rageManager == null) rageManager = FindObjectOfType<RageManager>();
         if (objectiveManager == null) objectiveManager = FindObjectOfType<ObjectiveManager>();
         if (failManager == null) failManager = FindObjectOfType<FailManager>();
+        if (hidingManager == null) hidingManager = FindObjectOfType<HidingManager>();
     }
 
     [ContextMenu("Wire Core References")]
@@ -112,6 +115,12 @@ public class CoreFacade : MonoBehaviour
             failManager.objectiveManager = objectiveManager;
         }
 
+        if (hidingManager != null)
+        {
+            hidingManager.scoreManager = scoreManager;
+            if (uiBridgeBehaviour != null) hidingManager.uiBridgeBehaviour = uiBridgeBehaviour;
+        }
+
         ICoreUIBridge bridge = uiBridgeBehaviour as ICoreUIBridge;
         if (bridge != null)
         {
@@ -127,17 +136,25 @@ public class CoreFacade : MonoBehaviour
         if (stageManager != null) stageManager.uiBridgeBehaviour = bridgeBehaviour;
         if (mischiefManager != null) mischiefManager.uiBridgeBehaviour = bridgeBehaviour;
         if (objectiveManager != null) objectiveManager.uiBridgeBehaviour = bridgeBehaviour;
+        if (hidingManager != null) hidingManager.uiBridgeBehaviour = bridgeBehaviour;
+
+        ICoreUIBridge bridge = bridgeBehaviour as ICoreUIBridge;
 
         if (scoreManager != null)
         {
             scoreManager.uiBridgeBehaviour = bridgeBehaviour;
-            scoreManager.SetUIBridge(bridgeBehaviour as ICoreUIBridge);
+            scoreManager.SetUIBridge(bridge);
         }
 
         if (rageManager != null)
         {
             rageManager.uiBridgeBehaviour = bridgeBehaviour;
-            rageManager.SetUIBridge(bridgeBehaviour as ICoreUIBridge);
+            rageManager.SetUIBridge(bridge);
+        }
+
+        if (hidingManager != null)
+        {
+            hidingManager.SetUIBridge(bridge);
         }
     }
 
@@ -150,6 +167,17 @@ public class CoreFacade : MonoBehaviour
         }
 
         stageManager.LoadStage(stageData);
+
+        if (hidingManager != null)
+        {
+            hidingManager.ConfigureFromStageData(stageManager.CurrentStageData);
+            hidingManager.ResetHidingState();
+        }
+
+        if (mischiefManager != null)
+        {
+            mischiefManager.ResetTargetStates();
+        }
     }
 
     public void StartStage()
@@ -177,6 +205,44 @@ public class CoreFacade : MonoBehaviour
     public bool CanApplyMischief(string targetId)
     {
         return mischiefManager != null && mischiefManager.CanApplyMischief(targetId);
+    }
+
+    public MischiefTargetState GetMischiefTargetState(string targetId)
+    {
+        return mischiefManager != null ? mischiefManager.GetMischiefTargetState(targetId) : MischiefTargetState.Disabled;
+    }
+
+    public void SetMischiefTargetState(string targetId, MischiefTargetState state)
+    {
+        if (mischiefManager == null)
+        {
+            Debug.LogWarning("CoreFacade.SetMischiefTargetState failed: MischiefManager is missing.");
+            return;
+        }
+
+        mischiefManager.SetMischiefTargetState(targetId, state);
+    }
+
+    public void StartMischiefTargetCooldown(string targetId, float duration)
+    {
+        if (mischiefManager == null)
+        {
+            Debug.LogWarning("CoreFacade.StartMischiefTargetCooldown failed: MischiefManager is missing.");
+            return;
+        }
+
+        mischiefManager.StartMischiefTargetCooldown(targetId, duration);
+    }
+
+    public void DisableMischiefTarget(string targetId)
+    {
+        if (mischiefManager == null)
+        {
+            Debug.LogWarning("CoreFacade.DisableMischiefTarget failed: MischiefManager is missing.");
+            return;
+        }
+
+        mischiefManager.DisableMischiefTarget(targetId);
     }
 
     public void LockMischiefTarget(string targetId)
@@ -260,6 +326,38 @@ public class CoreFacade : MonoBehaviour
         return rageManager.ReduceRageAround(origin, radius, rageReduction);
     }
 
+    public bool CanUseHideSpot(string hideSpotId)
+    {
+        return hidingManager != null && hidingManager.CanUseHideSpot(hideSpotId);
+    }
+
+    public bool ReportPlayerHidden(string hideSpotId)
+    {
+        if (hidingManager == null)
+        {
+            Debug.LogWarning("CoreFacade.ReportPlayerHidden failed: HidingManager is missing.");
+            return false;
+        }
+
+        return hidingManager.ReportPlayerHidden(hideSpotId);
+    }
+
+    public void ReportPlayerExitHiding()
+    {
+        if (hidingManager == null)
+        {
+            Debug.LogWarning("CoreFacade.ReportPlayerExitHiding failed: HidingManager is missing.");
+            return;
+        }
+
+        hidingManager.ReportPlayerExitHiding();
+    }
+
+    public bool HasUsedHideSpot(string hideSpotId)
+    {
+        return hidingManager != null && hidingManager.HasUsedHideSpot(hideSpotId);
+    }
+
     public void ReportPlayerCaught()
     {
         if (failManager == null)
@@ -310,13 +408,20 @@ public class CoreFacade : MonoBehaviour
         if (objectiveManager == null) missing.Add("ObjectiveManager");
         if (failManager == null) missing.Add("FailManager");
 
-        if (missing.Count > 0)
+        if (missing.Count == 0)
         {
-            report = "CoreFacade is missing references: " + string.Join(", ", missing.ToArray());
-            return false;
+            report = hidingManager == null
+                ? "CoreFacade references are valid. HidingManager is missing, so hiding support is disabled."
+                : "CoreFacade references are valid.";
+            return true;
         }
 
-        report = "CoreFacade references are valid.";
-        return true;
+        report = "CoreFacade is missing required references:";
+        for (int i = 0; i < missing.Count; i++)
+        {
+            report += "\n- " + missing[i];
+        }
+
+        return false;
     }
 }

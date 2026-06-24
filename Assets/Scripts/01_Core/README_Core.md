@@ -1,310 +1,162 @@
-# Project Cat Core v3.5
+# Project Cat Core README
 
-This package contains only Core-side scripts.
+## Current Version: Core v3-6
 
-It does not include real Player, NPC AI, UI, Sound, Camera, or animation implementation.
-Test-only mock scripts are included so Core logic can be verified before other team parts are complete.
+This package contains Core-only systems for Project Cat.
 
-## Folder Structure
+Core v3-6 adds two integration-safe systems based on the latest GDD:
 
-```text
-Assets/Scripts/01_Core/
-├── Contexts
-├── Data
-├── Enums
-├── Interfaces
-├── Managers
-├── Tests
-└── Editor
+- Mischief target state support.
+- Hiding core support.
+
+No real Player, NPC AI, UI, Camera, Sound, or object implementation is included. Test mocks are included only for Core validation.
+
+## Core Scope
+
+Core owns:
+
+- Score logic.
+- Rage logic.
+- Objective and fail / clear rules.
+- Mischief application rules.
+- Mischief target state.
+- Hiding score multiplier and hide spot usage tracking.
+- Shared data, enums, contexts, and interfaces.
+- Core integration facade.
+- Core smoke tests.
+
+External teams should integrate through `CoreFacade` whenever possible.
+
+## Main Integration Entry Point
+
+Use `CoreFacade` as the main entry point.
+
+Recommended external calls:
+
+```plain text
+Player / Interaction -> CoreFacade.ApplyMischief(context)
+NPC / AI             -> CoreFacade.RegisterRageReceiver(receiver)
+UI                   -> CoreFacade.SetUIBridge(uiBridge)
+Caught event          -> CoreFacade.ReportPlayerCaught()
+Cute action           -> CoreFacade.TryCuteAction(position)
+Target state          -> CoreFacade.SetMischiefTargetState(targetId, state)
+Hiding start          -> CoreFacade.ReportPlayerHidden(hideSpotId)
+Hiding end            -> CoreFacade.ReportPlayerExitHiding()
 ```
 
-## Core Rule
+## Mischief Target State
 
-```text
-No Signal Bus.
-Cross-part communication uses public Core methods.
-Data is passed through context structs.
-Shared values are stored in ScriptableObjects.
-Score, rage, objective, clear, and failure logic belong to Core.
+The latest tutorial needs target availability states instead of a simple locked/unlocked flag.
+
+Supported states:
+
+```plain text
+Available
+Cooldown
+Disabled
+Locked
 ```
 
-External gameplay scripts should not directly modify score, rage, objective, clear, or failure state.
+Recommended interpretation:
 
-## Recommended External Entry Point
+- `Available`: mischief can be applied.
+- `Cooldown`: temporarily unavailable, then returns to `Available` after the cooldown timer.
+- `Disabled`: unavailable until manually changed.
+- `Locked`: unavailable until manually unlocked.
 
-External teams should use `CoreFacade` when possible.
+Useful API:
 
-```text
-Assets/Scripts/01_Core/Managers/CoreFacade.cs
+```plain text
+CoreFacade.CanApplyMischief(targetId)
+CoreFacade.GetMischiefTargetState(targetId)
+CoreFacade.SetMischiefTargetState(targetId, state)
+CoreFacade.StartMischiefTargetCooldown(targetId, duration)
+CoreFacade.DisableMischiefTarget(targetId)
+CoreFacade.LockMischiefTarget(targetId)
+CoreFacade.UnlockMischiefTarget(targetId)
 ```
 
-`CoreFacade` wraps the manager calls that Player, NPC, and UI teams need most often.
-This reduces direct coupling to several separate Core managers.
+Compatibility note:
 
-### Player / Interaction Usage
-
-When a mischief action succeeds:
-
-```csharp
-coreFacade.ApplyMischief(context);
+```plain text
+LockMischiefTarget and UnlockMischiefTarget still work.
+Existing external code using the old lock API should not need to change immediately.
 ```
 
-When the player uses the cute action:
+## Hiding Core Support
 
-```csharp
-coreFacade.TryCuteAction(playerPosition);
+The latest GDD defines hiding spots as temporary escape tools.
+
+Core v3-6 supports:
+
+- Hide spot usage tracking.
+- One-time use per stage by default.
+- Hidden state tracking.
+- Max hiding duration.
+- Forced exit after the max duration.
+- Temporary score multiplier scaling while hidden.
+
+Default values from StageData:
+
+```plain text
+maxHideDuration = 10 seconds
+hiddenMultiplierScale = 0.1
+hideSpotUsesPerStage = 1
 ```
 
-When the player is caught:
+Useful API:
 
-```csharp
-coreFacade.ReportPlayerCaught();
+```plain text
+CoreFacade.CanUseHideSpot(hideSpotId)
+CoreFacade.ReportPlayerHidden(hideSpotId)
+CoreFacade.ReportPlayerExitHiding()
+CoreFacade.HasUsedHideSpot(hideSpotId)
 ```
 
-Player code should create `MischiefContext` but should not directly change score or rage.
+Score behavior:
 
-### NPC / AI Usage
-
-Preferred NPC registration:
-
-```csharp
-coreFacade.RegisterRageReceiver(this);
+```plain text
+While hidden, ScoreManager applies TemporaryMultiplierScale.
+CurrentMultiplier = CurrentBaseMultiplier * TemporaryMultiplierScale.
 ```
 
-The NPC should implement:
+NPC movement behavior is not implemented by Core. NPC / AI should handle the GDD-specific responses:
 
-```text
-IRageReceiver
+```plain text
+Supervisor / Worker: walk back to original position.
+Cleaner: continue cleaning.
+Security: stay in place.
 ```
 
-Required members:
+## Smoke Test
 
-```text
-NpcId
-NpcData
-CanReceiveRage
-Position
-SetRageState(state)
-StartChase()
-StopChase()
-LoseTarget()
-```
+Build the smoke test in the current scene:
 
-Compatibility registration remains available:
-
-```csharp
-coreFacade.RegisterRageReceiver(npcId, this);
-```
-
-This allows older `NpcController` scripts to register before they fully implement `IRageReceiver`.
-
-### UI Usage
-
-UI code may implement:
-
-```text
-ICoreUIBridge
-```
-
-Then register it through:
-
-```csharp
-coreFacade.SetUIBridge(this);
-```
-
-Core managers can call this bridge without owning the actual UI implementation.
-
-## CoreFacade Public API
-
-Important methods:
-
-```text
-ResolveReferences()
-WireReferences()
-SetUIBridge(bridgeBehaviour)
-LoadStage(stageData)
-StartStage()
-ApplyMischief(context)
-CanApplyMischief(targetId)
-LockMischiefTarget(targetId)
-UnlockMischiefTarget(targetId)
-RegisterRageReceiver(receiver)
-RegisterRageReceiver(npcId, receiverObject)
-UnregisterRageReceiver(receiver)
-UnregisterRageReceiver(npcId)
-TryCuteAction(origin)
-TryCuteAction(origin, radius, rageReduction)
-ReportPlayerCaught()
-AddScore(amount)
-SetSecurityMultiplierOverride(enabled)
-SetSecurityMultiplierOverride(enabled, multiplier)
-ValidateCoreReferences(out report)
-```
-
-## Reference Validation
-
-`CoreReferenceValidator` checks whether required Core managers and important manager links are assigned.
-
-```text
-Assets/Scripts/01_Core/Managers/CoreReferenceValidator.cs
-```
-
-Use the context menu on the component:
-
-```text
-Log Validation
-```
-
-Validation treats missing required managers as errors.
-Missing UI bridge is a warning because logic-only tests can run without real UI.
-
-## Main Runtime Flow
-
-```text
-CoreFacade.ApplyMischief(context)
-→ MischiefManager.ApplyMischief(context)
-→ RageManager.AddRageByMischief(context)
-→ RageManager updates NPC rage
-→ RageManager recalculates average rage
-→ ScoreManager recalculates score multiplier
-→ ScoreManager starts ticking score over time
-→ ObjectiveManager updates objective progress
-```
-
-## Time-Based Score
-
-Current implementation follows the GDD direction:
-
-```text
-Score starts at 0.
-ScoreMultiplier starts at 1.0.
-When any NPC rage becomes greater than 0, scoring starts.
-Score increases over time.
-Average NPC rage changes the multiplier.
-```
-
-Formula:
-
-```text
-AvgRage = sum(Ri) / n
-RageFactor = (AvgRage / 100)^2
-ScoreMultiplier = 1 + RageFactor * MaxBonus
-ScoreGainPerSecond = BaseScoreRate * ScoreMultiplier
-```
-
-Security override is supported as a Core-only multiplier override:
-
-```csharp
-coreFacade.SetSecurityMultiplierOverride(true, 13f);
-coreFacade.SetSecurityMultiplierOverride(false, 13f);
-```
-
-This does not implement real Security AI.
-
-## Core Smoke Test
-
-Use this to check whether Core logic works without real Player/NPC/UI code.
-
-### Build test objects in the current scene
-
-Open any scene, then use:
-
-```text
+```plain text
 Tools > Project Cat > Core > Build Smoke Test In Current Scene
 ```
 
-This creates objects in the current active scene only.
-It does not create a new scene.
+Then press Play.
 
-Created objects:
+Expected result:
 
-```text
-CoreSmokeTest
-├── Systems
-│   ├── GameManager
-│   ├── StageManager
-│   ├── ScoreManager
-│   ├── RageManager
-│   ├── ObjectiveManager
-│   ├── FailManager
-│   ├── MischiefManager
-│   ├── CoreFacade
-│   ├── CoreReferenceValidator
-│   └── MockUIBridge
-├── MockSupervisor
-├── MockKeyboardMischiefSource
-└── CoreSmokeTestRunner
-```
-
-### Run test
-
-Press Play.
-
-Expected Console result:
-
-```text
-Core Smoke Test Started
-[PASS] ...
+```plain text
 Core Smoke Test Finished: PASS X, FAIL 0
 ```
 
-## What the Smoke Test Checks
+The exact pass count may change as tests are added. The important condition is `FAIL 0`.
 
-- Managers exist.
-- `CoreFacade` exists.
-- `CoreReferenceValidator` exists.
-- Mock supervisor is registered as `IRageReceiver`.
-- Score does not tick before rage exists.
-- Mischief applies rage to supervisor.
-- Score starts after rage exists.
-- Score multiplier follows average rage formula.
-- 40 rage changes state to Annoyed.
-- 70 rage changes state to Angry.
-- 100 rage changes state to Enraged.
-- 100 rage calls `StartChase()`.
-- Target score can be reached.
-- `ObjectiveManager.HasEnoughScore()` works.
-- `ReduceRage()` lowers rage and updates state.
-- `ReduceRageAround()` affects nearby NPCs.
-- Locked mischief targets block mischief.
-- Security multiplier override forces multiplier to 13 and can be disabled.
-- `AlwaysFail` caught rule fails the stage.
-- `ClearIfEnoughScore` fails when score is not enough.
-- `ClearIfEnoughScore` clears the stage when score is enough.
-- `CoreFacade` can route mischief, cute action, target lock, security override, and caught reporting.
-- `CoreReferenceValidator` reports valid Core references.
+## Current Next Steps
 
-## v3.5 Additions
+Core v3-6 is intended to support the current tutorial direction before full integration.
 
-- Added `CoreFacade` as the recommended external integration entry point.
-- Added `CoreReferenceValidator` for scene reference checks.
-- Added smoke tests for facade-routed Core calls.
-- Added smoke tests for reference validation.
-- Updated the smoke scene builder to create and wire `CoreFacade` and `CoreReferenceValidator`.
-- Updated integration documentation for Player, NPC, and UI teams.
+Next external integration targets:
 
-## Compatibility Note
+- Player / Interaction: scripted tutorial sequence and target interaction.
+- UI: staged prompts, score UI, rage UI, cute prompt, hiding prompt.
+- NPC / AI: chase start, chase stop, and hiding response behavior.
+- Sound / Camera: BGM change and camera focus moments.
 
-`IMischiefTarget` intentionally uses the previous contract names:
+Core should not implement those external systems directly.
 
-```text
-InteractionId
-BaseScore
-BaseRageAmount
-RageRadius
-PrimaryNpcId
-```
-
-This keeps existing `02_PlayerInteraction/MischiefTarget.cs` compatible while Core still supports the GDD score/rage system.
-
-`MischiefTargetData` keeps the previous field names `instantScoreBonus` and `baseRageAmount` for compatibility with existing PlayerInteraction code.
-
-## Pending Design Decisions
-
-These are intentionally not hardcoded as final rules yet:
-
-- Whether mischief actions give instant score.
-- Whether getting caught always fails.
-- Whether enough score allows stage clear after being caught.
-- Whether the 30-second timer is demo-only or full-loop.
-- Security trigger and final behavior.
+---

@@ -14,6 +14,7 @@ public class ScoreManager : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private float currentScore;
     [SerializeField] private float currentMultiplier = 1f;
+    [SerializeField] private float temporaryMultiplierScale = 1f;
     [SerializeField] private bool isScoring;
     [SerializeField] private bool multiplierOverrideEnabled;
     [SerializeField] private float multiplierOverrideValue = 1f;
@@ -23,7 +24,10 @@ public class ScoreManager : MonoBehaviour
 
     public int CurrentScore => Mathf.FloorToInt(currentScore);
     public float CurrentScoreFloat => currentScore;
-    public float CurrentMultiplier => currentMultiplier;
+    public float CurrentBaseMultiplier => currentMultiplier;
+    public float CurrentMultiplier => currentMultiplier * temporaryMultiplierScale;
+    public float TemporaryMultiplierScale => temporaryMultiplierScale;
+    public bool HasTemporaryMultiplierScale => !Mathf.Approximately(temporaryMultiplierScale, 1f);
     public bool IsScoring => isScoring;
     public bool HasMultiplierOverride => multiplierOverrideEnabled;
     public float LastAverageRage => lastAverageRage;
@@ -46,6 +50,7 @@ public class ScoreManager : MonoBehaviour
         targetScore = Mathf.Max(0, newTargetScore);
         currentScore = 0f;
         currentMultiplier = 1f;
+        temporaryMultiplierScale = 1f;
         lastAverageRage = 0f;
         isScoring = false;
         multiplierOverrideEnabled = false;
@@ -82,7 +87,7 @@ public class ScoreManager : MonoBehaviour
             return;
         }
 
-        currentScore += baseScoreRate * currentMultiplier * deltaTime;
+        currentScore += baseScoreRate * CurrentMultiplier * deltaTime;
         RefreshUI();
     }
 
@@ -125,6 +130,17 @@ public class ScoreManager : MonoBehaviour
         RefreshMultiplierUI();
     }
 
+    public void SetTemporaryMultiplierScale(float scale)
+    {
+        temporaryMultiplierScale = Mathf.Clamp01(scale);
+        RefreshMultiplierUI();
+    }
+
+    public void ClearTemporaryMultiplierScale()
+    {
+        SetTemporaryMultiplierScale(1f);
+    }
+
     public int AddScore(int amount)
     {
         if (amount <= 0)
@@ -152,6 +168,7 @@ public class ScoreManager : MonoBehaviour
     {
         currentScore = 0f;
         currentMultiplier = 1f;
+        temporaryMultiplierScale = 1f;
         lastAverageRage = 0f;
         isScoring = false;
         multiplierOverrideEnabled = false;
@@ -185,6 +202,12 @@ public class ScoreManager : MonoBehaviour
             return false;
         }
 
+        if (temporaryMultiplierScale < 0f || temporaryMultiplierScale > 1f)
+        {
+            message = "ScoreManager.temporaryMultiplierScale must be between 0 and 1.";
+            return false;
+        }
+
         message = "ScoreManager is valid.";
         return true;
     }
@@ -207,7 +230,7 @@ public class ScoreManager : MonoBehaviour
         }
 
         uiBridge.SetScore(CurrentScore, targetScore);
-        uiBridge.SetScoreMultiplier(currentMultiplier);
+        uiBridge.SetScoreMultiplier(CurrentMultiplier);
     }
 
     private void RefreshMultiplierUI()
@@ -219,7 +242,7 @@ public class ScoreManager : MonoBehaviour
 
         if (uiBridge != null)
         {
-            uiBridge.SetScoreMultiplier(currentMultiplier);
+            uiBridge.SetScoreMultiplier(CurrentMultiplier);
         }
     }
 }

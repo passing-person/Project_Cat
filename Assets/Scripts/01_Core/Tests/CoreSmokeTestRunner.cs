@@ -10,6 +10,7 @@ public class CoreSmokeTestRunner : MonoBehaviour
     public RageManager rageManager;
     public ObjectiveManager objectiveManager;
     public FailManager failManager;
+    public HidingManager hidingManager;
     public CoreFacade coreFacade;
     public CoreReferenceValidator referenceValidator;
 
@@ -52,6 +53,8 @@ public class CoreSmokeTestRunner : MonoBehaviour
         RunTargetScoreTest();
         RunCuteRageReductionTest();
         RunTargetLockTest();
+        RunTargetStateTest();
+        RunHidingCoreTest();
         RunSecurityMultiplierOverrideTest();
         RunFacadeIntegrationTest();
         RunReferenceValidatorTest();
@@ -73,6 +76,7 @@ public class CoreSmokeTestRunner : MonoBehaviour
         if (rageManager == null) rageManager = FindObjectOfType<RageManager>();
         if (objectiveManager == null) objectiveManager = FindObjectOfType<ObjectiveManager>();
         if (failManager == null) failManager = FindObjectOfType<FailManager>();
+        if (hidingManager == null) hidingManager = FindObjectOfType<HidingManager>();
         if (coreFacade == null) coreFacade = FindObjectOfType<CoreFacade>();
         if (referenceValidator == null) referenceValidator = FindObjectOfType<CoreReferenceValidator>();
         if (supervisor == null) supervisor = FindObjectOfType<MockRageReceiver>();
@@ -104,6 +108,7 @@ public class CoreSmokeTestRunner : MonoBehaviour
             mischiefManager.scoreManager = scoreManager;
             mischiefManager.objectiveManager = objectiveManager;
             mischiefManager.uiBridgeBehaviour = uiBridge;
+            mischiefManager.autoTickTargetCooldowns = false;
         }
 
         if (scoreManager != null)
@@ -131,6 +136,13 @@ public class CoreSmokeTestRunner : MonoBehaviour
             failManager.objectiveManager = objectiveManager;
         }
 
+        if (hidingManager != null)
+        {
+            hidingManager.scoreManager = scoreManager;
+            hidingManager.uiBridgeBehaviour = uiBridge;
+            hidingManager.autoTick = false;
+        }
+
         if (coreFacade != null)
         {
             coreFacade.gameManager = gameManager;
@@ -140,6 +152,7 @@ public class CoreSmokeTestRunner : MonoBehaviour
             coreFacade.rageManager = rageManager;
             coreFacade.objectiveManager = objectiveManager;
             coreFacade.failManager = failManager;
+            coreFacade.hidingManager = hidingManager;
             coreFacade.uiBridgeBehaviour = uiBridge;
             coreFacade.cuteActionRadius = 5f;
             coreFacade.cuteActionRageReduction = 20f;
@@ -159,6 +172,7 @@ public class CoreSmokeTestRunner : MonoBehaviour
             referenceValidator.rageManager = rageManager;
             referenceValidator.objectiveManager = objectiveManager;
             referenceValidator.failManager = failManager;
+            referenceValidator.hidingManager = hidingManager;
             referenceValidator.uiBridgeBehaviour = uiBridge;
         }
     }
@@ -179,6 +193,9 @@ public class CoreSmokeTestRunner : MonoBehaviour
             stageData.baseScoreRate = 10f;
             stageData.maxScoreMultiplierBonus = 12f;
             stageData.securityMultiplierOverride = 13f;
+            stageData.maxHideDuration = 10f;
+            stageData.hiddenMultiplierScale = 0.1f;
+            stageData.hideSpotUsesPerStage = 1;
             stageData.NormalizeValues();
         }
 
@@ -191,6 +208,17 @@ public class CoreSmokeTestRunner : MonoBehaviour
         if (rageManager != null)
         {
             rageManager.ResetAllRage();
+        }
+
+        if (mischiefManager != null)
+        {
+            mischiefManager.ResetTargetStates();
+        }
+
+        if (hidingManager != null)
+        {
+            hidingManager.ConfigureFromStageData(stageData);
+            hidingManager.ResetHidingState();
         }
 
         if (supervisor != null)
@@ -210,6 +238,7 @@ public class CoreSmokeTestRunner : MonoBehaviour
         AssertNotNull("ScoreManager exists", scoreManager);
         AssertNotNull("RageManager exists", rageManager);
         AssertNotNull("MischiefManager exists", mischiefManager);
+        AssertNotNull("HidingManager exists", hidingManager);
         AssertNotNull("CoreFacade exists", coreFacade);
         AssertNotNull("CoreReferenceValidator exists", referenceValidator);
         AssertNotNull("Supervisor mock exists", supervisor);
@@ -312,14 +341,64 @@ public class CoreSmokeTestRunner : MonoBehaviour
         AssertTrue("Target is usable after unlock", mischiefManager.CanApplyMischief(targetId));
     }
 
+    private void RunTargetStateTest()
+    {
+        PrepareFreshStage(ObjectiveType.SurviveChase, CaughtRule.AlwaysFail, 100);
+        string targetId = keyboardSource.InteractionId;
+
+        AssertTrue("Target state defaults to Available", mischiefManager.GetMischiefTargetState(targetId) == MischiefTargetState.Available);
+
+        mischiefManager.StartMischiefTargetCooldown(targetId, 2f);
+        AssertTrue("Cooldown target blocks mischief", !mischiefManager.CanApplyMischief(targetId));
+        AssertTrue("Cooldown target reports Cooldown state", mischiefManager.GetMischiefTargetState(targetId) == MischiefTargetState.Cooldown);
+
+        mischiefManager.TickTargetCooldowns(1f);
+        AssertTrue("Cooldown remains before duration ends", mischiefManager.GetMischiefTargetState(targetId) == MischiefTargetState.Cooldown);
+
+        mischiefManager.TickTargetCooldowns(1.1f);
+        AssertTrue("Cooldown target becomes available after duration", mischiefManager.GetMischiefTargetState(targetId) == MischiefTargetState.Available);
+
+        mischiefManager.DisableMischiefTarget(targetId);
+        AssertTrue("Disabled target blocks mischief", !mischiefManager.CanApplyMischief(targetId));
+        AssertTrue("Disabled target reports Disabled state", mischiefManager.GetMischiefTargetState(targetId) == MischiefTargetState.Disabled);
+
+        coreFacade.SetMischiefTargetState(targetId, MischiefTargetState.Available);
+        AssertTrue("CoreFacade can restore target availability", coreFacade.CanApplyMischief(targetId));
+    }
+
+    private void RunHidingCoreTest()
+    {
+        PrepareFreshStage(ObjectiveType.SurviveChase, CaughtRule.AlwaysFail, 100);
+        rageManager.RegisterNpc(supervisor);
+        rageManager.SetRage(supervisor.NpcId, 50f);
+
+        const string hideSpotId = "CardboardBox";
+        AssertTrue("Hide spot is usable before first use", hidingManager.CanUseHideSpot(hideSpotId));
+
+        bool entered = coreFacade.ReportPlayerHidden(hideSpotId);
+        AssertTrue("CoreFacade.ReportPlayerHidden enters hiding", entered);
+        AssertTrue("HidingManager tracks hidden state", hidingManager.IsHidden);
+        AssertTrue("Hide spot is marked as used", hidingManager.HasUsedHideSpot(hideSpotId));
+        AssertApprox("Hidden multiplier scale is applied", scoreManager.TemporaryMultiplierScale, 0.1f, 0.001f);
+        AssertApprox("Visible multiplier becomes 10 percent", scoreManager.CurrentMultiplier, 0.4f, 0.001f);
+
+        float previousScore = scoreManager.CurrentScoreFloat;
+        scoreManager.StartScoring();
+        scoreManager.TickScore(1f);
+        AssertApprox("Hidden score ticking uses scaled multiplier", scoreManager.CurrentScoreFloat - previousScore, 4f, 0.001f);
+
+        hidingManager.TickHiding(10.1f);
+        AssertTrue("Hiding auto-exits after max duration", !hidingManager.IsHidden);
+        AssertTrue("Hiding reports forced timer exit", hidingManager.WasForcedOutByTimer);
+        AssertApprox("Multiplier scale is cleared after exit", scoreManager.TemporaryMultiplierScale, 1f, 0.001f);
+        AssertTrue("Used hide spot cannot be used again", !hidingManager.CanUseHideSpot(hideSpotId));
+    }
+
     private void RunSecurityMultiplierOverrideTest()
     {
         PrepareFreshStage(ObjectiveType.SurviveChase, CaughtRule.AlwaysFail, 100);
         rageManager.RegisterNpc(supervisor);
 
-        // The override should return to the current RageManager average after it is disabled.
-        // Set actual rage instead of only calling ScoreManager.RecalculateMultiplier,
-        // otherwise RageManager correctly restores from average rage 0.
         rageManager.SetRage(supervisor.NpcId, 50f);
         AssertApprox("Base multiplier at 50 rage is 4", scoreManager.CurrentMultiplier, 4f, 0.001f);
 
@@ -352,6 +431,16 @@ public class CoreSmokeTestRunner : MonoBehaviour
         AssertTrue("CoreFacade.LockMischiefTarget locks target", !coreFacade.CanApplyMischief(targetId));
         coreFacade.UnlockMischiefTarget(targetId);
         AssertTrue("CoreFacade.UnlockMischiefTarget unlocks target", coreFacade.CanApplyMischief(targetId));
+
+        coreFacade.StartMischiefTargetCooldown(targetId, 1f);
+        AssertTrue("CoreFacade.StartMischiefTargetCooldown blocks target", !coreFacade.CanApplyMischief(targetId));
+        coreFacade.SetMischiefTargetState(targetId, MischiefTargetState.Available);
+        AssertTrue("CoreFacade.SetMischiefTargetState restores target", coreFacade.CanApplyMischief(targetId));
+
+        bool hid = coreFacade.ReportPlayerHidden("FacadeBox");
+        AssertTrue("CoreFacade.ReportPlayerHidden routes to HidingManager", hid && coreFacade.IsPlayerHidden);
+        coreFacade.ReportPlayerExitHiding();
+        AssertTrue("CoreFacade.ReportPlayerExitHiding clears hidden state", !coreFacade.IsPlayerHidden);
 
         rageManager.SetRage(supervisor.NpcId, 50f);
         coreFacade.SetSecurityMultiplierOverride(true);

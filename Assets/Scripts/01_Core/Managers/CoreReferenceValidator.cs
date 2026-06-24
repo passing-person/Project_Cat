@@ -14,6 +14,7 @@ public class CoreReferenceValidator : MonoBehaviour
     public RageManager rageManager;
     public ObjectiveManager objectiveManager;
     public FailManager failManager;
+    public HidingManager hidingManager;
 
     [Header("Optional External Bridge")]
     public MonoBehaviour uiBridgeBehaviour;
@@ -53,6 +54,7 @@ public class CoreReferenceValidator : MonoBehaviour
             rageManager = rageManager != null ? rageManager : coreFacade.rageManager;
             objectiveManager = objectiveManager != null ? objectiveManager : coreFacade.objectiveManager;
             failManager = failManager != null ? failManager : coreFacade.failManager;
+            hidingManager = hidingManager != null ? hidingManager : coreFacade.hidingManager;
             uiBridgeBehaviour = uiBridgeBehaviour != null ? uiBridgeBehaviour : coreFacade.uiBridgeBehaviour;
         }
 
@@ -63,6 +65,7 @@ public class CoreReferenceValidator : MonoBehaviour
         if (rageManager == null) rageManager = FindObjectOfType<RageManager>();
         if (objectiveManager == null) objectiveManager = FindObjectOfType<ObjectiveManager>();
         if (failManager == null) failManager = FindObjectOfType<FailManager>();
+        if (hidingManager == null) hidingManager = FindObjectOfType<HidingManager>();
     }
 
     public bool ValidateCoreReferences(out string report)
@@ -78,6 +81,7 @@ public class CoreReferenceValidator : MonoBehaviour
         if (rageManager == null) errors.Add("RageManager is missing.");
         if (objectiveManager == null) errors.Add("ObjectiveManager is missing.");
         if (failManager == null) errors.Add("FailManager is missing.");
+        if (hidingManager == null) warnings.Add("HidingManager is missing. Hiding core support will be disabled.");
 
         if (stageManager != null)
         {
@@ -109,6 +113,11 @@ public class CoreReferenceValidator : MonoBehaviour
         {
             if (failManager.stageManager == null) warnings.Add("FailManager.stageManager is not assigned.");
             if (failManager.objectiveManager == null) warnings.Add("FailManager.objectiveManager is not assigned.");
+        }
+
+        if (hidingManager != null && hidingManager.scoreManager == null)
+        {
+            warnings.Add("HidingManager.scoreManager is not assigned.");
         }
 
         if (uiBridgeBehaviour == null)

@@ -22,6 +22,14 @@ public enum MischiefType
     Custom
 }
 
+public enum MischiefTargetState
+{
+    Available,
+    Cooldown,
+    Disabled,
+    Locked
+}
+
 public enum NpcType
 {
     Supervisor,

@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class NpcController : MonoBehaviour
 {
-    [SerializeField] private NpcData npcData;
-    [SerializeField] private RageManager rageManager;
-    [SerializeField] private NpcChase npcChase;
+    [SerializeField] NpcData npcData;
+    [SerializeField] CoreFacade coreFacade;
+    [SerializeField] NpcChase npcChase;
 
     public NpcData NpcData => npcData;
     public string NpcId => npcData != null ? npcData.npcId : gameObject.name;
@@ -13,16 +14,21 @@ public class NpcController : MonoBehaviour
     public bool IsChasing { get; private set; }
     public NpcRageState CurrentRageState { get; private set; } = NpcRageState.Calm;
 
-    private void Start()
+    private void Awake()
     {
-        if (rageManager != null)
-            rageManager.RegisterNpc(NpcId, this);
+        Initialize(npcData);
     }
 
-    private void OnDestroy()
+    private void OnEnable()
     {
-        if (rageManager != null)
-            rageManager.UnregisterNpc(NpcId);
+        coreFacade = FindFirstObjectByType<CoreFacade>();
+
+        coreFacade.RegisterRageReceiver(this as IRageReceiver);
+    }
+
+    private void OnDisable()
+    {
+        coreFacade.UnregisterRageReceiver(this as IRageReceiver);
     }
 
     public void Initialize(NpcData data)

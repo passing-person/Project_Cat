@@ -8,10 +8,11 @@ public class NpcNavigate : MonoBehaviour
 {
     [Header("Params")]
     [SerializeField] NpcType npcType;
+    [SerializeField, Range(0f, .5f)] float updatePathIntv;
 
     [Header("Debug")]
-    [SerializeField] float updatePathIntv;
-    [SerializeField] float newRage;
+    [SerializeField] bool debugIsChasing;
+    [SerializeField, Range(1f, 100f)] float debugSpeedMult;
 
     // NPC components
     private NpcController controller
@@ -27,22 +28,6 @@ public class NpcNavigate : MonoBehaviour
 
     // NPC Params
     private NpcData Data => controller.NpcData;
-    private NpcRageState RageState
-    {
-        get
-        {
-            _rageState = controller.CurrentRageState;
-            return _rageState;
-        }
-        set
-        {
-            if (value == _rageState) return;
-            NpcRageState prevRageState = _rageState;
-            _rageState = value;
-            ResolveRageStateChange(prevRageState);
-        }
-    }
-        private NpcRageState _rageState;
     private float CurrentSpeed
     {
         get
@@ -53,7 +38,7 @@ public class NpcNavigate : MonoBehaviour
         {
             if (value == _currentSpeed) return;
             LazyInstantiate();
-            agent.speed = value;
+            agent.speed = value * debugSpeedMult;
             _currentSpeed = value;
         }
     }
@@ -83,35 +68,17 @@ public class NpcNavigate : MonoBehaviour
 
     private void Start()
     {
-        StartChase(Target);
+        StartNav(Target, debugIsChasing);
     }
 
-    private void ResolveRageStateChange(NpcRageState prevRageState)
-    {
-        // decide nav behavior
-        switch (RageState)
-        {
-            case NpcRageState.Enraged: StartChase(Target); break;
-            case NpcRageState.Angry:
-                if (prevRageState == NpcRageState.Enraged) StopChase();
-                break;
-            default: break;
-        }
-
-        Debug.Log($"[NPC] {Id}: RageState changes from {prevRageState} to {RageState}");
-
-        // decide nav speed
-        if (RageState == NpcRageState.Enraged) CurrentSpeed = ChaseSpeed;
-        else CurrentSpeed = MoveSpeed;
-    }
-
-    public void StartChase(GameObject target)
+    public void StartNav(GameObject target, bool isChasing)
     {
         Debug.Log($"[NPC] {Id}: Chase has started.");
+        ToggleSpeed(isChasing);
         ToggleNav(true, target);
     }
 
-    public void StopChase()
+    public void StopNav()
     {
         Debug.Log($"[NPC] {Id}: Chase has stopped.");
         ToggleNav(false);
@@ -140,6 +107,11 @@ public class NpcNavigate : MonoBehaviour
         }
     }
 
+    private void ToggleSpeed(bool isChasing = false)
+    {
+        CurrentSpeed = isChasing ? ChaseSpeed : MoveSpeed;
+    }
+
     private IEnumerator FollowTarget(GameObject target)
     {
         while (enabled)
@@ -155,11 +127,4 @@ public class NpcNavigate : MonoBehaviour
         if (_controller == null) _controller = GetComponent<NpcController>();
         if (agent == null) agent = GetComponent<NavMeshAgent>();
     }
-
-    //[ContextMenu("Test Rage Change")]
-    //private void TestRageChange()
-    //{
-    //    RageManager rageManager = FindFirstObjectByType<RageManager>();
-    //    rageManager.SetRage(Id, newRage);
-    //}
 }

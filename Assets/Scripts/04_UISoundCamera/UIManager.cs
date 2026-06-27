@@ -37,9 +37,14 @@ public class UIManager : MonoBehaviour
         Debug.Log("Timer: " + time.ToString("0.0"));
     }
 
-    public void SetCuteCooldown(float normalizedValue)
+    public void SetCuteCooldown(float remainingSeconds, float totalSeconds)
     {
-        Debug.Log("Cute Cooldown: " + normalizedValue.ToString("0.00"));
+        Debug.Log($"撒娇冷却: {Mathf.Max(0f, remainingSeconds):0.0}s / {totalSeconds:0.0}s");
+    }
+
+    public void HideCuteCooldown()
+    {
+        Debug.Log("撒娇冷却: 就绪");
     }
 
     public void ShowDangerWarning(string message)

@@ -323,7 +323,7 @@ public class CoreFacade : MonoBehaviour
             return new List<RageResult>();
         }
 
-        return rageManager.ReduceRageAround(origin, radius, rageReduction);
+        return rageManager.ReduceRageAround(origin, radius, rageReduction, excludeSecurity: true);
     }
 
     public bool CanUseHideSpot(string hideSpotId)

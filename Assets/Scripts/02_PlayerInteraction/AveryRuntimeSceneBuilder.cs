@@ -83,7 +83,7 @@ public class AveryRuntimeSceneBuilder : MonoBehaviour
         runtimeStage.targetScore = 300;
         runtimeStage.baseScoreRate = 10f;
         runtimeStage.maxScoreMultiplierBonus = 12f;
-        runtimeStage.maxHideDuration = 10f;
+        runtimeStage.maxHideDuration = 0f;
         runtimeStage.hiddenMultiplierScale = 0.1f;
         runtimeStage.caughtRule = CaughtRule.ClearIfEnoughScore;
         stageManager.defaultStageData = runtimeStage;
@@ -101,7 +101,7 @@ public class AveryRuntimeSceneBuilder : MonoBehaviour
 
         hidingManager.scoreManager = scoreManager;
         hidingManager.autoTick = true;
-        hidingManager.maxHideDuration = 10f;
+        hidingManager.maxHideDuration = 0f;
         hidingManager.hiddenMultiplierScale = 0.1f;
 
         coreFacade.gameManager = gameManager;

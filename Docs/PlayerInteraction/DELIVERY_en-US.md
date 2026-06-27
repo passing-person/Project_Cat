@@ -41,7 +41,7 @@ This module covers player cat movement, interaction, mischief, cute action, hidi
 | 7 | Call MischiefManager | ✅ Done | `PlayerMischiefAction` |
 | 8 | Q cute action | ✅ Done | Via `CoreFacade`, excludes Security |
 | 9 | Cute → RageManager | ✅ Done | `ReduceRageAround` |
-| 10 | F hide / exit hide | ✅ Done | `HidingManager`, 10s forced exit |
+| 10 | F hide / exit hide | ✅ Done | No use limit, no forced timeout; exit with F |
 | 11 | Connect HideSpot | ✅ Done | `HideSpot` + `InteractionZone` |
 | 12 | Cat animation | ❌ Stub | `PlayerAnimationController` ready, no Animator assets |
 | 13 | Cat SFX | ❌ Stub | `PlayerSfxController` hooks ready, `AudioManager` has no clips |
@@ -57,7 +57,7 @@ This module covers player cat movement, interaction, mischief, cute action, hidi
 | E | Interact / unlock mischief hint | `detectionRadius = 1.2m`, `interactionRange = 0.5m` |
 | Left Click | Mischief | Requires `IMischiefTarget` as current target |
 | Q | Cute / reduce rage | `radius = 4m`, `-20` rage, `cooldown = 5s` (GDD: 20s) |
-| F | Hide / exit hide | 1 use per spot per stage, max 10s hide |
+| F | Hide / exit hide | No use limit; press F to enter/exit, no forced timeout |
 
 > **GDD gaps:** Move speed (GDD 1 m/s vs current 3), cute CD (GDD 20s vs 5), interact range (GDD 0.3m vs scene 0.5m). All tunable in Inspector.
 
@@ -113,8 +113,9 @@ Q cute action:
 F hide:
   PlayerHide
   → CoreFacade.ReportPlayerHidden()
-  → HidingManager (10s timer, score multiplier ×10%)
+  → HidingManager (score multiplier ×10%, no forced timeout)
   → PlayerController.IsHidden = true (NPCs cannot see player)
+  → Press F to exit; can re-hide anytime
 ```
 
 ---
@@ -163,7 +164,11 @@ F hide:
 
 - `detectionRadius` — Scan radius (default 1.2)  
 - `interactionRange` — Valid interact distance (default 0.5)  
-- `logInteractionDebug` — Interaction debug logs  
+- `logInteractionDebug` — Interaction debug logs (bilingual, newline-separated)  
+
+### PlayerHide
+
+- `logHideDebug` — Hide debug logs (bilingual, newline-separated)  
 
 ### PlayerCuteAction
 
@@ -178,9 +183,18 @@ F hide:
 
 ### PlayerMischiefAction
 
-- `logMischiefDebug` — Mischief debug logs  
+- `logMischiefDebug` — Mischief debug logs (bilingual, newline-separated)  
 
----
+### Debug log format
+
+All Player module debug logs and `UIManager` prompts use **Chinese + newline + English**, for example:
+
+```text
+[PlayerHide] F 成功：躲藏 → HideSpot_Box（按 F 出箱，可反复躲藏）
+F success: hiding → HideSpot_Box (press F to exit, can re-hide anytime)
+```
+
+Utility: `Assets/Scripts/BilingualDebug.cs`
 
 ## 8. Test Procedure
 
@@ -198,21 +212,21 @@ F hide:
 ### 8.3 Interact / Mischief
 
 1. Walk to desk keyboard  
-2. Console: `[PlayerInteraction] 扫描选中目标: Keyboard`  
-3. **E** → prompt `[左键] 捣乱`  
-4. **Left click** → Console: mischief success, supervisor rage increases  
+2. Console: `[PlayerInteraction]` scan logs (bilingual)  
+3. **E** → bilingual prompt `[左键] 捣乱` / `[LMB] Mischief` etc.  
+4. **Left click** → Console: `左键成功` / `LMB success` bilingual log, supervisor rage increases  
 
 ### 8.4 Cute Action
 
 1. Stand near supervisor, press **Q**  
-2. Console: cute cooldown logs once per second  
+2. Console: `撒娇冷却` / `Cute cooldown` bilingual logs once per second  
 
 ### 8.5 Hide
 
 1. Walk to `HideSpot_Box` on the left (~x = -2)  
-2. Console: target `HideSpot_Box`, prompt `[F] 躲藏`  
-3. **F** → cannot move, `Hidden - Press F to exit`  
-4. **F** again to exit, or wait 10s for forced exit  
+2. Console: bilingual scan log + prompt `[F] 躲藏` / `[F] Hide`  
+3. **F** → cannot move; bilingual prompt to exit with F  
+4. **F** again to exit; can re-hide immediately (no use limit, no 10s forced exit)  
 
 ---
 
@@ -225,7 +239,6 @@ F hide:
 | P1 | Cat model + Animator | `Model` child is still placeholder capsule |
 | P1 | SFX assets | `AudioManager` has no clip mapping |
 | P1 | Align GDD values | 1 m/s move, 20s cute CD, 0.3m interact range |
-| P2 | PlayerHide debug logs | Failures are silent |
 | P2 | Camera follow | Not implemented |
 | P2 | Tutorial flow | Not implemented |
 | P2 | PlayerCat Prefab | Scene-only, no prefab asset |
@@ -264,4 +277,4 @@ Docs/PlayerInteraction/DELIVERY_zh-CN.md   ← Chinese delivery doc
 
 ---
 
-*Document version: v1.0*
+*Document version: v1.1*

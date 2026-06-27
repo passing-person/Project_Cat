@@ -41,7 +41,7 @@
 | 7 | 调用 MischiefManager | ✅ 完成 | `PlayerMischiefAction` |
 | 8 | Q 撒娇 | ✅ 完成 | 经 `CoreFacade`，排除保安 |
 | 9 | 撒娇接 RageManager | ✅ 完成 | `ReduceRageAround` |
-| 10 | F 躲藏 / 出箱 | ✅ 完成 | 接 `HidingManager`，10 秒强制出箱 |
+| 10 | F 躲藏 / 出箱 | ✅ 完成 | 无次数限制、无强制出箱；按 F 主动进出 |
 | 11 | 连接 HideSpot | ✅ 完成 | `HideSpot` + `InteractionZone` |
 | 12 | 猫动画 | ❌ 占位 | `PlayerAnimationController` 接口就绪，无 Animator 资源 |
 | 13 | 猫音效 | ❌ 占位 | `PlayerSfxController` 调用点就绪，`AudioManager` 无 Clip |
@@ -57,7 +57,7 @@
 | E | 交互 / 解锁捣乱提示 | 检测半径 `1.2m`，有效距离 `0.5m` |
 | 左键 | 捣乱 | 需当前目标为 `IMischiefTarget` |
 | Q | 撒娇降怒 | 半径 `4m`，怒气 `-20`，CD `5s`（GDD 为 20s，待对齐） |
-| F | 躲藏 / 离开躲藏点 | 每关每点可用 1 次，最长 10 秒 |
+| F | 躲藏 / 离开躲藏点 | 无次数限制；按 F 进出，无超时强制出箱 |
 
 > **与 GDD 差异：** 移动速度（GDD 1 m/s vs 当前 3）、撒娇 CD（GDD 20s vs 当前 5s）、交互距离（GDD 0.3m vs 场景 0.5m）可在 Inspector 调整。
 
@@ -113,8 +113,9 @@ Q 撒娇:
 F 躲藏:
   PlayerHide
   → CoreFacade.ReportPlayerHidden()
-  → HidingManager（10s 计时、分数倍率 ×10%）
+  → HidingManager（分数倍率 ×10%，无计时强制出箱）
   → PlayerController.IsHidden = true（NPC 视野失效）
+  → 按 F 主动出箱，可反复躲藏
 ```
 
 ---
@@ -163,7 +164,11 @@ F 躲藏:
 
 - `detectionRadius` — 扫描半径（默认 1.2）  
 - `interactionRange` — 有效交互距离（默认 0.5）  
-- `logInteractionDebug` — 交互 Debug 日志  
+- `logInteractionDebug` — 交互 Debug 日志（中英双语，换行显示）  
+
+### PlayerHide
+
+- `logHideDebug` — 躲藏 Debug 日志（中英双语，换行显示）  
 
 ### PlayerCuteAction
 
@@ -178,9 +183,18 @@ F 躲藏:
 
 ### PlayerMischiefAction
 
-- `logMischiefDebug` — 捣乱 Debug 日志  
+- `logMischiefDebug` — 捣乱 Debug 日志（中英双语，换行显示）  
 
----
+### Debug 日志格式
+
+所有 Player 模块 Debug 日志与 `UIManager` 提示均采用 **中文 + 换行 + 英文** 格式，例如：
+
+```text
+[PlayerHide] F 成功：躲藏 → HideSpot_Box（按 F 出箱，可反复躲藏）
+F success: hiding → HideSpot_Box (press F to exit, can re-hide anytime)
+```
+
+工具类：`Assets/Scripts/BilingualDebug.cs`
 
 ## 8. 测试步骤
 
@@ -198,21 +212,21 @@ F 躲藏:
 ### 8.3 交互 / 捣乱
 
 1. 走到桌子键盘旁  
-2. Console：`[PlayerInteraction] 扫描选中目标: Keyboard`  
-3. **E** → 提示 `[左键] 捣乱`  
-4. **左键** → Console：`左键成功：捣乱 → Keyboard`，主管怒气上升  
+2. Console：`[PlayerInteraction]` 扫描日志（中英双语）  
+3. **E** → 提示 `[F] 躲藏` / `[F] Hide` 等双语 Prompt  
+4. **左键** → Console：`左键成功` / `LMB success` 双语日志，主管怒气上升  
 
 ### 8.4 撒娇
 
 1. 靠近主管按 **Q**  
-2. Console：`撒娇冷却: 5.0s / 5.0s`（每秒更新一次）  
+2. Console：`撒娇冷却` / `Cute cooldown` 双语日志（每秒更新一次）  
 
 ### 8.5 躲藏
 
 1. 走到左侧 `HideSpot_Box`（约 x = -2）  
-2. Console：`扫描选中目标: HideSpot_Box`，`[F] 躲藏`  
-3. **F** → 不能移动，Console：`Hidden - Press F to exit`  
-4. 再按 **F** 出箱，或等待 10 秒强制出箱  
+2. Console：双语扫描日志 + Prompt `[F] 躲藏` / `[F] Hide`  
+3. **F** → 不能移动，双语提示「已躲藏 - 按 F 出箱」  
+4. 再按 **F** 出箱，可立即再次躲藏（无次数限制、无 10 秒强制出箱）  
 
 ---
 
@@ -225,7 +239,6 @@ F 躲藏:
 | P1 | 猫模型 + Animator | `Model` 子物体仍为占位 Capsule |
 | P1 | 音效资源 | `AudioManager` 无 AudioClip 映射 |
 | P1 | GDD 数值对齐 | 速度 1 m/s、撒娇 CD 20s、交互 0.3m |
-| P2 | PlayerHide Debug 日志 | 失败时静默，建议补充 |
 | P2 | 相机跟随 | 未实现 |
 | P2 | 教学关引导 | 未实现 |
 | P2 | PlayerCat Prefab | 仅存在于场景中，未做成 Prefab |
@@ -264,4 +277,4 @@ Docs/PlayerInteraction/DELIVERY_en-US.md   ← 英文版交付文档
 
 ---
 
-*文档版本：v1.0*
+*文档版本：v1.1*

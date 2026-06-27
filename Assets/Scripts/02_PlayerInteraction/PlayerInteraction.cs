@@ -82,7 +82,11 @@ public class PlayerInteraction : MonoBehaviour
         if (best == null)
         {
             if (CurrentTarget != null)
-                LogDebug("扫描：范围内没有可交互目标，清除当前目标");
+            {
+                LogDebug(BilingualDebug.Line(
+                    "扫描：范围内没有可交互目标，清除当前目标",
+                    "Scan: no interactable in range, clearing current target"));
+            }
 
             if (CurrentTarget != null)
                 ClearCurrentTarget();
@@ -93,7 +97,9 @@ public class PlayerInteraction : MonoBehaviour
         if (CurrentTarget != best)
         {
             mischiefPromptUnlocked = false;
-            LogDebug($"扫描选中目标: {((MonoBehaviour)best).name}，距离 {bestDistance:0.00}m");
+            LogDebug(BilingualDebug.Line(
+                $"扫描选中目标: {((MonoBehaviour)best).name}，距离 {bestDistance:0.00}m",
+                $"Scan selected target: {((MonoBehaviour)best).name}, distance {bestDistance:0.00}m"));
             SetCurrentTarget(best);
         }
     }
@@ -105,21 +111,27 @@ public class PlayerInteraction : MonoBehaviour
 
         if (playerController != null && playerController.IsHidden)
         {
-            LogDebug("验证失败：玩家正在躲藏");
+            LogDebug(BilingualDebug.Line(
+                "验证失败：玩家正在躲藏",
+                "Validation failed: player is hidden"));
             ClearCurrentTarget();
             return;
         }
 
         if (!CurrentTarget.CanInteract)
         {
-            LogDebug($"验证失败：目标不可交互 {GetTargetName(CurrentTarget)}");
+            LogDebug(BilingualDebug.Line(
+                $"验证失败：目标不可交互 {GetTargetName(CurrentTarget)}",
+                $"Validation failed: target not interactable {GetTargetName(CurrentTarget)}"));
             ClearCurrentTarget();
             return;
         }
 
         if (!IsWithinRange(CurrentTarget, out float distance))
         {
-            LogDebug($"验证失败：目标过远 {GetTargetName(CurrentTarget)}，距离 {distance:0.00}m");
+            LogDebug(BilingualDebug.Line(
+                $"验证失败：目标过远 {GetTargetName(CurrentTarget)}，距离 {distance:0.00}m",
+                $"Validation failed: target too far {GetTargetName(CurrentTarget)}, distance {distance:0.00}m"));
             ClearCurrentTarget();
         }
     }
@@ -152,39 +164,51 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (playerController != null && playerController.IsHidden)
         {
-            LogDebug("E 失败：玩家正在躲藏");
+            LogDebug(BilingualDebug.Line(
+                "E 失败：玩家正在躲藏",
+                "E failed: player is hidden"));
             return false;
         }
 
         if (CurrentTarget == null)
         {
-            LogDebug("E 失败：没有当前交互目标（请靠近键盘/电话/纸箱）");
+            LogDebug(BilingualDebug.Line(
+                "E 失败：没有当前交互目标（请靠近键盘/电话/纸箱）",
+                "E failed: no current target (move near keyboard, phone, or hide box)"));
             return false;
         }
 
         if (!CurrentTarget.CanInteract)
         {
-            LogDebug($"E 失败：目标不可交互 {GetTargetName(CurrentTarget)}");
+            LogDebug(BilingualDebug.Line(
+                $"E 失败：目标不可交互 {GetTargetName(CurrentTarget)}",
+                $"E failed: target not interactable {GetTargetName(CurrentTarget)}"));
             return false;
         }
 
         if (!IsWithinRange(CurrentTarget, out float distance))
         {
-            LogDebug($"E 失败：距离过远 {GetTargetName(CurrentTarget)}，{distance:0.00}m / 需要 ≤{interactionRange:0.00}m");
+            LogDebug(BilingualDebug.Line(
+                $"E 失败：距离过远 {GetTargetName(CurrentTarget)}，{distance:0.00}m / 需要 ≤{interactionRange:0.00}m",
+                $"E failed: too far {GetTargetName(CurrentTarget)}, {distance:0.00}m / need ≤{interactionRange:0.00}m"));
             return false;
         }
 
         if (CurrentTarget is IMischiefTarget)
         {
             mischiefPromptUnlocked = true;
-            LogDebug($"E 成功：已解锁捣乱提示 → {GetTargetName(CurrentTarget)}");
+            LogDebug(BilingualDebug.Line(
+                $"E 成功：已解锁捣乱提示 → {GetTargetName(CurrentTarget)}",
+                $"E success: mischief hint unlocked → {GetTargetName(CurrentTarget)}"));
             RefreshPrompt();
             return true;
         }
 
         string actorId = playerController != null ? playerController.PlayerId : "Player";
         CurrentTarget.Interact(actorId);
-        LogDebug($"E 成功：交互 {GetTargetName(CurrentTarget)}");
+        LogDebug(BilingualDebug.Line(
+            $"E 成功：交互 {GetTargetName(CurrentTarget)}",
+            $"E success: interacted with {GetTargetName(CurrentTarget)}"));
         return true;
     }
 
@@ -201,20 +225,20 @@ public class PlayerInteraction : MonoBehaviour
 
         if (CurrentTarget is IHideSpot && (playerController == null || !playerController.IsHidden))
         {
-            uiManager.ShowPrompt("[F] 躲藏");
+            uiManager.ShowPrompt(BilingualDebug.Line("[F] 躲藏", "[F] Hide"));
             return;
         }
 
         if (CurrentTarget is IMischiefTarget)
         {
             if (mischiefPromptUnlocked)
-                uiManager.ShowPrompt("[左键] 捣乱");
+                uiManager.ShowPrompt(BilingualDebug.Line("[左键] 捣乱", "[LMB] Mischief"));
             else
-                uiManager.ShowPrompt("[E] 交互");
+                uiManager.ShowPrompt(BilingualDebug.Line("[E] 交互", "[E] Interact"));
             return;
         }
 
-        uiManager.ShowPrompt("[E] 交互");
+        uiManager.ShowPrompt(BilingualDebug.Line("[E] 交互", "[E] Interact"));
     }
 
     private void SetHighlighter(IInteractable target)

@@ -22,50 +22,66 @@ public class PlayerMischiefAction : MonoBehaviour
     {
         if (playerInteraction == null)
         {
-            LogDebug("左键失败：PlayerInteraction 未连接");
+            LogDebug(BilingualDebug.Line(
+                "左键失败：PlayerInteraction 未连接",
+                "LMB failed: PlayerInteraction is not assigned"));
             return;
         }
 
         if (mischiefManager == null)
         {
-            LogDebug("左键失败：MischiefManager 未连接");
+            LogDebug(BilingualDebug.Line(
+                "左键失败：MischiefManager 未连接",
+                "LMB failed: MischiefManager is not assigned"));
             return;
         }
 
         if (playerController != null && !playerController.IsControllable)
         {
-            LogDebug("左键失败：玩家不可控制");
+            LogDebug(BilingualDebug.Line(
+                "左键失败：玩家不可控制",
+                "LMB failed: player is not controllable"));
             return;
         }
 
         if (playerController != null && playerController.IsHidden)
         {
-            LogDebug("左键失败：玩家正在躲藏");
+            LogDebug(BilingualDebug.Line(
+                "左键失败：玩家正在躲藏",
+                "LMB failed: player is hidden"));
             return;
         }
 
         if (playerInteraction.CurrentTarget == null)
         {
-            LogDebug("左键失败：没有交互目标（请靠近键盘/电话）");
+            LogDebug(BilingualDebug.Line(
+                "左键失败：没有交互目标（请靠近键盘/电话）",
+                "LMB failed: no interaction target (move near keyboard or phone)"));
             return;
         }
 
         IMischiefTarget target = playerInteraction.CurrentTarget as IMischiefTarget;
         if (target == null)
         {
-            LogDebug($"左键失败：当前目标不是捣乱点 → {playerInteraction.CurrentTarget.InteractionId}");
+            LogDebug(BilingualDebug.Line(
+                $"左键失败：当前目标不是捣乱点 → {playerInteraction.CurrentTarget.InteractionId}",
+                $"LMB failed: current target is not a mischief target → {playerInteraction.CurrentTarget.InteractionId}"));
             return;
         }
 
         if (!target.CanInteract)
         {
-            LogDebug($"左键失败：目标不可交互 → {target.InteractionId}");
+            LogDebug(BilingualDebug.Line(
+                $"左键失败：目标不可交互 → {target.InteractionId}",
+                $"LMB failed: target not interactable → {target.InteractionId}"));
             return;
         }
 
         if (!mischiefManager.CanApplyMischief(target.InteractionId))
         {
-            LogDebug($"左键失败：MischiefManager 拒绝 → {target.InteractionId}，状态={mischiefManager.GetMischiefTargetState(target.InteractionId)}");
+            LogDebug(BilingualDebug.Line(
+                $"左键失败：MischiefManager 拒绝 → {target.InteractionId}，状态={mischiefManager.GetMischiefTargetState(target.InteractionId)}",
+                $"LMB failed: MischiefManager rejected → {target.InteractionId}, state={mischiefManager.GetMischiefTargetState(target.InteractionId)}"));
             return;
         }
 
@@ -75,11 +91,15 @@ public class PlayerMischiefAction : MonoBehaviour
 
         if (!applied)
         {
-            LogDebug($"左键失败：ApplyMischief 返回 false → {target.InteractionId}");
+            LogDebug(BilingualDebug.Line(
+                $"左键失败：ApplyMischief 返回 false → {target.InteractionId}",
+                $"LMB failed: ApplyMischief returned false → {target.InteractionId}"));
             return;
         }
 
-        LogDebug($"左键成功：捣乱 → {target.InteractionId}，怒气 +{context.BaseRageAmount}");
+        LogDebug(BilingualDebug.Line(
+            $"左键成功：捣乱 → {target.InteractionId}，怒气 +{context.BaseRageAmount}",
+            $"LMB success: mischief → {target.InteractionId}, rage +{context.BaseRageAmount}"));
         animationController?.PlayMischief();
         sfxController?.PlayMischief();
     }

@@ -1311,9 +1311,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scoreManager: {fileID: 1356432855}
   uiBridgeBehaviour: {fileID: 0}
-  maxHideDuration: 10
+  maxHideDuration: 0
   hiddenMultiplierScale: 0.1
-  hideSpotUsesPerStage: 1
+  hideSpotUsesPerStage: 0
   autoTick: 1
   isHidden: 0
   activeHideSpotId: 

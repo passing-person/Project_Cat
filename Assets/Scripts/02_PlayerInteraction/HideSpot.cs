@@ -12,6 +12,11 @@ public class HideSpot : MonoBehaviour, IHideSpot
 
     public void Interact(string actorId)
     {
-        // PlayerHide handles the actual hide action through the current interaction target.
+        // Hide is handled by PlayerHide (F key) when this spot is the current target.
+    }
+
+    public void Consume()
+    {
+        canInteract = false;
     }
 }

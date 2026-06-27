@@ -262,9 +262,9 @@ public static class CoreSmokeSceneBuilder
         data.baseScoreRate = 10f;
         data.maxScoreMultiplierBonus = 12f;
         data.securityMultiplierOverride = 13f;
-        data.maxHideDuration = 10f;
+        data.maxHideDuration = 0f;
         data.hiddenMultiplierScale = 0.1f;
-        data.hideSpotUsesPerStage = 1;
+        data.hideSpotUsesPerStage = 0;
         data.caughtRule = CaughtRule.AlwaysFail;
         EditorUtility.SetDirty(data);
         return data;

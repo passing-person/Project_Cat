@@ -193,9 +193,9 @@ public class CoreSmokeTestRunner : MonoBehaviour
             stageData.baseScoreRate = 10f;
             stageData.maxScoreMultiplierBonus = 12f;
             stageData.securityMultiplierOverride = 13f;
-            stageData.maxHideDuration = 10f;
+            stageData.maxHideDuration = 0f;
             stageData.hiddenMultiplierScale = 0.1f;
-            stageData.hideSpotUsesPerStage = 1;
+            stageData.hideSpotUsesPerStage = 0;
             stageData.NormalizeValues();
         }
 
@@ -378,20 +378,29 @@ public class CoreSmokeTestRunner : MonoBehaviour
         bool entered = coreFacade.ReportPlayerHidden(hideSpotId);
         AssertTrue("CoreFacade.ReportPlayerHidden enters hiding", entered);
         AssertTrue("HidingManager tracks hidden state", hidingManager.IsHidden);
-        AssertTrue("Hide spot is marked as used", hidingManager.HasUsedHideSpot(hideSpotId));
+        AssertTrue("Cannot enter hide while already hidden", !hidingManager.CanUseHideSpot(hideSpotId));
         AssertApprox("Hidden multiplier scale is applied", scoreManager.TemporaryMultiplierScale, 0.1f, 0.001f);
         AssertApprox("Visible multiplier becomes 10 percent", scoreManager.CurrentMultiplier, 0.4f, 0.001f);
+
+        coreFacade.ReportPlayerExitHiding();
+        AssertTrue("Manual exit leaves hiding state", !hidingManager.IsHidden);
+        AssertTrue("Hide spot is usable again after manual exit", hidingManager.CanUseHideSpot(hideSpotId));
+
+        entered = coreFacade.ReportPlayerHidden(hideSpotId);
+        AssertTrue("Player can hide again after manual exit", entered);
 
         float previousScore = scoreManager.CurrentScoreFloat;
         scoreManager.StartScoring();
         scoreManager.TickScore(1f);
         AssertApprox("Hidden score ticking uses scaled multiplier", scoreManager.CurrentScoreFloat - previousScore, 4f, 0.001f);
 
-        hidingManager.TickHiding(10.1f);
-        AssertTrue("Hiding auto-exits after max duration", !hidingManager.IsHidden);
-        AssertTrue("Hiding reports forced timer exit", hidingManager.WasForcedOutByTimer);
-        AssertApprox("Multiplier scale is cleared after exit", scoreManager.TemporaryMultiplierScale, 1f, 0.001f);
-        AssertTrue("Used hide spot cannot be used again", !hidingManager.CanUseHideSpot(hideSpotId));
+        hidingManager.TickHiding(30f);
+        AssertTrue("Hiding does not auto-exit without duration limit", hidingManager.IsHidden);
+        AssertApprox("Multiplier scale stays active while hidden", scoreManager.TemporaryMultiplierScale, 0.1f, 0.001f);
+
+        coreFacade.ReportPlayerExitHiding();
+        AssertApprox("Multiplier scale is cleared after manual exit", scoreManager.TemporaryMultiplierScale, 1f, 0.001f);
+        AssertTrue("Hide spot remains usable with no use limit", hidingManager.CanUseHideSpot(hideSpotId));
     }
 
     private void RunSecurityMultiplierOverrideTest()

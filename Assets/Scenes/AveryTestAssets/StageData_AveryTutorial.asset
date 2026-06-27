@@ -21,6 +21,6 @@ MonoBehaviour:
   baseScoreRate: 10
   maxScoreMultiplierBonus: 12
   securityMultiplierOverride: 13
-  maxHideDuration: 10
+  maxHideDuration: 0
   hiddenMultiplierScale: 0.1
-  hideSpotUsesPerStage: 1
+  hideSpotUsesPerStage: 0

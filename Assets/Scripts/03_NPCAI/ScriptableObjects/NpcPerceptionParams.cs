@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Project Cat/NPC/View Params")]
+[CreateAssetMenu(menuName = "Project Cat/NPC/View Params", fileName = "Default")]
 public class NpcViewParams : ScriptableObject
 {
     public float sectorRadius = 3.5f;

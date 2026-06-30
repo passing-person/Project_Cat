@@ -3,43 +3,24 @@ using UnityEngine;
 
 public class NpcController : MonoBehaviour, IRageReceiver
 {
-    [Header("Core References")]
-    [SerializeField] CoreFacade coreFacade;
+    private CoreFacade coreFacade;
 
     [Header("Params")]
     [SerializeField] NpcData npcData;
 
-    [Header("Debug")]
+    [Header("Debug - State Machine")]
+    [SerializeField] private bool debugPlayerInView;
+    [SerializeField] private bool debugPlayerInReach;
+    [SerializeField] private bool debugIsTired;
+    [SerializeField] private bool debugIsOverride;
     [SerializeField] NpcRageState debugRageState;
-
-    // runtime
-    public NpcState CurrentNpcState
-    {
-        get
-        {
-            return _npcState;
-        }
-        set
-        {
-            if (value == _npcState) return;
-            ResolveNpcStateChange(_npcState, value);
-            _npcState = value;
-        }
-    }
-        private NpcState _npcState;
-    public bool PlayerInView
-    {
-        get
-        {
-            LazyInitialize();
-            return npcView.PlayerInView;
-        }
-    }
+    [SerializeField] NpcState StateToSwitch;
 
     // Components
     private NpcNavigate npcNavigate;
     private NpcCatch npcCatch;
     private NpcView npcView;
+    private NpcStateMachine npcStateMachine;
 
     // behaviors
     private NpcIdleBehavior npcIdleBehavior;
@@ -55,8 +36,25 @@ public class NpcController : MonoBehaviour, IRageReceiver
     public Vector3 Position => transform.position;
     public NpcType NpcType => npcData != null ? npcData.npcType : NpcType.Worker;
     public bool CanReceiveRage => npcData == null || npcData.canReceiveRage;
-    
-    // runtime fields
+
+    // NpcState
+    public NpcState CurrentNpcState
+    {
+        get
+        {
+            return _npcState;
+        }
+        set
+        {
+            if (value == _npcState) return;
+            ResolveNpcStateChange(_npcState, value);
+            _npcState = value;
+        }
+    }
+        private NpcState _npcState;
+
+    // NpcState flags
+    // Do not access indented fields, access their property version
     public NpcRageState CurrentRageState
     {
         get
@@ -66,11 +64,75 @@ public class NpcController : MonoBehaviour, IRageReceiver
         set
         {
             if (value == _rageState) return;
-            // No need to call ResolveRageStateChange() because RageManager calls it for you.
+            // No need to call ResolveRageStateChange(), RageManager calls it for you.
             _rageState = value;
         }
     }
         private NpcRageState _rageState;
+    public bool PlayerInView
+    {
+        get
+        {
+            LazyInitialize();
+            _playerInView = npcView.PlayerInView;
+            return _playerInView;
+        }
+        set
+        {
+            if (value == _playerInView) return;
+            _playerInView = value;
+            OnNpcStateFlagsChange();
+        }
+    }
+        private bool _playerInView;
+
+    public bool IsTired
+    {
+        get
+        {
+            LazyInitialize();
+            return _isTired;
+        }
+        set
+        {
+            if (value == _isTired) return;
+            _isTired = value;
+            OnNpcStateFlagsChange();
+        }
+    }
+        private bool _isTired;
+
+    public bool IsOverride
+    {
+        get
+        {
+            LazyInitialize();
+            return _isOverride;
+        }
+        set
+        {
+            if (value == _isOverride) return;
+            _isOverride = value;
+            OnNpcStateFlagsChange();
+        }
+    }
+        private bool _isOverride;
+
+    public bool PlayerInReach
+    {
+        get
+        {
+            LazyInitialize();
+            return _playerInReach;
+        }
+        set
+        {
+            if (value == _playerInReach) return;
+            _playerInReach = value;
+            OnNpcStateFlagsChange();
+        }
+    }
+        private bool _playerInReach;
 
     // behavior delegates
     private delegate void IdleBehavior();
@@ -83,12 +145,9 @@ public class NpcController : MonoBehaviour, IRageReceiver
     private ChaseBehavior chaseAction;
     private SearchBehavior searchAction;
     private DiveBehavior diveAction;
-    private OverrideBehavior overrideAction;
     private CooldownBehavior cooldownAction;
+    private OverrideBehavior overrideAction;
 
-
-    [Header("Debug")]
-    public GameObject target;
 
     private void Awake()
     {
@@ -108,13 +167,29 @@ public class NpcController : MonoBehaviour, IRageReceiver
         coreFacade.UnregisterRageReceiver(this);
     }
 
-    private void Update()
+    private void Start()
     {
+        idleAction();
     }
 
-    private void UpdateNpcState()
+    private void OnNpcStateFlagsChange()
     {
+        // called whenever flags changes
+        // creates a snapshot and sends to NpcStateMachine
+        NpcStateSnapshot snapshot = new( CurrentNpcState,
+            CurrentRageState,
+            PlayerInView,
+            IsTired, 
+            IsOverride,
+            PlayerInReach
+        );
+        LazyInitialize();
+        npcStateMachine.ResolveFlagChange(snapshot);
+    }
 
+    public void SwitchNpcState(NpcState npcState)
+    {
+        CurrentNpcState = npcState;
     }
 
     private void ResolveNpcStateChange(NpcState prevState, NpcState currentState)
@@ -154,13 +229,14 @@ public class NpcController : MonoBehaviour, IRageReceiver
 
     public void StartChase()
     {
+        OnNpcStateFlagsChange();
         // this is effectively "ResolveRageStateChange()"
     }
 
     public void StopChase()
     {
         // this is effectively "ResolveRageStateChangeOver()"
-        npcNavigate.StopNav();
+        OnNpcStateFlagsChange();
     }
 
     public void LoseTarget()
@@ -226,6 +302,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
         if (npcSearchBehavior == null) npcSearchBehavior = GetComponent<NpcSearchBehavior>();
         if (npcDiveBehavior == null) npcDiveBehavior = GetComponent<NpcDiveBehavior>();
         if (npcCooldownBehavior == null) npcCooldownBehavior = GetComponent<NpcCooldownBehavior>();
+        if (npcStateMachine == null) npcStateMachine = GetComponent<NpcStateMachine>();
     }
 
     private void OnDrawGizmosSelected()
@@ -238,21 +315,30 @@ public class NpcController : MonoBehaviour, IRageReceiver
         Gizmos.DrawRay(transform.position, Quaternion.Euler(0f, -70f, 0f) * transform.forward * 3.5f);
     }
 
-    public enum NpcState
+
+    [ContextMenu("Debug Test NpcStateMachine")]
+    private void DebugTestNpcStateMachine()
     {
-        Idle,
-        Chase,
-        Search,
-        Dive,
-        Cooldown,
-        Override
+        CurrentRageState = debugRageState;
+        PlayerInView = debugPlayerInView;
+        PlayerInReach = debugPlayerInReach;
+        IsTired = debugIsTired;
+        IsOverride = debugIsOverride;
+
+        NpcStateSnapshot snapshot = new(
+            CurrentNpcState,
+            CurrentRageState,
+            PlayerInView,
+            IsTired,
+            IsOverride,
+            PlayerInReach
+        );
+
+        Debug.Log($"[NPC] {NpcId}: Testing state machine");
+
+        npcStateMachine.ResolveFlagChange(snapshot);
     }
 
-    [ContextMenu("Debug Test RageState")]
-    private void DebugTestRageState()
-    {
-        SetRageState(debugRageState);
-    }
     [ContextMenu("Debug Test Delegates")]
     private void DebugTestDelegates()
     {
@@ -262,5 +348,49 @@ public class NpcController : MonoBehaviour, IRageReceiver
         searchAction();
         overrideAction();
         cooldownAction();
+    }
+
+    [ContextMenu("Debug Test Finish CurrentState")]
+    private void FinishCurrentState()
+    {
+        npcStateMachine.NotifyStateFinished();
+    }
+    [ContextMenu("Debug Test RequestTransition")]
+    private void RequestTransition()
+    {
+        npcStateMachine.RequestTransition(StateToSwitch);
+    }
+}
+public enum NpcState
+{
+    Idle,
+    Chase,
+    Search,
+    Dive,
+    Cooldown,
+    Override
+}
+public readonly struct NpcStateSnapshot
+{
+    public readonly NpcState currentState;
+    public readonly NpcRageState currentRageState;
+    public readonly bool currentPlayerInView;
+    public readonly bool currentIsTired;
+    public readonly bool currentIsOverride;
+    public readonly bool currentPlayerInReach;
+
+    public NpcStateSnapshot(NpcState currentState,
+        NpcRageState currentRageState,
+        bool currentPlayerInView,
+        bool currentIsTired, 
+        bool currentIsOverride,
+        bool currentPlayerInReach)
+    {
+        this.currentState = currentState;
+        this.currentPlayerInView = currentPlayerInView;
+        this.currentRageState = currentRageState;
+        this.currentIsTired = currentIsTired;
+        this.currentIsOverride = currentIsOverride;
+        this.currentPlayerInReach = currentPlayerInReach;
     }
 }

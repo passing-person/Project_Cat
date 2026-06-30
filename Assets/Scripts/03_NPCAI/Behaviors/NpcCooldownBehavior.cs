@@ -22,4 +22,9 @@ public class NpcCooldownBehavior : MonoBehaviour
     {
 
     }
+
+    private void CooldownFinished()
+    {
+        
+    }
 }

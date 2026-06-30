@@ -15,7 +15,6 @@ public class NpcViewRange : MonoBehaviour
         if (other.GetComponentInParent<PlayerController>() != null)
         {
             playerInViewRange = true;
-            Debug.Log("Yes");
         }
     }
     private void OnTriggerExit(Collider other)

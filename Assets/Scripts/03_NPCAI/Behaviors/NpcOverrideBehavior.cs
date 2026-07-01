@@ -23,4 +23,9 @@ public class NpcOverrideBehavior : MonoBehaviour
     {
 
     }
+
+    public void ExitState()
+    {
+
+    }
 }

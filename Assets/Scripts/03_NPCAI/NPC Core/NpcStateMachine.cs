@@ -145,6 +145,11 @@ public class NpcStateMachine : MonoBehaviour
         npcController.SwitchNpcState(next);
     }
 
+    public void ReEvaluateState()
+    {
+        npcController.OnSnapshotRequest();
+    }
+
     public void RequestTransition(NpcState requested)
     {
         TryTransition(requested);

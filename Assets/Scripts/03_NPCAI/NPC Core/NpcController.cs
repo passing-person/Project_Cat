@@ -9,10 +9,6 @@ public class NpcController : MonoBehaviour, IRageReceiver
     [SerializeField] NpcData npcData;
 
     [Header("Debug - State Machine")]
-    [SerializeField] private bool debugPlayerInView;
-    [SerializeField] private bool debugPlayerInReach;
-    [SerializeField] private bool debugIsTired;
-    [SerializeField] private bool debugIsOverride;
     [SerializeField] NpcRageState debugRageState;
     [SerializeField] NpcState StateToSwitch;
 
@@ -54,38 +50,9 @@ public class NpcController : MonoBehaviour, IRageReceiver
         private NpcState _npcState;
 
     // NpcState flags
-    // Do not access indented fields, access their property version
-    public NpcRageState CurrentRageState
-    {
-        get
-        {
-            return _rageState;
-        }
-        set
-        {
-            if (value == _rageState) return;
-            // No need to call ResolveRageStateChange(), RageManager calls it for you.
-            _rageState = value;
-        }
-    }
-        private NpcRageState _rageState;
-    public bool PlayerInView
-    {
-        get
-        {
-            LazyInitialize();
-            _playerInView = npcView.PlayerInView;
-            return _playerInView;
-        }
-        set
-        {
-            if (value == _playerInView) return;
-            _playerInView = value;
-            OnNpcStateFlagsChange();
-        }
-    }
-        private bool _playerInView;
-
+    [HideInInspector] public NpcRageState CurrentRageState;
+    [HideInInspector] public bool PlayerInView;
+    [HideInInspector] public bool PlayerInReach;
     public bool IsTired
     {
         get
@@ -118,22 +85,6 @@ public class NpcController : MonoBehaviour, IRageReceiver
     }
         private bool _isOverride;
 
-    public bool PlayerInReach
-    {
-        get
-        {
-            LazyInitialize();
-            return _playerInReach;
-        }
-        set
-        {
-            if (value == _playerInReach) return;
-            _playerInReach = value;
-            OnNpcStateFlagsChange();
-        }
-    }
-        private bool _playerInReach;
-
     // behavior delegates
     private delegate void IdleBehavior();
     private delegate void ChaseBehavior();
@@ -147,24 +98,40 @@ public class NpcController : MonoBehaviour, IRageReceiver
     private DiveBehavior diveAction;
     private CooldownBehavior cooldownAction;
     private OverrideBehavior overrideAction;
+    private delegate void ExitIdleBehavior();
+    private delegate void ExitChaseBehavior();
+    private delegate void ExitSearchBehavior();
+    private delegate void ExitDiveBehavior();
+    private delegate void ExitOverrideBehavior();
+    private delegate void ExitCooldownBehavior();
+    private ExitIdleBehavior exitIdleAction;
+    private ExitChaseBehavior exitChaseAction;
+    private ExitSearchBehavior exitSearchAction;
+    private ExitDiveBehavior exitDiveAction;
+    private ExitCooldownBehavior exitCooldownAction;
+    private ExitOverrideBehavior exitOverrideAction;
 
 
     private void Awake()
     {
         LazyInitialize();
         AssignBehaviors();
+        AssignExitBehaviors();
     }
 
     private void OnEnable()
     {
         coreFacade = FindFirstObjectByType<CoreFacade>();
-
         coreFacade.RegisterRageReceiver(this);
+
+        SubscribeFlagChange();
     }
 
     private void OnDisable()
     {
         coreFacade.UnregisterRageReceiver(this);
+
+        UnsubscribeFlagChange();
     }
 
     private void Start()
@@ -172,18 +139,26 @@ public class NpcController : MonoBehaviour, IRageReceiver
         idleAction();
     }
 
+    private void Update()
+    {
+        RefreshNpcStateFlags();
+    }
+
     private void OnNpcStateFlagsChange()
     {
-        // called whenever flags changes
-        // creates a snapshot and sends to NpcStateMachine
-        NpcStateSnapshot snapshot = new( CurrentNpcState,
+        LazyInitialize();
+
+        RefreshNpcStateFlags();
+
+        NpcStateSnapshot snapshot = new(
+            CurrentNpcState,
             CurrentRageState,
             PlayerInView,
-            IsTired, 
+            IsTired,
             IsOverride,
             PlayerInReach
         );
-        LazyInitialize();
+
         npcStateMachine.ResolveFlagChange(snapshot);
     }
 
@@ -195,6 +170,30 @@ public class NpcController : MonoBehaviour, IRageReceiver
     private void ResolveNpcStateChange(NpcState prevState, NpcState currentState)
     {
         Debug.Log($"[NPC] {NpcId}: NpcState changes from {prevState} to {currentState}");
+        // exit behavior of previous state
+        switch (prevState)
+        {
+            case NpcState.Override:
+                exitOverrideAction();
+                break;
+            case NpcState.Idle:
+                exitIdleAction();
+                break;
+            case NpcState.Chase:
+                exitChaseAction();
+                break;
+            case NpcState.Dive:
+                exitDiveAction();
+                break;
+            case NpcState.Search:
+                exitSearchAction();
+                break;
+            case NpcState.Cooldown:
+                exitCooldownAction();
+                break;
+        }
+
+        // next state's behavior
         switch (currentState)
         {
             case NpcState.Override:
@@ -217,6 +216,10 @@ public class NpcController : MonoBehaviour, IRageReceiver
                 Debug.Log($"[NPC] {NpcId}: perform search behavior");
                 searchAction();
                 break;
+            case NpcState.Cooldown:
+                Debug.Log($"[NPC] {NpcId}: perform cooldown behavior");
+                npcCooldownBehavior.EnterFrom(prevState);
+                break;
         }
     }
 
@@ -224,7 +227,6 @@ public class NpcController : MonoBehaviour, IRageReceiver
     {
         CurrentRageState = state;
         Debug.Log($"[NPC] {NpcId}: RageState changes to {state}");
-        // TODO: Update NPC animation, expression, and behavior state.
     }
 
     public void StartChase()
@@ -270,6 +272,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
                 searchAction = npcSearchBehavior.Worker;
                 diveAction = npcDiveBehavior.Worker;
                 overrideAction = npcOverrideBehavior.Worker;
+                cooldownAction = npcCooldownBehavior.Worker;
                 break;
             case NpcType.Cleaner:
                 idleAction = npcIdleBehavior.Cleaner;
@@ -277,6 +280,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
                 searchAction = npcSearchBehavior.Cleaner;
                 diveAction = npcDiveBehavior.Cleaner;
                 overrideAction = npcOverrideBehavior.Cleaner;
+                cooldownAction = npcCooldownBehavior.Cleaner;
                 break;
             case NpcType.Security:
                 idleAction = npcIdleBehavior.Security;
@@ -284,11 +288,27 @@ public class NpcController : MonoBehaviour, IRageReceiver
                 searchAction = npcSearchBehavior.Security;
                 diveAction = npcDiveBehavior.Security;
                 overrideAction = npcOverrideBehavior.Security;
+                cooldownAction = npcCooldownBehavior.Security;
                 break;
             default:
                 Debug.LogWarning($"No behavior defined for {NpcType}, using Supervisor defaults.");
                 goto case NpcType.Supervisor;
         }
+    }
+
+    public void OnSnapshotRequest()
+    {
+        OnNpcStateFlagsChange();
+    }
+
+    public void AssignExitBehaviors()
+    {
+        exitIdleAction = npcIdleBehavior.ExitState;
+        exitChaseAction = npcChaseBehavior.ExitState;
+        exitSearchAction = npcSearchBehavior.ExitState;
+        exitDiveAction = npcDiveBehavior.ExitState;
+        exitOverrideAction = npcOverrideBehavior.ExitState;
+        exitCooldownAction = npcCooldownBehavior.ExitState;
     }
 
     private void LazyInitialize()
@@ -305,6 +325,24 @@ public class NpcController : MonoBehaviour, IRageReceiver
         if (npcStateMachine == null) npcStateMachine = GetComponent<NpcStateMachine>();
     }
 
+    private void SubscribeFlagChange()
+    {
+        npcView.PlayerInViewFlagChange += OnNpcStateFlagsChange;
+        npcView.PlayerInReachFlagChange += OnNpcStateFlagsChange;
+    }
+
+    private void UnsubscribeFlagChange()
+    {
+        npcView.PlayerInViewFlagChange -= OnNpcStateFlagsChange;
+        npcView.PlayerInReachFlagChange -= OnNpcStateFlagsChange;
+    }
+
+    private void RefreshNpcStateFlags()
+    {
+        PlayerInView = npcView.PlayerInView;
+        PlayerInReach = npcView.PlayerInReach;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(255, 0, 0);
@@ -316,45 +354,12 @@ public class NpcController : MonoBehaviour, IRageReceiver
     }
 
 
-    [ContextMenu("Debug Test NpcStateMachine")]
-    private void DebugTestNpcStateMachine()
-    {
-        CurrentRageState = debugRageState;
-        PlayerInView = debugPlayerInView;
-        PlayerInReach = debugPlayerInReach;
-        IsTired = debugIsTired;
-        IsOverride = debugIsOverride;
-
-        NpcStateSnapshot snapshot = new(
-            CurrentNpcState,
-            CurrentRageState,
-            PlayerInView,
-            IsTired,
-            IsOverride,
-            PlayerInReach
-        );
-
-        Debug.Log($"[NPC] {NpcId}: Testing state machine");
-
-        npcStateMachine.ResolveFlagChange(snapshot);
-    }
-
-    [ContextMenu("Debug Test Delegates")]
-    private void DebugTestDelegates()
-    {
-        idleAction();
-        chaseAction();
-        diveAction();
-        searchAction();
-        overrideAction();
-        cooldownAction();
-    }
-
     [ContextMenu("Debug Test Finish CurrentState")]
     private void FinishCurrentState()
     {
         npcStateMachine.NotifyStateFinished();
     }
+
     [ContextMenu("Debug Test RequestTransition")]
     private void RequestTransition()
     {
@@ -370,6 +375,7 @@ public enum NpcState
     Cooldown,
     Override
 }
+
 public readonly struct NpcStateSnapshot
 {
     public readonly NpcState currentState;

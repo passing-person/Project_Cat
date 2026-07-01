@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -28,6 +29,9 @@ public class NpcNavigate : MonoBehaviour
         private NpcController _controller; // Do not access indented fields, Jill!
     private NavMeshAgent agent;
 
+    // API
+    public bool IsNavigating => navCoro != null;
+
     // NPC Params
     private NpcData Data => controller.NpcData;
     private float CurrentSpeed
@@ -49,8 +53,9 @@ public class NpcNavigate : MonoBehaviour
     private float ChaseSpeed => Data.chaseSpeed;
     private float MoveSpeed => Data.moveSpeed;
 
-    // NPC Movement delegate
-    private delegate void NpcMovement(NpcRageState rageState);
+    // actions
+    public event Action OnNavigationOver;
+    public event Action DestinationReached;
 
     // cache
     private Coroutine navCoro;
@@ -78,6 +83,14 @@ public class NpcNavigate : MonoBehaviour
         ToggleNav(target, true);
     }
 
+    public void StartNavToPoint(Vector3 target, bool isChasing)
+    {
+        StopNav();
+        Debug.Log($"[NPC] {Id}: Chase has started.");
+        ToggleSpeed(isChasing);
+        ToggleNav(target, true);
+    }
+
     public void StopNav()
     {
         if (navCoro != null)
@@ -91,6 +104,7 @@ public class NpcNavigate : MonoBehaviour
             agent.ResetPath();
         }
         agent.enabled = false;
+        OnNavigationOver?.Invoke();
     }
 
     /// <summary>
@@ -132,27 +146,6 @@ public class NpcNavigate : MonoBehaviour
         StopNav(); // Also stop any ongoing navigation
     }
 
-    private IEnumerator PatrolRoutine(NpcState state, bool isChasing)
-    {
-        while (enabled)
-        {
-            if (!pathDict.TryGetValue(state, out PatrolPath path) || path == null)
-            {
-                Debug.Log($"[NPC] {Id}: No patrol path for {state}.");
-                yield break;
-            }
-
-            ToggleSpeed(isChasing);
-
-            yield return FollowPath(path);
-
-            Debug.Log($"[NPC] {Id}: Patrol loop cycle complete.");
-
-            yield return null;
-        }
-    }
-
-
     private void ToggleNav(GameObject target, bool state)
     {
         if (state)
@@ -164,6 +157,22 @@ public class NpcNavigate : MonoBehaviour
                 return;
             }
             navCoro = StartCoroutine(FollowTarget(target));
+        }
+        else // state == false
+        {
+            if (navCoro == null) return;
+            StopCoroutine(navCoro);
+            navCoro = null;
+            agent.enabled = false;
+        }
+    }
+
+    private void ToggleNav(Vector3 target, bool state)
+    {
+        if (state)
+        {
+            agent.enabled = true;
+            navCoro = StartCoroutine(NavToPoint(target));
         }
         else // state == false
         {
@@ -206,6 +215,21 @@ public class NpcNavigate : MonoBehaviour
         }
     }
 
+    private IEnumerator NavToPoint(Vector3 target)
+    {
+        agent.SetDestination(target);
+
+        while (agent.pathPending ||
+               agent.remainingDistance > agent.stoppingDistance)
+        {
+            yield return null;
+        }
+
+        agent.ResetPath();
+        navCoro = null;
+        DestinationReached?.Invoke();
+    }
+
     private IEnumerator FollowPath(PatrolPath path)
     {
         agent.enabled = true;
@@ -239,6 +263,28 @@ public class NpcNavigate : MonoBehaviour
         }
 
         agent.ResetPath();
+        navCoro = null;
+        OnNavigationOver?.Invoke();
+    }
+
+    private IEnumerator PatrolRoutine(NpcState state, bool isChasing)
+    {
+        while (enabled)
+        {
+            if (!pathDict.TryGetValue(state, out PatrolPath path) || path == null)
+            {
+                Debug.Log($"[NPC] {Id}: No patrol path for {state}.");
+                yield break;
+            }
+
+            ToggleSpeed(isChasing);
+
+            yield return FollowPath(path);
+
+            Debug.Log($"[NPC] {Id}: Patrol loop cycle complete.");
+
+            yield return null;
+        }
     }
 
     [System.Serializable]

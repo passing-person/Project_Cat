@@ -18,16 +18,21 @@ public class NpcIdleBehavior : MonoBehaviour
 
     public void Worker()
     {
-
+        nav.Patrol(NpcState.Idle, false);
     }
 
     public void Cleaner()
     {
-
+        nav.Patrol(NpcState.Idle, false);
     }
 
     public void Security()
     {
+        nav.Patrol(NpcState.Idle, false);
+    }
 
+    public void ExitState()
+    {
+        nav.StopPatrol();
     }
 }

@@ -104,7 +104,7 @@ Material:
     - _Glossiness: 0.5656854
     - _GlossyReflections: 1
     - _LightAcceptance: 50
-    - _LightDarkShadeRate: 50
+    - _LightDarkShadeRate: 1000
     - _Metallic: 0
     - _Mode: 0
     - _NormalMapStrength: 1
@@ -129,7 +129,7 @@ Material:
     - _BrightColor: {r: 0.33333334, g: 0.34901962, b: 0.56078434, a: 1}
     - _Color: {r: 0.5168809, g: 0.5168809, b: 0.5168809, a: 1}
     - _DarkShadeColor: {r: 0.13725491, g: 0.14901961, b: 0.2784314, a: 1}
-    - _DarkZoneColor: {r: 0.13725491, g: 0.14901961, b: 0.2784314, a: 1}
+    - _DarkZoneColor: {r: 0.2610993, g: 0.24662782, b: 0.54088044, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MidColor: {r: 0.21176472, g: 0.1764706, b: 0.35686275, a: 1}
     - _SheenColor: {r: 0, g: 0.01691605, b: 0.24528301, a: 1}

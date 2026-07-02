@@ -104,7 +104,7 @@ Material:
     - _Glossiness: 0.5656854
     - _GlossyReflections: 1
     - _LightAcceptance: 50
-    - _LightDarkShadeRate: 50
+    - _LightDarkShadeRate: 1000
     - _Metallic: 0
     - _Mode: 0
     - _NormalMapStrength: 1
@@ -129,12 +129,12 @@ Material:
     - _BrightColor: {r: 0.9367824, g: 1, b: 0.7019608, a: 1}
     - _Color: {r: 0.69379294, g: 0.71946275, b: 0.80363095, a: 1}
     - _DarkShadeColor: {r: 0.44654083, g: 0.39285597, b: 0.31314024, a: 1}
-    - _DarkZoneColor: {r: 0.408805, g: 0.37791598, b: 0.2841066, a: 1}
+    - _DarkZoneColor: {r: 0.19977441, g: 0.21339162, b: 0.23270428, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MidColor: {r: 0.72156864, g: 0.71956277, b: 0.52156866, a: 1}
-    - _SheenColor: {r: 0.34117648, g: 0.27704656, b: 0.22352941, a: 1}
+    - _SheenColor: {r: 0.3333333, g: 0.3039832, b: 0.28197062, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _SpecularColor: {r: 0.6039216, g: 0.51568455, b: 0.2352941, a: 1}
+    - _SpecularColor: {r: 0.5471698, g: 0.5012794, b: 0.35961786, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &3593974603423765725
 MonoBehaviour:

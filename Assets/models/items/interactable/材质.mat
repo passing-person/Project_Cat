@@ -142,10 +142,10 @@ Material:
     - _BrightColor: {r: 0.51886785, g: 0.6904021, b: 1, a: 1}
     - _Color: {r: 0.7585878, g: 0.8952268, b: 0.9063317, a: 1}
     - _DarkShadeColor: {r: 0.3803922, g: 0.44705886, b: 0.77647066, a: 1}
-    - _DarkZoneColor: {r: 0.23495902, g: 0.2716304, b: 0.4528302, a: 1}
+    - _DarkZoneColor: {r: 0.10025309, g: 0.15202633, b: 0.23270428, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MidColor: {r: 0.43137258, g: 0.5882353, b: 0.87843144, a: 1}
-    - _SheenColor: {r: 0, g: 0.48427665, b: 0.47031447, a: 1}
+    - _SheenColor: {r: 0.0031446018, g: 0.3333333, b: 0.32527995, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularColor: {r: 0.78301877, g: 0.9744142, b: 1, a: 1}
   m_BuildTextureStacks: []

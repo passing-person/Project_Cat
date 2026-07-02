@@ -113,7 +113,7 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _ScatterOverSurface: 0.5
-    - _SheenPower: 1.45
+    - _SheenPower: 1.94
     - _Smoothness: 0.5656854
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1

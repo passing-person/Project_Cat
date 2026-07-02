@@ -129,9 +129,6 @@ public class NpcStateMachine : MonoBehaviour
         npcController.SwitchNpcState(desiredState);
     }
 
-    /// <summary>
-    /// Called by behaviors when a non-interruptible state finishes.
-    /// </summary>
     public void NotifyStateFinished()
     {
         if (!deferredState.HasValue)
@@ -141,6 +138,33 @@ public class NpcStateMachine : MonoBehaviour
         deferredState = null;
 
         Debug.Log($"[NPC] {npcController.NpcId}: resume deferred -> {next}");
+
+        npcController.SwitchNpcState(next);
+    }
+
+    /// <summary>
+    /// Called by behaviors when a non-interruptible state finishes.
+    /// If a deferred state exists, resume it.
+    /// Otherwise, go to fallbackState.
+    /// This bypasses CanInterrupt because the current non-interruptible state has finished.
+    /// </summary>
+    public void NotifyStateFinished(NpcState fallbackState)
+    {
+        NpcState next;
+
+        if (deferredState.HasValue)
+        {
+            next = deferredState.Value;
+            deferredState = null;
+
+            Debug.Log($"[NPC] {npcController.NpcId}: resume deferred -> {next}");
+        }
+        else
+        {
+            next = fallbackState;
+
+            Debug.Log($"[NPC] {npcController.NpcId}: no deferred state, fallback -> {next}");
+        }
 
         npcController.SwitchNpcState(next);
     }

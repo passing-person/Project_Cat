@@ -6,7 +6,7 @@ using UnityEngine;
 public class NpcViewParams : ScriptableObject
 {
     public float sectorRadius = 3.5f;
-    public float sectorHeight = 1.5f;
+    //public float sectorHeight = 1.5f;
     [Tooltip("Measured in deg.")]
     public float sectorDeg = 140f;
 }

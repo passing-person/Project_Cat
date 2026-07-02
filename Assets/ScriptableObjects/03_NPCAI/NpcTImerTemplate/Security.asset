@@ -21,4 +21,4 @@ MonoBehaviour:
     isOneShot: 0
   - timerType: 4
     duration: 1.5
-    isOneShot: 0
+    isOneShot: 1

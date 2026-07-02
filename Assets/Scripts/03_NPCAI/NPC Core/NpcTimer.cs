@@ -170,8 +170,11 @@ public class NpcTimer : MonoBehaviour
 
             callback?.Invoke();
 
+            if (!isRunning)
+                return;
+
             if (isOneShot) Reset();
-            else Start();
+            else Start(callback);
         }
 
         public void Reset()

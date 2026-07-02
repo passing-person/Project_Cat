@@ -1,63 +1,44 @@
 using UnityEngine;
-using UnityEngine.UIElements;
 using System;
 
 public class NpcView : MonoBehaviour
 {
     [Header("Params")]
-    [SerializeField] NpcViewParams viewParams;
+    [SerializeField] private NpcViewParams viewParams;
 
-    // components
+    [Header("Body parts")]
+    [SerializeField] private GameObject head;
+
+    [Header("Reach")]
+    [SerializeField, Min(0f)] private float diveTriggerRadius = 1.75f;
+    [SerializeField, Min(0f)] private float catchRadius = 0.75f;
+
+    [Tooltip("If true, dive range only counts while the player is inside the view range trigger.")]
+    [SerializeField] private bool requireViewRangeForDive = true;
+
+    [Tooltip("If true, catch range only counts while the player is inside the view range trigger.")]
+    [SerializeField] private bool requireViewRangeForCatch = false;
+
+    private Transform headTransform => head != null ? head.transform : transform;
+
     private NpcViewRange viewRange;
-
-    // actions
-    public event Action PlayerInViewFlagChange;
-    public event Action PlayerInReachFlagChange;
-
-    // out API
-    public bool PlayerInView
-    {
-        get
-        {
-            UpdatePlayerVisibility();
-            return _playerInView;
-        }
-        private set
-        {
-            if (_playerInView == value)
-                return;
-
-            _playerInView = value;
-            OnPlayerInViewChange();
-        }
-    }
-        private bool _playerInView;
-    public bool PlayerInReach
-    {
-        get
-        {
-            UpdatePlayerReach();
-            return _playerInReach;
-        }
-        private set
-        {
-            if (_playerInReach == value)
-                return;
-
-            _playerInReach = value;
-            OnPlayerInReachChange();
-        }
-    }
-        private bool _playerInReach;
-    public Vector3 PlayerPosition => player.transform.position;
-
-    // player reference
     private GameObject player;
 
-    // unpacked view params
+    public event Action PlayerInViewFlagChange;
+    public event Action PlayerInReachFlagChange;
+    public event Action PlayerInCatchRangeFlagChange;
+
+    public bool PlayerInView => _playerInView;
+    public bool PlayerInReach => _playerInDiveRange;
+    public bool PlayerInCatchRange => _playerInCatchRange;
+
+    public Vector3 PlayerPosition => player != null ? player.transform.position : transform.position;
+
+    private bool _playerInView;
+    private bool _playerInDiveRange;
+    private bool _playerInCatchRange;
+
     private float SectorRadius => viewParams.sectorRadius;
-    private float SectorHeight => viewParams.sectorHeight;
-    [Tooltip("Measured in deg.")]
     private float SectorDeg => viewParams.sectorDeg;
 
     private void Awake()
@@ -67,71 +48,123 @@ public class NpcView : MonoBehaviour
 
     private void Start()
     {
-        if (player == null) player = FindFirstObjectByType<PlayerController>().gameObject;
+        LazyInstantiate();
     }
 
-    /// <summary>
-    /// True once the player has been spotted.
-    /// The player is only forgotten after leaving the ViewRange.
-    /// </summary>
+    private void Update()
+    {
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        LazyInstantiate();
+
+        if (player == null || viewRange == null)
+        {
+            SetPlayerInView(false);
+            SetPlayerInDiveRange(false);
+            SetPlayerInCatchRange(false);
+            return;
+        }
+
+        UpdatePlayerVisibility();
+        UpdatePlayerDiveRange();
+        UpdatePlayerCatchRange();
+    }
+
     private void UpdatePlayerVisibility()
     {
-        // Already tracking.
         if (_playerInView)
         {
             if (!viewRange.playerInViewRange)
-                PlayerInView = false;
+                SetPlayerInView(false);
 
             return;
         }
 
-        // Not tracking.
         if (!viewRange.playerInViewRange)
             return;
 
         Vector3 toPlayer = player.transform.position - transform.position;
 
-        bool withinHeight = Mathf.Abs(toPlayer.y) < SectorHeight * 0.5f;
-        bool withinDeg = Vector3.Angle(transform.forward, toPlayer) < SectorDeg * 0.5f;
-        bool withinRadius = toPlayer.sqrMagnitude < SectorRadius * SectorRadius;
+        bool withinDeg = Vector3.Angle(headTransform.forward, toPlayer) < SectorDeg * 0.5f;
+        bool withinRadius = toPlayer.sqrMagnitude <= SectorRadius * SectorRadius;
 
-        if (withinHeight && withinDeg && withinRadius)
-            PlayerInView = true;
+        if (withinDeg && withinRadius)
+            SetPlayerInView(true);
     }
 
-    /// <summary>
-    /// True while the player is within 1 unit of the NPC.
-    /// Detection is only active while the player is inside the ViewRange trigger.
-    /// </summary>
-    private void UpdatePlayerReach()
+    private void UpdatePlayerDiveRange()
     {
-        // ViewRange gates all detection.
-        if (!viewRange.playerInViewRange)
+        if (requireViewRangeForDive && !viewRange.playerInViewRange)
         {
-            PlayerInReach = false;
+            SetPlayerInDiveRange(false);
             return;
         }
 
-        Vector3 toPlayer = player.transform.position - transform.position;
+        SetPlayerInDiveRange(IsPlayerWithinHorizontalRadius(diveTriggerRadius));
+    }
 
-        // Ignore height.
+    private void UpdatePlayerCatchRange()
+    {
+        if (requireViewRangeForCatch && !viewRange.playerInViewRange)
+        {
+            SetPlayerInCatchRange(false);
+            return;
+        }
+
+        SetPlayerInCatchRange(IsPlayerWithinHorizontalRadius(catchRadius));
+    }
+
+    private bool IsPlayerWithinHorizontalRadius(float radius)
+    {
+        if (player == null)
+            return false;
+
+        Vector3 toPlayer = player.transform.position - transform.position;
         toPlayer.y = 0f;
 
-        PlayerInReach = toPlayer.sqrMagnitude <= 1f;
+        return toPlayer.sqrMagnitude <= radius * radius;
     }
 
-    private void OnPlayerInViewChange()
+    private void SetPlayerInView(bool value)
     {
+        if (_playerInView == value)
+            return;
+
+        _playerInView = value;
         PlayerInViewFlagChange?.Invoke();
     }
 
-    private void OnPlayerInReachChange()
+    private void SetPlayerInDiveRange(bool value)
     {
+        if (_playerInDiveRange == value)
+            return;
+
+        _playerInDiveRange = value;
         PlayerInReachFlagChange?.Invoke();
+    }
+
+    private void SetPlayerInCatchRange(bool value)
+    {
+        if (_playerInCatchRange == value)
+            return;
+
+        _playerInCatchRange = value;
+        PlayerInCatchRangeFlagChange?.Invoke();
     }
 
     private void LazyInstantiate()
     {
-        if (viewRange == null) viewRange = gameObject.GetComponentInChildren<NpcViewRange>();
+        if (viewRange == null)
+            viewRange = GetComponentInChildren<NpcViewRange>();
+
+        if (player == null)
+        {
+            PlayerController playerController = FindFirstObjectByType<PlayerController>();
+            if (playerController != null)
+                player = playerController.gameObject;
+        }
     }
 }

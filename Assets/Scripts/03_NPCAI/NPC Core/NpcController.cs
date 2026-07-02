@@ -8,6 +8,10 @@ public class NpcController : MonoBehaviour, IRageReceiver
     [Header("Params")]
     [SerializeField] NpcData npcData;
 
+    [Header("Body Parts")]
+    [SerializeField] GameObject head;
+    private Transform headTransform => head.transform;
+
     [Header("Debug - State Machine")]
     [SerializeField] NpcRageState debugRageState;
     [SerializeField] NpcState StateToSwitch;
@@ -43,8 +47,11 @@ public class NpcController : MonoBehaviour, IRageReceiver
         set
         {
             if (value == _npcState) return;
-            ResolveNpcStateChange(_npcState, value);
+
+            NpcState prevState = _npcState;
             _npcState = value;
+
+            ResolveNpcStateChange(prevState, value);
         }
     }
         private NpcState _npcState;
@@ -244,8 +251,6 @@ public class NpcController : MonoBehaviour, IRageReceiver
     public void LoseTarget()
     {
         StopChase();
-
-        // TODO: Start wandering/searching behavior.
     }
 
     public void OnPlayerCaught(PlayerController player)
@@ -346,11 +351,11 @@ public class NpcController : MonoBehaviour, IRageReceiver
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(255, 0, 0);
-        Gizmos.DrawRay(transform.position, transform.forward * 3.5f);
+        Gizmos.DrawRay(headTransform.position, headTransform.forward * 3.5f);
         Gizmos.color = new Color(255, 0, 0);
-        Gizmos.DrawRay(transform.position, Quaternion.Euler(0f, 70f, 0f) * transform.forward * 3.5f);
+        Gizmos.DrawRay(headTransform.position, Quaternion.Euler(0f, 70f, 0f) * headTransform.forward * 3.5f);
         Gizmos.color = new Color(255, 0, 0);
-        Gizmos.DrawRay(transform.position, Quaternion.Euler(0f, -70f, 0f) * transform.forward * 3.5f);
+        Gizmos.DrawRay(headTransform.position, Quaternion.Euler(0f, -70f, 0f) * headTransform.forward * 3.5f);
     }
 
 

@@ -7,6 +7,7 @@ public class NpcChaseBehavior : MonoBehaviour
     private NpcController controller;
     private NpcTimer timer;
     private NpcView view;
+    private NpcAnimationMachine anim;
 
     private bool PlayerInView => view.PlayerInView;
 
@@ -72,6 +73,8 @@ public class NpcChaseBehavior : MonoBehaviour
     {
         StartChaseTimerIfNeeded();
 
+        anim.PlayLocomotion();
+
         if (chaseRoutine != null)
             return;
 
@@ -118,6 +121,7 @@ public class NpcChaseBehavior : MonoBehaviour
         chaseMode = ChaseMode.ToLastKnownPosition;
 
         nav.StartNavToPoint(LastKnownPosition, true);
+        anim.PlayLocomotion();
 
         Debug.Log($"[NPC] {controller.NpcId}: chasing to last known player position.");
     }
@@ -132,6 +136,7 @@ public class NpcChaseBehavior : MonoBehaviour
 
         // This cancels NavToPoint and starts FollowTarget(player).
         nav.ToggleChasePlayer(true);
+        anim.PlayLocomotion();
 
         Debug.Log($"[NPC] {controller.NpcId}: player acquired, switching chase target to player.");
     }
@@ -224,5 +229,8 @@ public class NpcChaseBehavior : MonoBehaviour
 
         if (player == null)
             player = FindFirstObjectByType<PlayerController>().gameObject;
+    
+        if (anim == null)
+            anim = GetComponent<NpcAnimationMachine>();
     }
 }

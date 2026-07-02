@@ -15,7 +15,7 @@ public class NpcNavigate : MonoBehaviour
 
     [Header("Debug")]
     [SerializeField] bool debugIsChasing;
-    [SerializeField, Range(1f, 100f)] float debugSpeedMult;
+    [SerializeField, Range(1f, 100f)] float debugSpeedMult = 1.9f;
 
     // NPC components
     private NpcController controller
@@ -42,10 +42,14 @@ public class NpcNavigate : MonoBehaviour
         }
         set
         {
-            if (value == _currentSpeed) return;
             LazyInstantiate();
-            agent.speed = value * debugSpeedMult;
+
             _currentSpeed = value;
+            agent.speed = value * debugSpeedMult;
+
+            Debug.Log(
+                $"[NPC] {Id}: Set speed. Base={value}, Mult={debugSpeedMult}, AgentSpeed={agent.speed}"
+            );
         }
     }
         private float _currentSpeed;

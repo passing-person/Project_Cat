@@ -6,6 +6,7 @@ public class NpcCooldownBehavior : MonoBehaviour
     private NpcTimer timer;
     private NpcNavigate nav;
     private NpcStateMachine stateMachine;
+    private NpcAnimationMachine anim;
 
     private NpcTimerType? activeCooldownTimer;
 
@@ -35,7 +36,17 @@ public class NpcCooldownBehavior : MonoBehaviour
     /// </summary>
     public void EnterFrom(NpcState sourceState)
     {
-        StartCooldown(sourceState);
+        LazyInstantiate();
+
+        nav.StopPatrol();
+        nav.StopNav();
+
+        anim.PlayCooldownFrom(sourceState);
+
+        activeCooldownTimer = ResolveCooldownTimerType(sourceState);
+        timer.StartTimer(activeCooldownTimer.Value, ResolveCooldownFinished);
+
+        Debug.Log($"[NPC] {controller.NpcId}: Cooldown started from {sourceState}, using {activeCooldownTimer.Value}.");
     }
 
     public void ExitState()
@@ -52,18 +63,16 @@ public class NpcCooldownBehavior : MonoBehaviour
     {
         LazyInstantiate();
 
-        // Cooldown means NPC is panting / recovering, so stop movement.
-        nav.ToggleChasePlayer(false);
+        nav.StopPatrol();
+        nav.StopNav();
 
-        // Prevent stale callbacks from a previous cooldown type.
-        StopCooldownTimer(NpcTimerType.ChaseCooldown);
-        StopCooldownTimer(NpcTimerType.DiveCooldown);
+        anim.PlayCooldownFrom(sourceState);
 
-        activeCooldownTimer = ResolveCooldownTimerType(sourceState);
 
-        timer.StartTimer(activeCooldownTimer.Value, ResolveCooldownFinished);
+        NpcTimerType cooldownType = ResolveCooldownTimerType(sourceState);
+        activeCooldownTimer = cooldownType;
 
-        Debug.Log($"[NPC] {controller.NpcId}: Cooldown started from {sourceState}, using {activeCooldownTimer.Value}.");
+        timer.StartTimer(cooldownType, ResolveCooldownFinished);
     }
 
     private NpcTimerType ResolveCooldownTimerType(NpcState sourceState)
@@ -87,8 +96,6 @@ public class NpcCooldownBehavior : MonoBehaviour
 
     private void ResolveCooldownFinished()
     {
-        LazyInstantiate();
-
         if (controller.CurrentNpcState != NpcState.Cooldown)
             return;
 
@@ -96,10 +103,9 @@ public class NpcCooldownBehavior : MonoBehaviour
 
         activeCooldownTimer = null;
 
-        // Let the state machine decide the next valid state:
-        // Chase / Dive / Search / Override depending on current flags.
         stateMachine.ReEvaluateState();
-        stateMachine.NotifyStateFinished();
+
+        stateMachine.NotifyStateFinished(NpcState.Search);
     }
 
     private void StopCooldownTimer(NpcTimerType timerType)
@@ -135,5 +141,8 @@ public class NpcCooldownBehavior : MonoBehaviour
 
         if (stateMachine == null)
             stateMachine = GetComponent<NpcStateMachine>();
+
+        if (anim == null)
+            anim = GetComponent<NpcAnimationMachine>();
     }
 }

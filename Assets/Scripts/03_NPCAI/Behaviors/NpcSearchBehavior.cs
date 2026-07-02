@@ -7,7 +7,7 @@ public class NpcSearchBehavior : MonoBehaviour
     private NpcController controller;
     private NpcNavigate nav;
 
-    // Optional. Use only if this component exists.
+    private NpcAnimationMachine anim;
     private Animator animator;
 
     // cache
@@ -62,15 +62,10 @@ public class NpcSearchBehavior : MonoBehaviour
     {
         searchStarted = false;
 
-        if (timer != null)
-        {
-            timer.StopTimer(NpcTimerType.Search);
-            timer.ResetTimer(NpcTimerType.Search);
-        }
+        timer.StopTimer(NpcTimerType.Search);
+        timer.ResetTimer(NpcTimerType.Search);
 
-        // Optional animation hook.
-        if (animator != null)
-            animator.SetBool("Searching", false);
+        anim.PlayLocomotion();
     }
 
     private void StartSearch()
@@ -82,21 +77,14 @@ public class NpcSearchBehavior : MonoBehaviour
 
         searchStarted = true;
 
-        // Search is local scanning behavior, not movement behavior.
         nav.StopPatrol();
         nav.StopNav();
 
-        // Optional animation hook.
-        // Your search animation can rotate the NPC to scan the area.
-        // if (animator != null)
-        //    animator.SetBool("Searching", true);
+        anim.PlaySearch();
 
-        Debug.Log($"[NPC] {controller.NpcId}: Search started.");
-
-        // If player is already visible at search start, leave Search immediately.
         if (PlayerInView)
         {
-            ResolvePlayerFound();
+            controller.CurrentNpcState = NpcState.Chase;
             return;
         }
 
@@ -151,22 +139,18 @@ public class NpcSearchBehavior : MonoBehaviour
 
     private void ResolveSearchTimeOver()
     {
-        if (!IsValidSearchState())
+        if (controller.CurrentNpcState != NpcState.Search)
             return;
-
-        Debug.Log($"[NPC] {controller.NpcId}: Search finished.");
 
         searchStarted = false;
 
-        if (animator != null)
-            animator.SetBool("Searching", false);
-
         if (PlayerInView)
         {
-            ResolvePlayerFound();
+            controller.CurrentNpcState = NpcState.Chase;
             return;
         }
 
+        anim.PlaySearchToIdle();
         controller.CurrentNpcState = NpcState.Idle;
     }
 
@@ -193,5 +177,8 @@ public class NpcSearchBehavior : MonoBehaviour
 
         if (animator == null)
             animator = GetComponent<Animator>();
+
+        if (anim == null)
+            anim = GetComponent<NpcAnimationMachine>();
     }
 }

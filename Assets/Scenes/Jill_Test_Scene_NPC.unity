@@ -3737,8 +3737,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1159759782}
-  - component: {fileID: 1159759783}
-  - component: {fileID: 1159759785}
   - component: {fileID: 1159759784}
   m_Layer: 0
   m_Name: Walls
@@ -3796,30 +3794,6 @@ Transform:
   - {fileID: 128392319}
   m_Father: {fileID: 560467845}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1159759783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1159759781}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11632ff7e1ed2c34a92b1788e2556416, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  collidersToDisable: []
-  navMeshObstaclesToDisable: []
-  disableCollidersOnDestroy: 1
-  disableNavMeshObstaclesOnDestroy: 1
-  enableGravityOnDestroy: 1
-  disableRigidbodyCollisions: 1
-  downwardImpulse: 0
-  destroyAfterDrop: 0
-  destroyDelay: 3
-  logDestruction: 1
-  destroyed: 0
 --- !u!208 &1159759784
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -3836,33 +3810,6 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1159759785
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1159759781}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &1220723086
 GameObject:
   m_ObjectHideFlags: 0
@@ -5022,7 +4969,7 @@ CapsuleCollider:
   m_Radius: 0.35
   m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1869411630
 GameObject:
   m_ObjectHideFlags: 0

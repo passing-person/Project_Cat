@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 48a2ade38c2b3a5449251a91e7c7a789
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - rgbToOklabLut: {instanceID: 0}
+  - oklabToRgbLut: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

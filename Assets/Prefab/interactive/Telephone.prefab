@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2093752425358901843}
   - component: {fileID: 9042464533313893150}
   m_Layer: 0
-  m_Name: phone
+  m_Name: Telephone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -105,14 +105,14 @@ Material:
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
-    - _Cull: 0
+    - _Cull: 2
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _Fallof: 0.47
+    - _Fallof: -0.26
     - _GlossMapScale: 1
     - _Glossiness: 0.5656854
     - _GlossyReflections: 1
@@ -139,13 +139,13 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.81777793, g: 0.9063317, b: 0.6886536, a: 1}
-    - _BrightColor: {r: 0.8392157, g: 0.7106582, b: 0.5176471, a: 1}
+    - _BrightColor: {r: 0.7987421, g: 0.61494625, b: 0.4144416, a: 1}
     - _Color: {r: 0.81777793, g: 0.9063317, b: 0.6886536, a: 1}
-    - _DarkShadeColor: {r: 0.5764706, g: 0.27651483, b: 0.1490196, a: 1}
-    - _DarkZoneColor: {r: 0.24705882, g: 0, b: 0.025650788, a: 1}
+    - _DarkShadeColor: {r: 0.2578616, g: 0.0997389, b: 0.13457955, a: 1}
+    - _DarkZoneColor: {r: 0.21960784, g: 0.093246244, b: 0.06666668, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MidColor: {r: 0.69803923, g: 0.5186661, b: 0.3372549, a: 1}
-    - _SheenColor: {r: 0.2627451, g: 0.07880033, b: 0, a: 1}
+    - _MidColor: {r: 0.46666667, g: 0.2509804, b: 0.2517056, a: 1}
+    - _SheenColor: {r: 0.25256392, g: 0.004845503, b: 0.30817598, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _SpecularColor: {r: 0.8392157, g: 0.6385569, b: 0.5176471, a: 1}
+    - _SpecularColor: {r: 0.66666657, g: 0.42557642, b: 0.5759908, a: 1}
   m_BuildTextureStacks: []

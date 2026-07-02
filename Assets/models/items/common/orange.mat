@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: "\u6750\u8D28.1"
+  m_Name: orange
   m_Shader: {fileID: 4800000, guid: be1fca6efdd6fbf438989440ba692382, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -99,7 +99,7 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _Fallof: 0
+    - _Fallof: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5656854
     - _GlossyReflections: 1
@@ -113,7 +113,7 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _ScatterOverSurface: 0.5
-    - _SheenPower: 2
+    - _SheenPower: 0.68
     - _Smoothness: 0.5656854
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -121,22 +121,22 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _UVSec: 0
-    - _Width: 0.2
+    - _Width: 0.3829787
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
-    - _BrightColor: {r: 0.9607844, g: 0.8235295, b: 0.70980394, a: 1}
-    - _Color: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
-    - _DarkShadeColor: {r: 0.29124632, g: 0.42128065, b: 0.46540874, a: 1}
-    - _DarkZoneColor: {r: 0.3647059, g: 0.54509807, b: 0.58431375, a: 1}
+    - _BaseColor: {r: 0.69379294, g: 0.71946275, b: 0.80363095, a: 1}
+    - _BrightColor: {r: 0.6862745, g: 0.5508423, b: 0.36862746, a: 1}
+    - _Color: {r: 0.69379294, g: 0.71946275, b: 0.80363095, a: 1}
+    - _DarkShadeColor: {r: 0.2627451, g: 0.16394144, b: 0.1254902, a: 1}
+    - _DarkZoneColor: {r: 0.19215687, g: 0.12789412, b: 0.105882354, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MidColor: {r: 0.49411768, g: 0.69411767, b: 0.7372549, a: 1}
-    - _SheenColor: {r: 0, g: 0.20125782, b: 0.191045, a: 1}
+    - _MidColor: {r: 0.50980395, g: 0.35595745, b: 0.24705881, a: 1}
+    - _SheenColor: {r: 0.34117648, g: 0.28572673, b: 0.22352941, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecularColor: {r: 0.6039216, g: 0.3601964, b: 0.2352941, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &3894506144172586415
+--- !u!114 &3593974603423765725
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

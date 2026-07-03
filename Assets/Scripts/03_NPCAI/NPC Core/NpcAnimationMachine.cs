@@ -398,9 +398,7 @@ public class NpcAnimationMachine : MonoBehaviour
 
     private void UpdateLocomotionSpeed()
     {
-        if (animator == null ||
-            animator.runtimeAnimatorController == null ||
-            string.IsNullOrWhiteSpace(speedParamName))
+        if (animator == null || string.IsNullOrWhiteSpace(speedParamName))
             return;
 
         float speed = 0f;

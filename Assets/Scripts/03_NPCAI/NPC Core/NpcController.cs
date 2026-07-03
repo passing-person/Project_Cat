@@ -128,20 +128,14 @@ public class NpcController : MonoBehaviour, IRageReceiver
     private void OnEnable()
     {
         coreFacade = FindFirstObjectByType<CoreFacade>();
-        if (coreFacade != null && coreFacade.rageManager != null)
-        {
-            coreFacade.RegisterRageReceiver(this);
-        }
+        coreFacade.RegisterRageReceiver(this);
 
         SubscribeFlagChange();
     }
 
     private void OnDisable()
     {
-        if (coreFacade != null && coreFacade.rageManager != null)
-        {
-            coreFacade.UnregisterRageReceiver(this);
-        }
+        coreFacade.UnregisterRageReceiver(this);
 
         UnsubscribeFlagChange();
     }
@@ -354,9 +348,6 @@ public class NpcController : MonoBehaviour, IRageReceiver
 
     private void OnDrawGizmosSelected()
     {
-        if (head == null)
-            return;
-
         Gizmos.color = new Color(255, 0, 0);
         Gizmos.DrawRay(headTransform.position, headTransform.forward * 3.5f);
         Gizmos.color = new Color(255, 0, 0);

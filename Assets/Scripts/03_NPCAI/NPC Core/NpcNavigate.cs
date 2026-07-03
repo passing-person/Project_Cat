@@ -223,7 +223,7 @@ public class NpcNavigate : MonoBehaviour
 
     /// <summary>
     /// Snap the NPC directly to a seat (Transform), bypassing NavMesh path validation.
-    /// This forcibly stops any current navigation, moves the actor to the seat
+    /// This forcibly stops any current navigation and patrols, moves the actor to the seat
     /// (uses NavMeshAgent.Warp when agent is on the NavMesh) and invokes arrival callbacks.
     /// </summary>
     public void SnapToSeat(Transform seat)
@@ -234,8 +234,9 @@ public class NpcNavigate : MonoBehaviour
             return;
         }
 
-        // Stop any ongoing navigation first (will invoke OnNavigationOver)
-        StopNav();
+        // Stop any ongoing patrols AND navigation so no coroutine will re-enable the agent
+        StopPatrol();
+        StopNav(); // redundant but safe: ensures nav state cleared and OnNavigationOver invoked
 
         LazyInstantiate();
 

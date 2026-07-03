@@ -103,7 +103,6 @@ Material:
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
-    - _CastShadow: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -126,7 +125,7 @@ Material:
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _ScatterOverSurface: 0.03
+    - _ScatterOverSurface: 0.5
     - _SheenPower: 2
     - _Smoothness: 0.5656854
     - _SmoothnessTextureChannel: 0

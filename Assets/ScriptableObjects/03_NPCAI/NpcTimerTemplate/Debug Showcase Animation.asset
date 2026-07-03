@@ -29,5 +29,5 @@ MonoBehaviour:
     duration: 4.817
     isOneShot: 1
   - timerType: 5
-    duration: 3
+    duration: 10
     isOneShot: 0

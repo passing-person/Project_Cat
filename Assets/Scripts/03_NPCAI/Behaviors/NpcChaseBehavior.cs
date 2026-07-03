@@ -12,6 +12,7 @@ public class NpcChaseBehavior : MonoBehaviour
     private bool PlayerInView => view.PlayerInView;
 
     private Vector3 LastKnownPosition;
+    private bool hasLastKnownPosition;
     private GameObject player;
 
     private bool navigatingToLastKnownPos;
@@ -83,24 +84,35 @@ public class NpcChaseBehavior : MonoBehaviour
 
     private IEnumerator ChaseRoutine()
     {
+        // Irritation should always capture the player's current position first,
+        // regardless of PlayerInView.
+        bool snapshotCaptured = CapturePlayerPositionSnapshot();
+
         if (PlayerInView)
         {
             SwitchToPlayerChase();
         }
-        else
+        else if (snapshotCaptured)
         {
             SwitchToLastKnownPositionChase();
         }
+        else
+        {
+            Debug.LogWarning(
+                $"[NPC] {controller.NpcId}: no player snapshot available, switching to Search."
+            );
 
-        // Important:
-        // NpcController currently calls enter behavior before assigning _npcState.
-        // Wait one frame so CurrentNpcState is actually Chase.
+            TransitionOutOfChase(NpcState.Search);
+            yield break;
+        }
+
         yield return null;
 
         while (controller.CurrentNpcState == NpcState.Chase)
         {
             if (chaseMode == ChaseMode.ToLastKnownPosition && PlayerInView)
             {
+                CapturePlayerPositionSnapshot();
                 SwitchToPlayerChase();
             }
 
@@ -110,12 +122,60 @@ public class NpcChaseBehavior : MonoBehaviour
         chaseRoutine = null;
     }
 
+    private bool CapturePlayerPositionSnapshot()
+    {
+        LazyInstantiate();
+
+        if (view != null && view.TryGetPlayerPositionSnapshot(out Vector3 snapshot))
+        {
+            LastKnownPosition = snapshot;
+            hasLastKnownPosition = true;
+
+            Debug.Log(
+                $"[NPC] {controller.NpcId}: captured player snapshot at {LastKnownPosition}."
+            );
+
+            return true;
+        }
+
+        if (player != null)
+        {
+            LastKnownPosition = player.transform.position;
+            hasLastKnownPosition = true;
+
+            Debug.Log(
+                $"[NPC] {controller.NpcId}: captured fallback player snapshot at {LastKnownPosition}."
+            );
+
+            return true;
+        }
+
+        hasLastKnownPosition = false;
+
+        Debug.LogWarning(
+            $"[NPC] {controller.NpcId}: failed to capture player snapshot."
+        );
+
+        return false;
+    }
+
     private void SwitchToLastKnownPositionChase()
     {
         if (chaseMode == ChaseMode.ToLastKnownPosition)
             return;
 
-        LastKnownPosition = player.transform.position;
+        if (!hasLastKnownPosition)
+        {
+            if (!CapturePlayerPositionSnapshot())
+            {
+                Debug.LogWarning(
+                    $"[NPC] {controller.NpcId}: cannot chase last known position because no snapshot exists."
+                );
+
+                TransitionOutOfChase(NpcState.Search);
+                return;
+            }
+        }
 
         navigatingToLastKnownPos = true;
         chaseMode = ChaseMode.ToLastKnownPosition;
@@ -123,7 +183,9 @@ public class NpcChaseBehavior : MonoBehaviour
         nav.StartNavToPoint(LastKnownPosition, true);
         anim.PlayLocomotion();
 
-        Debug.Log($"[NPC] {controller.NpcId}: chasing to last known player position.");
+        Debug.Log(
+            $"[NPC] {controller.NpcId}: chasing player snapshot at {LastKnownPosition}."
+        );
     }
 
     private void SwitchToPlayerChase()
@@ -199,6 +261,7 @@ public class NpcChaseBehavior : MonoBehaviour
 
         navigatingToLastKnownPos = false;
         chaseMode = ChaseMode.None;
+        hasLastKnownPosition = false;
 
         if (stopTimer && chaseTimerStarted)
         {
@@ -228,8 +291,12 @@ public class NpcChaseBehavior : MonoBehaviour
             view = GetComponent<NpcView>();
 
         if (player == null)
-            player = FindFirstObjectByType<PlayerController>().gameObject;
-    
+        {
+            PlayerController playerController = FindFirstObjectByType<PlayerController>();
+            if (playerController != null)
+                player = playerController.gameObject;
+        }
+
         if (anim == null)
             anim = GetComponent<NpcAnimationMachine>();
     }

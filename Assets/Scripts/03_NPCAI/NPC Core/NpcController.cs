@@ -18,7 +18,6 @@ public class NpcController : MonoBehaviour, IRageReceiver
 
     // Components
     private NpcNavigate npcNavigate;
-    private NpcCatch npcCatch;
     private NpcView npcView;
     private NpcStateMachine npcStateMachine;
 
@@ -318,7 +317,6 @@ public class NpcController : MonoBehaviour, IRageReceiver
 
     private void LazyInitialize()
     {
-        if (npcCatch == null) npcCatch = GetComponent<NpcCatch>();
         if (npcNavigate == null) npcNavigate = GetComponent<NpcNavigate>();
         if (npcView == null) npcView = GetComponent<NpcView>();
         if (npcOverrideBehavior == null) npcOverrideBehavior = GetComponent<NpcOverrideBehavior>();

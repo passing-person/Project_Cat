@@ -77,6 +77,10 @@ public class AnimParam
 
     [Tooltip("If true, NavMeshAgent transform updates are paused while this root-motion animation plays.")]
     public bool pauseAgentUpdateWhileRootMotion = true;
+
+    [Header("IK")]
+    [Tooltip("If true, IK is allowed during this animation.")]
+    public bool enableAnimatorIK = false;
 }
 
 public enum AnimState
@@ -94,5 +98,8 @@ public enum AnimState
 
     OverrideMove,
 
-    Caught
+    Caught,
+
+    TransitionStandToSit,
+    IdleSitting
 }

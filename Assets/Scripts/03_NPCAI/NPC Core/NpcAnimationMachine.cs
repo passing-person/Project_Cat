@@ -16,6 +16,10 @@ public class NpcAnimationMachine : MonoBehaviour
     [Header("Animator Params")]
     [SerializeField] private string speedParamName = "Speed";
 
+    [Header("Animator IK")]
+    [SerializeField] private string ikActiveParamName = "IKActive";
+    [SerializeField] private bool setIKActiveOnPlay = true;
+
     [Header("Animator Layer")]
     [SerializeField] private int baseLayerIndex = 0;
 
@@ -39,6 +43,10 @@ public class NpcAnimationMachine : MonoBehaviour
     private Vector3 previousVisualLocalPosition;
     private Quaternion previousVisualLocalRotation;
 
+    private int ikActiveHash;
+    private bool hasIKActiveParam;
+    private bool animatorIKActive;
+
     private int speedHash;
     private AnimState? currentAnimState;
 
@@ -50,6 +58,8 @@ public class NpcAnimationMachine : MonoBehaviour
 
         if (!string.IsNullOrWhiteSpace(speedParamName))
             speedHash = Animator.StringToHash(speedParamName);
+
+        CacheAnimatorIKParam();
     }
 
     private void Update()
@@ -130,6 +140,9 @@ public class NpcAnimationMachine : MonoBehaviour
         }
 
         ApplyRootMotionSetting(param);
+
+        if (setIKActiveOnPlay)
+            SetAnimatorIK(param.enableAnimatorIK);
 
         animator.CrossFadeInFixedTime(
             stateHash,
@@ -338,6 +351,16 @@ public class NpcAnimationMachine : MonoBehaviour
     public void PlayOverrideMove()
     {
         Play(AnimState.OverrideMove);
+    }
+
+    public void PlayStandToSit()
+    {
+        Play(AnimState.TransitionStandToSit, true);
+    }
+
+    public void PlayIdleSitting()
+    {
+        Play(AnimState.IdleSitting);
     }
 
     public void PlayByNpcState(NpcState state)
@@ -553,6 +576,53 @@ public class NpcAnimationMachine : MonoBehaviour
         return
             info.shortNameHash == shortHash ||
             info.fullPathHash == fullHash;
+    }
+
+    public bool AnimatorIKActive => animatorIKActive;
+
+    public void SetAnimatorIK(bool value)
+    {
+        LazyInstantiate();
+
+        animatorIKActive = value;
+
+        if (animator == null)
+            return;
+
+        if (!hasIKActiveParam)
+            CacheAnimatorIKParam();
+
+        if (!hasIKActiveParam)
+            return;
+
+        animator.SetBool(ikActiveHash, value);
+    }
+
+    private void CacheAnimatorIKParam()
+    {
+        hasIKActiveParam = false;
+
+        if (animator == null)
+            return;
+
+        if (string.IsNullOrWhiteSpace(ikActiveParamName))
+            return;
+
+        foreach (AnimatorControllerParameter param in animator.parameters)
+        {
+            if (param.name == ikActiveParamName &&
+                param.type == AnimatorControllerParameterType.Bool)
+            {
+                ikActiveHash = Animator.StringToHash(ikActiveParamName);
+                hasIKActiveParam = true;
+                return;
+            }
+        }
+
+        Debug.LogWarning(
+            $"[NPC Anim] {name}: Animator bool parameter '{ikActiveParamName}' is missing. " +
+            "SetAnimatorIK will update the local flag, but cannot write to Animator."
+        );
     }
 
     private void LazyInstantiate()

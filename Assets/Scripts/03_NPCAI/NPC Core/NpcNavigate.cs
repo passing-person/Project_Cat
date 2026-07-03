@@ -192,6 +192,84 @@ public class NpcNavigate : MonoBehaviour
         CurrentSpeed = isChasing ? ChaseSpeed : MoveSpeed;
     }
 
+    public void WarpTo(Vector3 position, Quaternion rotation)
+    {
+        LazyInstantiate();
+
+        if (agent != null)
+        {
+            if (!agent.enabled)
+                agent.enabled = true;
+
+            if (agent.isOnNavMesh)
+            {
+                agent.Warp(position);
+            }
+            else
+            {
+                transform.position = position;
+            }
+
+            agent.ResetPath();
+            agent.enabled = false;
+        }
+        else
+        {
+            transform.position = position;
+        }
+
+        transform.rotation = rotation;
+    }
+
+    /// <summary>
+    /// Snap the NPC directly to a seat (Transform), bypassing NavMesh path validation.
+    /// This forcibly stops any current navigation, moves the actor to the seat
+    /// (uses NavMeshAgent.Warp when agent is on the NavMesh) and invokes arrival callbacks.
+    /// </summary>
+    public void SnapToSeat(Transform seat)
+    {
+        if (seat == null)
+        {
+            Debug.LogWarning($"[NPC] {Id}: SnapToSeat called with null seat.");
+            return;
+        }
+
+        // Stop any ongoing navigation first (will invoke OnNavigationOver)
+        StopNav();
+
+        LazyInstantiate();
+
+        // If there's an agent and it's on the NavMesh, use Warp to keep agent internal state coherent.
+        if (agent != null)
+        {
+            if (agent.isOnNavMesh)
+            {
+                // Ensure agent enabled so Warp works reliably, then disable again to prevent unintended movement.
+                bool wasEnabled = agent.enabled;
+                if (!wasEnabled) agent.enabled = true;
+
+                agent.Warp(seat.position);
+                agent.ResetPath();
+
+                if (!wasEnabled) agent.enabled = false;
+            }
+            else
+            {
+                // Agent not on NavMesh: set transform directly.
+                transform.position = seat.position;
+            }
+        }
+        else
+        {
+            transform.position = seat.position;
+        }
+
+        transform.rotation = seat.rotation;
+
+        Debug.Log($"[NPC] {Id}: Snapped to seat '{seat.name}'.");
+        DestinationReached?.Invoke();
+    }
+
     private void LazyInstantiate()
     {
         // Used in properties and Awake()
@@ -221,15 +299,84 @@ public class NpcNavigate : MonoBehaviour
 
     private IEnumerator NavToPoint(Vector3 target)
     {
-        agent.SetDestination(target);
+        if (agent == null)
+            yield break;
 
-        while (agent.pathPending ||
-               agent.remainingDistance > agent.stoppingDistance)
+        if (!agent.enabled)
+            agent.enabled = true;
+
+        // Let the NavMeshAgent fully rebind after being enabled.
+        yield return null;
+
+        if (!agent.isOnNavMesh)
         {
+            Debug.LogWarning($"[NPC] {Id}: Agent is not on NavMesh. Cannot navigate to {target}.");
+            navCoro = null;
+            yield break;
+        }
+
+        agent.isStopped = false;
+
+        bool accepted = agent.SetDestination(target);
+
+        if (!accepted)
+        {
+            Debug.LogWarning($"[NPC] {Id}: SetDestination failed. Target={target}");
+            navCoro = null;
+            yield break;
+        }
+
+        // Important: wait at least one frame after SetDestination.
+        yield return null;
+
+        // Wait while Unity computes the path.
+        while (agent.enabled && agent.isOnNavMesh && agent.pathPending)
+            yield return null;
+
+        if (!agent.enabled || !agent.isOnNavMesh)
+        {
+            navCoro = null;
+            yield break;
+        }
+
+        if (!agent.hasPath)
+        {
+            Debug.LogWarning(
+                $"[NPC] {Id}: No path after SetDestination. " +
+                $"Target={target}, Remaining={agent.remainingDistance}, Status={agent.pathStatus}"
+            );
+
+            navCoro = null;
+            yield break;
+        }
+
+        if (agent.pathStatus == NavMeshPathStatus.PathInvalid)
+        {
+            Debug.LogWarning(
+                $"[NPC] {Id}: Invalid path. " +
+                $"Target={target}, Status={agent.pathStatus}, Remaining={agent.remainingDistance}"
+            );
+
+            agent.ResetPath();
+            navCoro = null;
+            yield break;
+        }
+
+        while (agent.enabled && agent.isOnNavMesh)
+        {
+            if (!agent.pathPending &&
+                agent.hasPath &&
+                agent.remainingDistance <= agent.stoppingDistance)
+            {
+                break;
+            }
+
             yield return null;
         }
 
-        agent.ResetPath();
+        if (agent.enabled && agent.isOnNavMesh)
+            agent.ResetPath();
+
         navCoro = null;
         DestinationReached?.Invoke();
     }

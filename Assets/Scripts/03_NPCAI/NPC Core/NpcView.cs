@@ -56,6 +56,20 @@ public class NpcView : MonoBehaviour
         Refresh();
     }
 
+    public bool TryGetPlayerPositionSnapshot(out Vector3 position)
+    {
+        LazyInstantiate();
+
+        if (player == null)
+        {
+            position = transform.position;
+            return false;
+        }
+
+        position = player.transform.position;
+        return true;
+    }
+
     public void Refresh()
     {
         LazyInstantiate();

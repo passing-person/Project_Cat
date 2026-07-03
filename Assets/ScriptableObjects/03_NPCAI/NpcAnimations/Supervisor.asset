@@ -18,52 +18,75 @@ MonoBehaviour:
     animatorStateName: Locomotion
     crossFadeTime: 0.1
     applyRootMotion: 0
-    pauseAgentUpdateWhileRootMotion: 1
+    pauseAgentUpdateWhileRootMotion: 0
+    enableAnimatorIK: 1
   - animState: 1
     requiredState: 2
     animatorStateName: Search
     crossFadeTime: 0.1
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
+    enableAnimatorIK: 1
   - animState: 2
     requiredState: 2
     animatorStateName: TransitionSearchToIdle
     crossFadeTime: 0.1
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
+    enableAnimatorIK: 1
   - animState: 3
     requiredState: 3
     animatorStateName: Dive
     crossFadeTime: 0.1
     applyRootMotion: 1
     pauseAgentUpdateWhileRootMotion: 1
+    enableAnimatorIK: 0
   - animState: 4
     requiredState: 3
     animatorStateName: TransitionDiveToCooldown
     crossFadeTime: 0.1
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
+    enableAnimatorIK: 0
   - animState: 5
     requiredState: 4
     animatorStateName: ChaseCooldown
     crossFadeTime: 0.1
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
+    enableAnimatorIK: 1
   - animState: 6
     requiredState: 4
     animatorStateName: DiveCooldown
     crossFadeTime: 0.1
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
+    enableAnimatorIK: 0
   - animState: 7
     requiredState: 5
     animatorStateName: OverrideMove
     crossFadeTime: 0.1
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
+    enableAnimatorIK: 0
   - animState: 8
     requiredState: 3
     animatorStateName: Caught
     crossFadeTime: 0.1
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
+    enableAnimatorIK: 0
+  - animState: 9
+    requiredState: 3
+    animatorStateName: TransitionStandToSit
+    crossFadeTime: 0.1
+    applyRootMotion: 0
+    pauseAgentUpdateWhileRootMotion: 0
+    enableAnimatorIK: 1
+  - animState: 10
+    requiredState: 3
+    animatorStateName: IdleSitting
+    crossFadeTime: 0.1
+    applyRootMotion: 0
+    pauseAgentUpdateWhileRootMotion: 0
+    enableAnimatorIK: 1

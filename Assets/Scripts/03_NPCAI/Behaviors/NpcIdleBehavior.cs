@@ -9,8 +9,6 @@ public class NpcIdleBehavior : MonoBehaviour
     [SerializeField, Min(0f)]
     private float maxSeatSnapDistance = 0.45f;
 
-    private readonly float seatNavigationTimeout = 8f;
-
     [Tooltip("Optional NPC bottom reference. If assigned, root is placed so this transform lands on the seat bottom point.")]
     [SerializeField] private Transform npcBottomReference;
 
@@ -87,7 +85,7 @@ public class NpcIdleBehavior : MonoBehaviour
 
         float elapsed = 0f;
 
-        while (elapsed < seatNavigationTimeout)
+        while (true)
         {
             if (!IsValidIdleState())
             {

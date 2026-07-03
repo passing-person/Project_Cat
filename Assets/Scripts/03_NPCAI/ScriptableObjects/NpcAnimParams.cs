@@ -81,6 +81,13 @@ public class AnimParam
     [Header("IK")]
     [Tooltip("If true, IK is allowed during this animation.")]
     public bool enableAnimatorIK = false;
+
+    [Header("Popout")]
+    [Tooltip("Does this animation allow popout?")]
+    public bool allowPopout;
+
+    [Tooltip("Which head anchor should popout adopt. If none, popout is unavailable.")]
+    public NpcPopoutAnchorMode popoutAnchorMode = NpcPopoutAnchorMode.None;
 }
 
 public enum AnimState
@@ -102,4 +109,11 @@ public enum AnimState
 
     TransitionStandToSit,
     IdleSitting
+}
+
+public enum NpcPopoutAnchorMode
+{
+    None,
+    Standing,
+    Sitting
 }

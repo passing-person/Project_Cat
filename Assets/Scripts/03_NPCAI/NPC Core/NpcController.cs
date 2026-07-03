@@ -20,6 +20,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
     private NpcNavigate npcNavigate;
     private NpcView npcView;
     private NpcStateMachine npcStateMachine;
+    private NpcPopoutController popoutController;
 
     // behaviors
     private NpcIdleBehavior npcIdleBehavior;
@@ -175,6 +176,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
 
     private void ResolveNpcStateChange(NpcState prevState, NpcState currentState)
     {
+        LazyInitialize();
         Debug.Log($"[NPC] {NpcId}: NpcState changes from {prevState} to {currentState}");
         // exit behavior of previous state
         switch (prevState)
@@ -227,6 +229,16 @@ public class NpcController : MonoBehaviour, IRageReceiver
                 npcCooldownBehavior.EnterFrom(prevState);
                 break;
         }
+
+        NpcStateSnapshot snapshot = new(
+            CurrentNpcState,
+            CurrentRageState,
+            PlayerInView,
+            IsTired,
+            IsOverride,
+            PlayerInReach
+        );
+        popoutController.UpdatePopout(snapshot);
     }
 
     public void SetRageState(NpcRageState state)
@@ -326,6 +338,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
         if (npcDiveBehavior == null) npcDiveBehavior = GetComponent<NpcDiveBehavior>();
         if (npcCooldownBehavior == null) npcCooldownBehavior = GetComponent<NpcCooldownBehavior>();
         if (npcStateMachine == null) npcStateMachine = GetComponent<NpcStateMachine>();
+        if (popoutController == null) popoutController = GetComponent<NpcPopoutController>();
     }
 
     private void SubscribeFlagChange()
@@ -356,6 +369,13 @@ public class NpcController : MonoBehaviour, IRageReceiver
         Gizmos.DrawRay(HeadTransform.position, Quaternion.Euler(0f, -70f, 0f) * HeadTransform.forward * 3.5f);
     }
 
+
+    [ContextMenu("Debug Switch RageState")]
+    private void DebugSwitchRageState()
+    {
+        SetRageState(debugRageState);
+        OnNpcStateFlagsChange();
+    }
 
     [ContextMenu("Debug Test Finish CurrentState")]
     private void FinishCurrentState()

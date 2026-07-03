@@ -50,6 +50,8 @@ public class NpcAnimationMachine : MonoBehaviour
     private int speedHash;
     private AnimState? currentAnimState;
 
+    private AnimParam currentAnimParam;
+
     public AnimState? CurrentAnimState => currentAnimState;
 
     private void Awake()
@@ -116,6 +118,8 @@ public class NpcAnimationMachine : MonoBehaviour
 
         if (!TryResolveAnimState(animState, out AnimParam param, out int shortHash, out int fullHash))
             return;
+
+        currentAnimParam = param;
 
         if (!forceReplay && currentAnimState.HasValue && currentAnimState.Value == animState)
             return;
@@ -288,6 +292,20 @@ public class NpcAnimationMachine : MonoBehaviour
             $"[NPC Anim] {name}: agent.updatePosition = {agent.updatePosition}, " +
             $"agent.updateRotation = {agent.updateRotation}"
         );
+    }
+
+    public bool TryGetCurrentPopoutAnchorMode(out NpcPopoutAnchorMode mode)
+    {
+        mode = NpcPopoutAnchorMode.None;
+
+        if (currentAnimParam == null)
+            return false;
+
+        if (!currentAnimParam.allowPopout)
+            return false;
+
+        mode = currentAnimParam.popoutAnchorMode;
+        return mode != NpcPopoutAnchorMode.None;
     }
 
     public void PlayLocomotion()

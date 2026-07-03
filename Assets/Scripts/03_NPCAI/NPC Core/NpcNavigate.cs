@@ -192,9 +192,11 @@ public class NpcNavigate : MonoBehaviour
         CurrentSpeed = isChasing ? ChaseSpeed : MoveSpeed;
     }
 
-    public void WarpTo(Vector3 position, Quaternion rotation)
+    public bool WarpTo(Vector3 position, Quaternion rotation)
     {
         LazyInstantiate();
+
+        bool warpSucceeded = false;
 
         if (agent != null)
         {
@@ -203,22 +205,31 @@ public class NpcNavigate : MonoBehaviour
 
             if (agent.isOnNavMesh)
             {
-                agent.Warp(position);
-            }
-            else
-            {
-                transform.position = position;
+                warpSucceeded = agent.Warp(position);
+
+                if (warpSucceeded)
+                {
+                    agent.ResetPath();
+                }
             }
 
-            agent.ResetPath();
+            // Important: disable agent before forcing transform position.
+            // This prevents NavMeshAgent from immediately overriding manual placement.
             agent.enabled = false;
         }
-        else
-        {
-            transform.position = position;
-        }
 
-        transform.rotation = rotation;
+        // For seating, force the visual/gameplay root to the exact seat pose anyway.
+        // Seat pose is an animation pose target, not necessarily a valid NavMesh point.
+        transform.SetPositionAndRotation(position, rotation);
+        Physics.SyncTransforms();
+
+        Debug.Log(
+            $"[NPC] {Id}: WarpTo seat. " +
+            $"Target={position}, Actual={transform.position}, " +
+            $"WarpSucceeded={warpSucceeded}, Delta={Vector3.Distance(transform.position, position)}"
+        );
+
+        return warpSucceeded;
     }
 
     /// <summary>

@@ -20,6 +20,8 @@ MonoBehaviour:
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 0
     enableAnimatorIK: 1
+    allowPopout: 1
+    popoutAnchorMode: 1
   - animState: 1
     requiredState: 2
     animatorStateName: Search
@@ -27,6 +29,8 @@ MonoBehaviour:
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
     enableAnimatorIK: 1
+    allowPopout: 1
+    popoutAnchorMode: 1
   - animState: 2
     requiredState: 2
     animatorStateName: TransitionSearchToIdle
@@ -34,6 +38,8 @@ MonoBehaviour:
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
     enableAnimatorIK: 1
+    allowPopout: 1
+    popoutAnchorMode: 1
   - animState: 3
     requiredState: 3
     animatorStateName: Dive
@@ -41,13 +47,17 @@ MonoBehaviour:
     applyRootMotion: 1
     pauseAgentUpdateWhileRootMotion: 1
     enableAnimatorIK: 0
+    allowPopout: 0
+    popoutAnchorMode: 0
   - animState: 4
     requiredState: 3
     animatorStateName: TransitionDiveToCooldown
     crossFadeTime: 0.1
-    applyRootMotion: 0
+    applyRootMotion: 1
     pauseAgentUpdateWhileRootMotion: 1
     enableAnimatorIK: 0
+    allowPopout: 0
+    popoutAnchorMode: 0
   - animState: 5
     requiredState: 4
     animatorStateName: ChaseCooldown
@@ -55,6 +65,8 @@ MonoBehaviour:
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
     enableAnimatorIK: 1
+    allowPopout: 1
+    popoutAnchorMode: 1
   - animState: 6
     requiredState: 4
     animatorStateName: DiveCooldown
@@ -62,6 +74,8 @@ MonoBehaviour:
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
     enableAnimatorIK: 0
+    allowPopout: 1
+    popoutAnchorMode: 1
   - animState: 7
     requiredState: 5
     animatorStateName: OverrideMove
@@ -69,6 +83,8 @@ MonoBehaviour:
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
     enableAnimatorIK: 0
+    allowPopout: 0
+    popoutAnchorMode: 0
   - animState: 8
     requiredState: 3
     animatorStateName: Caught
@@ -76,17 +92,23 @@ MonoBehaviour:
     applyRootMotion: 0
     pauseAgentUpdateWhileRootMotion: 1
     enableAnimatorIK: 0
+    allowPopout: 0
+    popoutAnchorMode: 0
   - animState: 9
-    requiredState: 3
+    requiredState: 0
     animatorStateName: TransitionStandToSit
     crossFadeTime: 0.1
     applyRootMotion: 0
-    pauseAgentUpdateWhileRootMotion: 0
+    pauseAgentUpdateWhileRootMotion: 1
     enableAnimatorIK: 1
+    allowPopout: 0
+    popoutAnchorMode: 0
   - animState: 10
     requiredState: 3
     animatorStateName: IdleSitting
     crossFadeTime: 0.1
     applyRootMotion: 0
-    pauseAgentUpdateWhileRootMotion: 0
+    pauseAgentUpdateWhileRootMotion: 1
     enableAnimatorIK: 1
+    allowPopout: 1
+    popoutAnchorMode: 2

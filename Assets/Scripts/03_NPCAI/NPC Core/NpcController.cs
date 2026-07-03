@@ -10,7 +10,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
 
     [Header("Body Parts")]
     [SerializeField] GameObject head;
-    private Transform headTransform => head.transform;
+    private Transform HeadTransform => head.transform;
 
     [Header("Debug - State Machine")]
     [SerializeField] NpcRageState debugRageState;
@@ -349,11 +349,11 @@ public class NpcController : MonoBehaviour, IRageReceiver
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(255, 0, 0);
-        Gizmos.DrawRay(headTransform.position, headTransform.forward * 3.5f);
+        Gizmos.DrawRay(HeadTransform.position, HeadTransform.forward * 3.5f);
         Gizmos.color = new Color(255, 0, 0);
-        Gizmos.DrawRay(headTransform.position, Quaternion.Euler(0f, 70f, 0f) * headTransform.forward * 3.5f);
+        Gizmos.DrawRay(HeadTransform.position, Quaternion.Euler(0f, 70f, 0f) * HeadTransform.forward * 3.5f);
         Gizmos.color = new Color(255, 0, 0);
-        Gizmos.DrawRay(headTransform.position, Quaternion.Euler(0f, -70f, 0f) * headTransform.forward * 3.5f);
+        Gizmos.DrawRay(HeadTransform.position, Quaternion.Euler(0f, -70f, 0f) * HeadTransform.forward * 3.5f);
     }
 
 

@@ -7,19 +7,28 @@ public class ThirdPersonCameraController : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private PlayerController playerController;
 
-    [Header("Camera")]
-    [SerializeField] private Vector3 targetOffset = new Vector3(0f, 0.65f, 0f);
+    [Header("Third Person Camera")]
+    [SerializeField] private Vector3 targetOffset = new Vector3(0f, 0.75f, 0f);
     [SerializeField] private float distance = 3.2f;
     [SerializeField] private float minDistance = 1.2f;
     [SerializeField] private float maxDistance = 5f;
     [SerializeField] private float followSharpness = 18f;
     [SerializeField] private float rotationSharpness = 20f;
+    [SerializeField] private float normalFov = 60f;
+
+    [Header("Hidden First Person Camera")]
+    [SerializeField] private Vector3 hiddenEyeOffset = new Vector3(0f, 0.55f, 0.08f);
+    [SerializeField] private float hiddenDistance = 0.05f;
+    [SerializeField] private float hiddenFov = 42f;
+    [SerializeField] private float hiddenYawLimit = 38f;
+    [SerializeField] private float hiddenMinPitch = -12f;
+    [SerializeField] private float hiddenMaxPitch = 22f;
 
     [Header("Mouse Look")]
     [SerializeField] private float mouseSensitivityX = 3.2f;
     [SerializeField] private float mouseSensitivityY = 2.4f;
-    [SerializeField] private float minPitch = -30f;
-    [SerializeField] private float maxPitch = 65f;
+    [SerializeField] private float minPitch = -35f;
+    [SerializeField] private float maxPitch = 70f;
     [SerializeField] private bool invertY;
     [SerializeField] private bool rotateTargetYaw = true;
 
@@ -31,12 +40,19 @@ public class ThirdPersonCameraController : MonoBehaviour
     [Header("Cursor")]
     [SerializeField] private bool lockCursorOnStart = true;
 
+    private Camera attachedCamera;
     private float yaw;
     private float pitch = 18f;
+    private float hiddenYawCenter;
+    private bool wasHidden;
     private Vector3 currentVelocity;
+    private float shakeTimer;
+    private float shakeMagnitude;
 
     private void Awake()
     {
+        attachedCamera = GetComponent<Camera>();
+
         if (target == null)
         {
             PlayerController foundPlayer = FindObjectOfType<PlayerController>();
@@ -57,6 +73,11 @@ public class ThirdPersonCameraController : MonoBehaviour
             yaw = target.eulerAngles.y;
         }
 
+        if (attachedCamera != null)
+        {
+            normalFov = attachedCamera.fieldOfView;
+        }
+
         if (lockCursorOnStart)
         {
             LockCursor();
@@ -72,13 +93,23 @@ public class ThirdPersonCameraController : MonoBehaviour
             return;
         }
 
-        bool canLook = playerController == null || (playerController.IsControllable && !playerController.IsHidden);
-        if (canLook)
+        bool isHidden = playerController != null && playerController.IsHidden;
+        if (isHidden && !wasHidden)
+        {
+            EnterHiddenCameraMode();
+        }
+        wasHidden = isHidden;
+
+        if (isHidden)
+        {
+            UpdateHiddenInput();
+            UpdateHiddenCameraPosition();
+        }
+        else
         {
             UpdateOrbitInput();
+            UpdateThirdPersonCameraPosition();
         }
-
-        UpdateCameraPosition();
     }
 
     public void SetTarget(Transform newTarget)
@@ -96,15 +127,25 @@ public class ThirdPersonCameraController : MonoBehaviour
         distance = Mathf.Clamp(newDistance, minDistance, maxDistance);
     }
 
+    public void AddImpulse(float magnitude, float duration)
+    {
+        shakeMagnitude = Mathf.Max(shakeMagnitude, magnitude);
+        shakeTimer = Mathf.Max(shakeTimer, duration);
+    }
+
+    private void EnterHiddenCameraMode()
+    {
+        hiddenYawCenter = target.eulerAngles.y;
+        yaw = hiddenYawCenter;
+        pitch = 0f;
+        currentVelocity = Vector3.zero;
+    }
+
     private void UpdateOrbitInput()
     {
         float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivityX;
         float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivityY;
-
-        if (invertY)
-        {
-            mouseY = -mouseY;
-        }
+        if (invertY) mouseY = -mouseY;
 
         yaw += mouseX;
         pitch = Mathf.Clamp(pitch - mouseY, minPitch, maxPitch);
@@ -116,8 +157,23 @@ public class ThirdPersonCameraController : MonoBehaviour
         }
     }
 
-    private void UpdateCameraPosition()
+    private void UpdateHiddenInput()
     {
+        float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivityX;
+        float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivityY;
+        if (invertY) mouseY = -mouseY;
+
+        yaw = ClampAngleAroundCenter(yaw + mouseX, hiddenYawCenter, hiddenYawLimit);
+        pitch = Mathf.Clamp(pitch - mouseY, hiddenMinPitch, hiddenMaxPitch);
+    }
+
+    private void UpdateThirdPersonCameraPosition()
+    {
+        if (attachedCamera != null)
+        {
+            attachedCamera.fieldOfView = Mathf.Lerp(attachedCamera.fieldOfView, normalFov, 1f - Mathf.Exp(-10f * Time.deltaTime));
+        }
+
         Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
         Vector3 pivot = target.position + targetOffset;
         Vector3 desiredDirection = rotation * Vector3.back;
@@ -125,8 +181,7 @@ public class ThirdPersonCameraController : MonoBehaviour
 
         if (useCameraCollision)
         {
-            RaycastHit hit;
-            if (Physics.SphereCast(pivot, collisionRadius, desiredDirection, out hit, distance, collisionMask, QueryTriggerInteraction.Ignore))
+            if (Physics.SphereCast(pivot, collisionRadius, desiredDirection, out RaycastHit hit, distance, collisionMask, QueryTriggerInteraction.Ignore))
             {
                 if (!hit.transform.IsChildOf(target))
                 {
@@ -135,9 +190,47 @@ public class ThirdPersonCameraController : MonoBehaviour
             }
         }
 
-        Vector3 desiredPosition = pivot + desiredDirection * desiredDistance;
+        Vector3 desiredPosition = pivot + desiredDirection * desiredDistance + GetShakeOffset();
         transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref currentVelocity, 1f / Mathf.Max(1f, followSharpness));
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(pivot - transform.position, Vector3.up), 1f - Mathf.Exp(-rotationSharpness * Time.deltaTime));
+    }
+
+    private void UpdateHiddenCameraPosition()
+    {
+        if (attachedCamera != null)
+        {
+            attachedCamera.fieldOfView = Mathf.Lerp(attachedCamera.fieldOfView, hiddenFov, 1f - Mathf.Exp(-12f * Time.deltaTime));
+        }
+
+        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
+        Vector3 pivot = target.position + hiddenEyeOffset;
+        Vector3 desiredPosition = pivot + rotation * Vector3.back * hiddenDistance + GetShakeOffset() * 0.4f;
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, 1f - Mathf.Exp(-20f * Time.deltaTime));
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 1f - Mathf.Exp(-20f * Time.deltaTime));
+    }
+
+    private Vector3 GetShakeOffset()
+    {
+        if (shakeTimer <= 0f)
+        {
+            return Vector3.zero;
+        }
+
+        shakeTimer -= Time.deltaTime;
+        float falloff = Mathf.Clamp01(shakeTimer);
+        Vector3 offset = Random.insideUnitSphere * shakeMagnitude * falloff;
+        if (shakeTimer <= 0f)
+        {
+            shakeMagnitude = 0f;
+        }
+        return offset;
+    }
+
+    private static float ClampAngleAroundCenter(float angle, float center, float limit)
+    {
+        float delta = Mathf.DeltaAngle(center, angle);
+        delta = Mathf.Clamp(delta, -limit, limit);
+        return center + delta;
     }
 
     private void HandleCursor()

@@ -40,6 +40,7 @@ public class PlayerMischiefAction : MonoBehaviour
             LogDebug(BilingualDebug.Line(
                 "左键失败：PlayerInteraction 未连接",
                 "LMB failed: PlayerInteraction is not assigned"));
+            uiManager?.ShowInteractionNotice("Mischief failed: interaction is missing");
             return;
         }
 
@@ -72,6 +73,7 @@ public class PlayerMischiefAction : MonoBehaviour
             LogDebug(BilingualDebug.Line(
                 "左键失败：没有交互目标",
                 "LMB failed: no interaction target"));
+            uiManager?.ShowInteractionNotice("Move close to a target and press E first");
             return;
         }
 
@@ -81,6 +83,7 @@ public class PlayerMischiefAction : MonoBehaviour
             LogDebug(BilingualDebug.Line(
                 $"左键失败：当前目标不是捣乱点 → {playerInteraction.CurrentTarget.InteractionId}",
                 $"LMB failed: current target is not a mischief target → {playerInteraction.CurrentTarget.InteractionId}"));
+            uiManager?.ShowInteractionNotice("This target cannot be mischieved");
             return;
         }
 
@@ -97,6 +100,7 @@ public class PlayerMischiefAction : MonoBehaviour
             LogDebug(BilingualDebug.Line(
                 $"左键失败：Core 拒绝 → {target.InteractionId}，状态={GetTargetState(target.InteractionId)}",
                 $"LMB failed: Core rejected → {target.InteractionId}, state={GetTargetState(target.InteractionId)}"));
+            uiManager?.ShowInteractionNotice("Target unavailable: " + GetTargetState(target.InteractionId));
             return;
         }
 

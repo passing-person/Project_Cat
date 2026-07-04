@@ -1,62 +1,75 @@
-# Project Cat Integration v2
+# Project Cat Integration v3
 
-This patch focuses on playable feedback for the submission build.
+This patch focuses on emergency visual feedback and MainScene play testing.
 
-## Main scene rule
+## Scope
 
-Use this scene as the playable integration scene:
+Modified areas:
 
 ```text
-Assets/Scenes/MainScene.unity
+Assets/Scripts/01_Core/
+Assets/Scripts/02_PlayerInteraction/
+Assets/Scripts/04_UISoundCamera/
+Assets/Scripts/05_Integration/
 ```
 
-Build or rebuild the functional scene with:
+Not modified:
+
+```text
+Assets/Scripts/03_NPCAI/
+```
+
+## MainScene workflow
+
+Use this menu before testing:
 
 ```text
 Tools > Project Cat > MainScene > Build Playable MainScene
 ```
 
-## Added / changed systems
+The builder creates or repairs:
 
 ```text
-UIManager
-- Creates a runtime Canvas if none exists.
-- Shows score, target score, multiplier, rage, target prompt, key hints, hide timer, hidden overlay, clear/fail result.
-- Implements ICoreUIBridge.
-
-PlayerInteraction
-- Sends current target and action state to UIManager.
-- Shows whether E selection or LMB mischief is expected.
-
-PlayerMischiefAction
-- Sends visible feedback after successful mischief.
-
-PlayerHide
-- Shows a dark hidden overlay and remaining hide timer while hidden.
-
-InteractableHighlighter
-- Auto-generates a small marker if no custom highlight object exists.
-- Tints nearby interactable objects while selected.
-
-ThirdPersonCameraController
-- Replaces prototype first-person look for MainScene.
-- Supports mouse left/right and up/down TPS camera movement.
-- Rotates the player yaw so WASD stays camera-facing.
+Core runtime managers
+Runtime UI feedback
+Runtime feedback audio
+TPS camera
+Player
+Mischief targets
+Hide spot
+Basic floor / walls
+NavMeshSurface bake if AI Navigation package is available
+NavMeshAgentPlacementFixer
 ```
 
-## Test loop
+## Player controls
 
-1. Open `Assets/Scenes/MainScene.unity`.
-2. Press Play.
-3. Move with WASD and rotate camera with Mouse.
-4. Approach Keyboard / Phone / WaterDispenser.
-5. Check target panel and highlight marker.
-6. Press E, then Left Click.
-7. Check score, multiplier, rage bar, and feedback message.
-8. Approach HideSpot_Box and press F.
-9. Check hidden overlay and hide timer.
-10. Wait 10 seconds and confirm forced exit.
+```text
+WASD    Move
+Shift   Sprint
+Mouse   Camera
+Space   Jump
+E       Select / interact
+LMB     Mischief
+Q       Cute
+F       Hide / exit hide
+Esc     Unlock cursor
+```
 
-## Scope note
+## Required NPC-side connection
 
-This patch does not modify `Assets/Scripts/03_NPCAI/`.
+NPC code still needs to call this when the player is caught:
+
+```csharp
+CoreFacade.ReportPlayerCaught();
+```
+
+## NavMesh note
+
+If NPC logs this error:
+
+```text
+SetDestination can only be called on an active agent that has been placed on a NavMesh.
+```
+
+Run the MainScene builder again. It will try to bake a NavMesh using the AI Navigation package. If the package is missing or the bake fails, bake the NavMesh manually from the NavMeshSurface object in MainScene.

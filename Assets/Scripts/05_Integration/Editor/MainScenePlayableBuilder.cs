@@ -46,6 +46,7 @@ public static class MainScenePlayableBuilder
         CreateSupervisorOrSpawnPoint(root.transform);
         SetupPlayerCamera(player);
         WirePlayer(player);
+        BuildNavMeshIfPackageExists(root);
 
         CoreReferenceValidator validator = systems.GetComponent<CoreReferenceValidator>();
         if (validator != null)
@@ -122,6 +123,8 @@ public static class MainScenePlayableBuilder
 
         UIManager uiManager = systems.AddComponent<UIManager>();
         AudioManager audioManager = systems.AddComponent<AudioManager>();
+        SimpleFeedbackAudio feedbackAudio = systems.AddComponent<SimpleFeedbackAudio>();
+        NavMeshAgentPlacementFixer navMeshFixer = systems.AddComponent<NavMeshAgentPlacementFixer>();
         AudioSource sfxSource = systems.AddComponent<AudioSource>();
         AudioSource bgmSource = systems.AddComponent<AudioSource>();
         GameManager gameManager = systems.AddComponent<GameManager>();
@@ -201,6 +204,7 @@ public static class MainScenePlayableBuilder
         SetPrivateField(audioManager, "sfxSource", sfxSource);
         SetPrivateField(audioManager, "bgmSource", bgmSource);
         SetPrivateField(uiManager, "coreFacade", coreFacade);
+        SetPrivateField(uiManager, "feedbackAudio", feedbackAudio);
         SetPrivateField(starter, "coreFacade", coreFacade);
         SetPrivateField(starter, "uiManager", uiManager);
         SetPrivateField(starter, "stageData", stageData);
@@ -316,6 +320,12 @@ public static class MainScenePlayableBuilder
         ThirdPersonCameraController thirdPersonCamera = EnsureComponent<ThirdPersonCameraController>(cameraObject);
         SetPrivateField(thirdPersonCamera, "target", player.transform);
         SetPrivateField(thirdPersonCamera, "playerController", player.GetComponent<PlayerController>());
+
+        UIManager uiManager = Object.FindObjectOfType<UIManager>();
+        if (uiManager != null)
+        {
+            SetPrivateField(uiManager, "cameraController", thirdPersonCamera);
+        }
     }
 
     private static void WirePlayer(GameObject player)
@@ -338,8 +348,15 @@ public static class MainScenePlayableBuilder
 
         SetPrivateField(interaction, "playerController", controller);
         SetPrivateField(interaction, "uiManager", uiManager);
-        interaction.interactionRange = 0.5f;
-        interaction.detectionRadius = 1.4f;
+        interaction.interactionRange = 0.75f;
+        interaction.detectionRadius = 1.8f;
+
+        PlayerMovement movement = player.GetComponent<PlayerMovement>();
+        if (movement != null)
+        {
+            movement.moveSpeed = 2.6f;
+            movement.sprintMultiplier = 1.55f;
+        }
 
         PlayerMischiefAction mischief = player.GetComponent<PlayerMischiefAction>();
         SetPrivateField(mischief, "playerController", controller);
@@ -426,6 +443,54 @@ public static class MainScenePlayableBuilder
         marker.transform.SetParent(spawnPoint.transform, false);
         marker.transform.localPosition = new Vector3(0f, 0.8f, 0f);
         marker.transform.localScale = new Vector3(0.5f, 0.8f, 0.5f);
+    }
+
+
+    private static void BuildNavMeshIfPackageExists(GameObject root)
+    {
+        System.Type surfaceType = FindTypeByName("Unity.AI.Navigation.NavMeshSurface");
+        if (surfaceType == null)
+        {
+            Debug.LogWarning("AI Navigation package NavMeshSurface type was not found. NPC NavMesh may need manual baking.");
+            return;
+        }
+
+        GameObject surfaceObject = GameObject.Find("MVP_NavMeshSurface");
+        if (surfaceObject == null)
+        {
+            surfaceObject = CreateEmpty("MVP_NavMeshSurface", root.transform, Vector3.zero);
+        }
+
+        Component surface = surfaceObject.GetComponent(surfaceType);
+        if (surface == null)
+        {
+            surface = surfaceObject.AddComponent(surfaceType);
+        }
+
+        MethodInfo buildMethod = surfaceType.GetMethod("BuildNavMesh", BindingFlags.Instance | BindingFlags.Public);
+        if (buildMethod == null)
+        {
+            Debug.LogWarning("NavMeshSurface.BuildNavMesh() was not found. Please bake NavMesh manually.");
+            return;
+        }
+
+        buildMethod.Invoke(surface, null);
+        EditorUtility.SetDirty(surfaceObject);
+        Debug.Log("Built NavMesh for MainScene using AI Navigation package.");
+    }
+
+    private static System.Type FindTypeByName(string fullName)
+    {
+        foreach (System.Reflection.Assembly assembly in System.AppDomain.CurrentDomain.GetAssemblies())
+        {
+            System.Type type = assembly.GetType(fullName);
+            if (type != null)
+            {
+                return type;
+            }
+        }
+
+        return null;
     }
 
     private static StageData CreateOrLoadDefaultStageData()

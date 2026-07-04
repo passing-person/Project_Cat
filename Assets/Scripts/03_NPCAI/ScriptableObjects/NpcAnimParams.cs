@@ -88,6 +88,18 @@ public class AnimParam
 
     [Tooltip("Which head anchor should popout adopt. If none, popout is unavailable.")]
     public NpcPopoutAnchorMode popoutAnchorMode = NpcPopoutAnchorMode.None;
+
+    [Header("Code Driven Horizontal Motion")]
+    public bool useCodeDrivenHorizontalMotion;
+
+    [Min(0f)]
+    public float horizontalMotionDistance = 0f;
+
+    [Min(0.01f)]
+    public float horizontalMotionDuration = 0.35f;
+
+    public AnimationCurve horizontalMotionCurve =
+        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 }
 
 public enum AnimState

@@ -37,6 +37,17 @@ public class NpcAnimationMachine : MonoBehaviour
 
     [SerializeField] private Transform visualRoot;
 
+    [Header("Code Driven Horizontal Motion")]
+    [SerializeField] private bool enableCodeDrivenHorizontalMotion = true;
+
+    private bool codeMotionActive;
+    private AnimParam codeMotionParam;
+    private AnimState codeMotionAnimState;
+    private Vector3 codeMotionDirection;
+    private Vector3 codeMotionStartPosition;
+    private float codeMotionElapsed;
+    private float codeMotionPreviousCurveValue;
+
     private bool relayingRootMotion;
     private Vector3 visualRootInitialLocalPosition;
     private Quaternion visualRootInitialLocalRotation;
@@ -67,6 +78,7 @@ public class NpcAnimationMachine : MonoBehaviour
     private void Update()
     {
         UpdateLocomotionSpeed();
+        UpdateCodeDrivenHorizontalMotion();
     }
 
     private void LateUpdate()
@@ -155,6 +167,8 @@ public class NpcAnimationMachine : MonoBehaviour
         );
 
         currentAnimState = animState;
+
+        ConfigureCodeDrivenHorizontalMotion(animState, param);
 
         Debug.Log($"[NPC Anim] {name}: Play {animState} -> {param.animatorStateName}");
     }
@@ -269,6 +283,149 @@ public class NpcAnimationMachine : MonoBehaviour
             agent.nextPosition = transform.position;
 
         Debug.Log($"[NPC Anim] {name}: End child root-motion relay.");
+    }
+
+    private void ConfigureCodeDrivenHorizontalMotion(AnimState animState, AnimParam param)
+    {
+        StopCodeDrivenHorizontalMotion();
+
+        if (!enableCodeDrivenHorizontalMotion)
+            return;
+
+        if (param == null)
+            return;
+
+        if (!param.useCodeDrivenHorizontalMotion)
+            return;
+
+        if (param.horizontalMotionDistance <= 0f)
+            return;
+
+        codeMotionActive = true;
+        codeMotionParam = param;
+        codeMotionAnimState = animState;
+        codeMotionElapsed = 0f;
+        codeMotionPreviousCurveValue = 0f;
+        codeMotionStartPosition = transform.position;
+
+        codeMotionDirection = transform.forward;
+        codeMotionDirection.y = 0f;
+
+        if (codeMotionDirection.sqrMagnitude <= 0.0001f)
+            codeMotionDirection = Vector3.forward;
+
+        codeMotionDirection.Normalize();
+
+        Debug.Log(
+            $"[NPC Anim] {name}: Code motion started. " +
+            $"State={animState}, Distance={param.horizontalMotionDistance}, " +
+            $"Duration={param.horizontalMotionDuration}, Direction={codeMotionDirection}"
+        );
+    }
+
+    private void UpdateCodeDrivenHorizontalMotion()
+    {
+        if (!codeMotionActive)
+            return;
+
+        if (codeMotionParam == null)
+        {
+            StopCodeDrivenHorizontalMotion();
+            return;
+        }
+
+        codeMotionElapsed += Time.deltaTime;
+
+        float duration = Mathf.Max(0.01f, codeMotionParam.horizontalMotionDuration);
+        float progress = Mathf.Clamp01(codeMotionElapsed / duration);
+
+        float curveValue = progress;
+
+        if (codeMotionParam.horizontalMotionCurve != null)
+            curveValue = codeMotionParam.horizontalMotionCurve.Evaluate(progress);
+
+        curveValue = Mathf.Clamp01(curveValue);
+
+        float deltaCurve = curveValue - codeMotionPreviousCurveValue;
+
+        if (deltaCurve > 0f)
+        {
+            float deltaDistance = deltaCurve * codeMotionParam.horizontalMotionDistance;
+            Vector3 delta = codeMotionDirection * deltaDistance;
+
+            ApplyCodeDrivenHorizontalDelta(delta);
+        }
+
+        codeMotionPreviousCurveValue = curveValue;
+
+        if (progress >= 1f)
+        {
+            StopCodeDrivenHorizontalMotion();
+        }
+    }
+
+    private void ApplyCodeDrivenHorizontalDelta(Vector3 delta)
+    {
+        if (delta.sqrMagnitude <= 0.000001f)
+            return;
+
+        // During Dive, NpcDiveBehavior calls nav.StopNav(),
+        // so the NavMeshAgent is usually disabled here.
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            bool warped = agent.Warp(transform.position + delta);
+
+            if (!warped)
+            {
+                transform.position += delta;
+            }
+        }
+        else
+        {
+            transform.position += delta;
+        }
+    }
+
+    private void StopCodeDrivenHorizontalMotion()
+    {
+        if (!codeMotionActive)
+            return;
+
+        float actualDistance = Vector3.Distance(
+            codeMotionStartPosition,
+            transform.position
+        );
+
+        Debug.Log(
+            $"[NPC Anim] {name}: Code motion stopped. " +
+            $"State={codeMotionAnimState}, " +
+            $"Designed={codeMotionParam.horizontalMotionDistance:0.00}, " +
+            $"Actual={actualDistance:0.00}, " +
+            $"FinalCurve={codeMotionPreviousCurveValue:0.00}"
+        );
+
+        codeMotionActive = false;
+        codeMotionParam = null;
+        codeMotionElapsed = 0f;
+        codeMotionPreviousCurveValue = 0f;
+
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+            agent.nextPosition = transform.position;
+    }
+
+    private void ApplyCodeMotionDelta(Vector3 delta)
+    {
+        if (delta.sqrMagnitude <= 0.000001f)
+            return;
+
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            agent.Warp(transform.position + delta);
+        }
+        else
+        {
+            transform.position += delta;
+        }
     }
 
     private void ApplyAgentRootMotionPolicy(AnimParam param)

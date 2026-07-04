@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbf4a249a17e59f4095842a2a1a72ddb, type: 3}
-  m_Name: Supervisor
+  m_Name: Worker
   m_EditorClassIdentifier: 
   animParams:
   - animState: 0

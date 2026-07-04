@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e6bf5565eff5c4b4abadeee73a6cffd5, type: 3}
-  m_Name: Supervisor
+  m_Name: Worker
   m_EditorClassIdentifier: 
-  npcId: Supervisor
-  npcType: 0
+  npcId: Worker
+  npcType: 1
   moveSpeed: 1.3333334
   chaseSpeed: 1.733333
   annoyedThreshold: 40

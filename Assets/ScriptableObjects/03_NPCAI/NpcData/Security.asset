@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e6bf5565eff5c4b4abadeee73a6cffd5, type: 3}
-  m_Name: Supervisor
+  m_Name: Security
   m_EditorClassIdentifier: 
-  npcId: Supervisor
-  npcType: 0
+  npcId: Security
+  npcType: 3
   moveSpeed: 1.3333334
   chaseSpeed: 1.733333
   annoyedThreshold: 40
   angryThreshold: 70
   enragedThreshold: 100
-  canReceiveRage: 1
+  canReceiveRage: 0

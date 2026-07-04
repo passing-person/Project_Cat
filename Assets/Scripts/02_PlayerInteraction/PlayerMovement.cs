@@ -9,11 +9,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private PlayerSfxController sfxController;
     [SerializeField] private Transform groundCheck;
 
-    [Header("Movement")]
-    public float moveSpeed = 3f;
+    [Header("Movement (moveSpeed in debug)")]
+    private readonly float moveSpeed = 1.333333f;
 
-    [Header("Jump")]
-    public float jumpForce = 6f;
+    [Header("Jump (jumpForce in debug)")]
+    private readonly float jumpForce = 3.96f;
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
 
@@ -42,7 +42,15 @@ public class PlayerMovement : MonoBehaviour
 
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
-        moveInput = new Vector3(horizontal, 0f, vertical).normalized;
+        Vector3 forward = transform.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        Vector3 right = transform.right;
+        right.y = 0f;
+        right.Normalize();
+
+        moveInput = (right * horizontal + forward * vertical).normalized;
 
         if (Input.GetKeyDown(KeyCode.Space))
             TryJump();
@@ -85,6 +93,8 @@ public class PlayerMovement : MonoBehaviour
         if (!IsGrounded())
             return;
 
+
+
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
         animationController?.PlayJump();
@@ -94,10 +104,12 @@ public class PlayerMovement : MonoBehaviour
     private bool IsGrounded()
     {
         if (groundCheck == null)
-            return true;
+            return false;
 
-        return Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
-    }
+        float rayLength = 0.1f;
+        RaycastHit hit;
+        return Physics.Raycast(groundCheck.position, Vector3.down, out hit, rayLength, groundLayer);
+}
 
     private void UpdateAnimation(bool isMoving, bool isGrounded)
     {

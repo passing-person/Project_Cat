@@ -1328,7 +1328,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3, y: 2, z: -13}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4355787592859684985}
   - {fileID: 3651148140942182157}
@@ -1400,7 +1400,7 @@ NavMeshAgent:
   m_AgentTypeID: -1372625422
   m_Radius: 0.5
   m_Speed: 10
-  m_Acceleration: 8
+  m_Acceleration: 1000
   avoidancePriority: 50
   m_AngularSpeed: 720
   m_StoppingDistance: 0
@@ -1476,7 +1476,6 @@ MonoBehaviour:
   updatePathIntv: 0.01
   statePaths: []
   debugIsChasing: 0
-  debugSpeedMult: 1.9
 --- !u!114 &3573199755699029014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1597,6 +1596,8 @@ MonoBehaviour:
   movementIntentDistanceBuffer: 0.05
   relayChildAnimatorRootMotionToRoot: 1
   visualRoot: {fileID: 5602731118455023580}
+  enableCodeDrivenAnimationMotion: 1
+  syncAgentAfterCodeMotion: 1
 --- !u!114 &1700134064427332149
 MonoBehaviour:
   m_ObjectHideFlags: 0

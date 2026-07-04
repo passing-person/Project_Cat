@@ -22,6 +22,8 @@ public class NpcDiveBehavior : MonoBehaviour
     [SerializeField]
     private bool snapToPlayerDirectionAfterMaxTurnTime = true;
 
+
+
     private bool diveCatchWindowOpen;
     private bool PlayerInCatchRange => view != null && view.PlayerInCatchRange;
 

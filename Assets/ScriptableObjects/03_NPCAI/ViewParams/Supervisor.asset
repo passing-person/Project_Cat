@@ -12,6 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 761325ab9247caf479ec07692c854a84, type: 3}
   m_Name: Supervisor
   m_EditorClassIdentifier: 
-  sectorRadius: 3.5
-  sectorHeight: 1.5
+  sectorRadius: 4.6666665
   sectorDeg: 140

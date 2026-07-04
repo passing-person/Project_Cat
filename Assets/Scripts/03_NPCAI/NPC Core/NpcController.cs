@@ -361,6 +361,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
 
     private void OnDrawGizmosSelected()
     {
+        if (HeadTransform == null) return;
         Gizmos.color = new Color(255, 0, 0);
         Gizmos.DrawRay(HeadTransform.position, HeadTransform.forward * 3.5f);
         Gizmos.color = new Color(255, 0, 0);

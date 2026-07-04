@@ -217,6 +217,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerId: PlayerCat
+  animationController: {fileID: 0}
+  sfxController: {fileID: 0}
 --- !u!54 &1620700158995799479
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -242,7 +244,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!208 &37990434758033499
 NavMeshObstacle:

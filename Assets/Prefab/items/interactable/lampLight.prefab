@@ -78,6 +78,11 @@ PrefabInstance:
       propertyPath: m_CastShadows
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4704470240132818650, guid: db114308da3d934438b2d47e8bff2fc4,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 810c5896e091a4b4d97ad3b0ed6e09ec, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: -8454106927955108345, guid: db114308da3d934438b2d47e8bff2fc4, type: 3}

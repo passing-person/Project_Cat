@@ -200,6 +200,7 @@ public class PlayerInteraction : MonoBehaviour
             LogDebug(BilingualDebug.Line(
                 $"E 成功：已解锁捣乱提示 → {GetTargetName(CurrentTarget)}",
                 $"E success: mischief hint unlocked → {GetTargetName(CurrentTarget)}"));
+            uiManager?.ShowInteractionNotice("Target selected: " + GetTargetName(CurrentTarget) + " / LMB to Mischief");
             RefreshPrompt();
             return true;
         }
@@ -209,6 +210,7 @@ public class PlayerInteraction : MonoBehaviour
         LogDebug(BilingualDebug.Line(
             $"E 成功：交互 {GetTargetName(CurrentTarget)}",
             $"E success: interacted with {GetTargetName(CurrentTarget)}"));
+        uiManager?.ShowInteractionNotice("Interacted: " + GetTargetName(CurrentTarget));
         return true;
     }
 
@@ -220,24 +222,30 @@ public class PlayerInteraction : MonoBehaviour
         if (CurrentTarget == null)
         {
             uiManager.HidePrompt();
+            uiManager.ClearInteractionTarget();
             return;
         }
 
+        string targetName = GetTargetName(CurrentTarget);
+
         if (CurrentTarget is IHideSpot && (playerController == null || !playerController.IsHidden))
         {
+            uiManager.SetInteractionTarget(targetName, "Hide Spot", true);
             uiManager.ShowPrompt(BilingualDebug.Line("[F] 躲藏", "[F] Hide"));
             return;
         }
 
         if (CurrentTarget is IMischiefTarget)
         {
+            uiManager.SetInteractionTarget(targetName, "Mischief Target", mischiefPromptUnlocked);
             if (mischiefPromptUnlocked)
                 uiManager.ShowPrompt(BilingualDebug.Line("[左键] 捣乱", "[LMB] Mischief"));
             else
-                uiManager.ShowPrompt(BilingualDebug.Line("[E] 交互", "[E] Interact"));
+                uiManager.ShowPrompt(BilingualDebug.Line("[E] 选择目标", "[E] Select Target"));
             return;
         }
 
+        uiManager.SetInteractionTarget(targetName, "Interactable", true);
         uiManager.ShowPrompt(BilingualDebug.Line("[E] 交互", "[E] Interact"));
     }
 

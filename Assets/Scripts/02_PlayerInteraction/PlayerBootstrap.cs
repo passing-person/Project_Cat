@@ -27,7 +27,9 @@ public class PlayerBootstrap : MonoBehaviour
 
     private void ResolveSceneManagers()
     {
+        SetPrivateField(GetComponent<PlayerMischiefAction>(), "coreFacade", FindObjectOfType<CoreFacade>());
         SetPrivateField(GetComponent<PlayerMischiefAction>(), "mischiefManager", FindObjectOfType<MischiefManager>());
+        SetPrivateField(GetComponent<PlayerMischiefAction>(), "uiManager", FindObjectOfType<UIManager>());
         SetPrivateField(GetComponent<PlayerCuteAction>(), "coreFacade", FindObjectOfType<CoreFacade>());
         SetPrivateField(GetComponent<PlayerCuteAction>(), "rageManager", FindObjectOfType<RageManager>());
         SetPrivateField(GetComponent<PlayerCuteAction>(), "uiManager", FindObjectOfType<UIManager>());

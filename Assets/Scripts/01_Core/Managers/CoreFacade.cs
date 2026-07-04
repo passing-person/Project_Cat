@@ -34,6 +34,10 @@ public class CoreFacade : MonoBehaviour
     public int CurrentScore => scoreManager != null ? scoreManager.CurrentScore : 0;
     public float CurrentScoreFloat => scoreManager != null ? scoreManager.CurrentScoreFloat : 0f;
     public float CurrentMultiplier => scoreManager != null ? scoreManager.CurrentMultiplier : 1f;
+    public int TargetScore => scoreManager != null ? scoreManager.targetScore : 0;
+    public bool HasEnoughScore => scoreManager != null && scoreManager.HasReachedTargetScore();
+    public float RemainingHideTime => hidingManager != null ? hidingManager.RemainingHideTime : 0f;
+    public string ActiveHideSpotId => hidingManager != null ? hidingManager.ActiveHideSpotId : string.Empty;
     public bool IsPlayerHidden => hidingManager != null && hidingManager.IsHidden;
     public bool IsStageFinished => stageManager != null && stageManager.IsStageFinished;
     public bool StageCleared => stageManager != null && stageManager.StageCleared;
@@ -267,6 +271,11 @@ public class CoreFacade : MonoBehaviour
         mischiefManager.UnlockMischiefTarget(targetId);
     }
 
+    public float GetTargetCooldownRemaining(string targetId)
+    {
+        return mischiefManager != null ? mischiefManager.GetTargetCooldownRemaining(targetId) : 0f;
+    }
+
     public void RegisterRageReceiver(IRageReceiver receiver)
     {
         if (rageManager == null)
@@ -308,6 +317,21 @@ public class CoreFacade : MonoBehaviour
         }
 
         rageManager.UnregisterNpc(npcId);
+    }
+
+    public float GetRage(string npcId)
+    {
+        return rageManager != null ? rageManager.GetRage(npcId) : 0f;
+    }
+
+    public NpcRageState GetRageState(string npcId)
+    {
+        return rageManager != null ? rageManager.GetRageState(npcId) : NpcRageState.Calm;
+    }
+
+    public float GetAverageRage()
+    {
+        return rageManager != null ? rageManager.GetAverageRage() : 0f;
     }
 
     public List<RageResult> TryCuteAction(Vector3 origin)

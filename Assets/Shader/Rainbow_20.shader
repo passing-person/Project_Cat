@@ -7,6 +7,7 @@ Shader "Custom/Rainbow_20"
         _MidColor("Mid Color", Color) = (0.5,0.5,0.5,1)
         _DarkShadeColor("Dark Shade Color", Color) = (0,0,0,1)
         _DarkZoneColor("Dark Zone Color", Color) = (0,0,0,1)
+        _AOColor("AO Color", Color) = (0.01,0.01,0.01,1)
 
         [Header(Light)]
         _LightAcceptance("Light Acceptance", Range(0,100)) = 50.0
@@ -33,6 +34,7 @@ Shader "Custom/Rainbow_20"
 
         [Header(Surface Options)]
         [Enum(Off,0,Front,1,Back,2,FrontAndBack,3)]_Cull("Cull", Float) = 2
+        [ToggleUI]_ReceiveShadows("Receive Shadows", Float) = 1
     }
     SubShader
     {
@@ -90,7 +92,9 @@ Shader "Custom/Rainbow_20"
             float4 _DarkShadeColor;
             float4 _DarkZoneColor;
             float4 _SheenColor;
+            float4 _AOColor;
             float _SheenPower;
+            float _ReceiveShadows;
             float _LightAcceptance;
             float _LightDarkShadeRate;
             float _ScatterOverSurface;
@@ -130,6 +134,10 @@ Shader "Custom/Rainbow_20"
                 float normalAttenuation = 0;
                 float3 totalColor = 0;
                 float totalAttenuation = 0;
+                float shadow = 0.0;
+                if(_ReceiveShadows == 1){
+                    shadow = 1.0;
+                }
 
                 // Main Light
                 float4 LIGHT_COORDS = TransformWorldToShadowCoord(i.worldPos);
@@ -139,7 +147,8 @@ Shader "Custom/Rainbow_20"
                 currentBrightness = normalAttenuation
                 * mainLight.distanceAttenuation 
                 * mainLight.shadowAttenuation
-                * (mainLight.color.r+mainLight.color.g+mainLight.color.b)/3.0;
+                * (mainLight.color.r+mainLight.color.g+mainLight.color.b)/3.0
+                * shadow;
                 totalBrightness += currentBrightness;
                 totalColor += mainLight.color.rgb * currentBrightness;
 
@@ -155,7 +164,8 @@ Shader "Custom/Rainbow_20"
                     currentBrightness = normalAttenuation
                     * (addlight.distanceAttenuation) 
                     * addlight.shadowAttenuation
-                    * (addlight.color.r+addlight.color.g+addlight.color.b)/3.0; // 计算每个光源的亮度贡献，并累加
+                    * (addlight.color.r+addlight.color.g+addlight.color.b)/3.0
+                    * shadow; // 计算每个光源的亮度贡献，并累加
                     totalBrightness += currentBrightness;
                     totalColor += addlight.color.rgb * currentBrightness;
                     totalAttenuation += addlight.distanceAttenuation * (addlight.color.r+addlight.color.g+addlight.color.b)/3.0;
@@ -193,7 +203,7 @@ Shader "Custom/Rainbow_20"
                 float ao = ambientOcclusion.indirectAmbientOcclusion;
                 //ao = 1.0-(1.0-ao)*(1.0-shadow);
                 ao = lerp(ao, 1.0, totalBrightness);
-                color.rgb *= ao;
+                color.rgb = Oklch_LerpRgb(_AOColor.rgb, color.rgb, ao);
 
             // SPECULAR
                 float3 lightDir = normalize(GetAdditionalLight(0, i.worldPos.xyz).direction);

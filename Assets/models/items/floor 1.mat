@@ -56,7 +56,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 2800000, guid: 36da9c6c1ce902b4f8d61b9a52ed09fc, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9021e38a6ea62f54489a10931de55703, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -99,7 +99,7 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _Fallof: -0.52
+    - _Fallof: -0.7
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -119,20 +119,21 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
-    - _Width: 0.014
+    - _Width: 0.149
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - _AOColor: {r: 0.2830189, g: 0.052509777, b: 0.073582634, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BrightColor: {r: 0.5882353, g: 0.37647063, b: 0.46274513, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DarkShadeColor: {r: 0.26666668, g: 0.09019608, b: 0.23529413, a: 1}
-    - _DarkZoneColor: {r: 0.34901962, g: 0.11764707, b: 0.2627451, a: 1}
+    - _DarkZoneColor: {r: 0.24528301, g: 0.14732406, b: 0.16946916, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MidColor: {r: 0.5031446, g: 0.31802532, b: 0.35810265, a: 1}
     - _SheenColor: {r: 0, g: 0.025157217, b: 0.14465404, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecularColor: {r: 1, g: 0.7201257, b: 0.80638224, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &5142261115309165463
 MonoBehaviour:

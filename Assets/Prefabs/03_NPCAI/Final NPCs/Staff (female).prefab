@@ -3081,7 +3081,7 @@ NavMeshAgent:
   m_Speed: 10
   m_Acceleration: 1000
   avoidancePriority: 50
-  m_AngularSpeed: 720
+  m_AngularSpeed: 1000
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 0
@@ -3104,6 +3104,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   npcData: {fileID: 11400000, guid: 2b7c01c5a89167e40a96424026bf0466, type: 2}
   head: {fileID: 6807920060895328973}
+  reduceRageWhenChaseSequenceEndsInIdle: 1
+  chaseToIdleRageReduction: 20
   debugRageState: 0
   StateToSwitch: 1
   CurrentRageState: 0
@@ -3123,7 +3125,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewParams: {fileID: 11400000, guid: 283e4281eb10a1242924c3075174431c, type: 2}
   head: {fileID: 6807920060895328973}
-  diveTriggerRadius: 2
+  snapshotWhenPlayerLeavesViewSector: 1
+  allowSearchTimeoutSnapshotInsideViewRange: 1
+  targetingRectDimension: {x: 0.5, y: 1.6}
+  diveInterval: 0.2
+  ensureSpaceRectDimension: {x: 0.5, y: 1.6}
+  useAnimationMachineCloseRangeDiveDistanceThreshold: 1
+  closeRangeDiveDistanceThreshold: 2.5
   catchRadius: 0.75
   requireViewRangeForDive: 1
   requireViewRangeForCatch: 0
@@ -3170,7 +3178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   assignedSeat: {fileID: 0}
-  maxSeatSnapDistance: 2
+  maxSeatSnapDistance: 1
   npcBottomReference: {fileID: 4964653888772618303}
 --- !u!114 &725159188917878929
 MonoBehaviour:
@@ -3184,6 +3192,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bd7785ec9155134f87af4470cf2aed6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxFruitlessChaseTime: 3
+  snapshotDestinationRefreshDistance: 0.15
 --- !u!114 &7825233375533005594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3203,6 +3213,7 @@ MonoBehaviour:
   maxPreDiveTurnTime: 0.25
   facePlayerAngleTolerance: 3
   snapToPlayerDirectionAfterMaxTurnTime: 1
+  snapExactlyToPlayerDirectionBeforeDive: 1
 --- !u!114 &1661857798121828316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3277,6 +3288,12 @@ MonoBehaviour:
   movementIntentDistanceBuffer: 0.05
   relayChildAnimatorRootMotionToRoot: 1
   visualRoot: {fileID: 83671262995944045}
+  enableCodeDrivenHorizontalMotion: 1
+  deterministicCodeDrivenHorizontalMotion: 1
+  isolateCodeDrivenHorizontalMotion: 1
+  snapCodeDrivenMotionToTargetOnComplete: 1
+  enableCloseRangeDiveWarp: 1
+  closeRangeDiveDistanceThreshold: 1
 --- !u!114 &125269190174174145
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,6 +3,13 @@ using UnityEngine;
 
 public class NpcChaseBehavior : MonoBehaviour
 {
+    [Header("Snapshot Chase")]
+    [Tooltip("Maximum consecutive time the NPC may spend chasing snapshot positions without reacquiring actual view. 0 means unlimited.")]
+    [SerializeField, Min(0f)] private float maxFruitlessChaseTime = 3f;
+
+    [Tooltip("Minimum movement of the active snapshot before the NavMesh destination is refreshed.")]
+    [SerializeField, Min(0f)] private float snapshotDestinationRefreshDistance = 0.15f;
+
     private NpcNavigate nav;
     private NpcController controller;
     private NpcTimer timer;
@@ -10,24 +17,31 @@ public class NpcChaseBehavior : MonoBehaviour
     private NpcAnimationMachine anim;
 
     private bool PlayerInView => view.PlayerInView;
+    private bool PlayerInActualView => view.PlayerInActualView;
 
-    private Vector3 LastKnownPosition;
-    private bool hasLastKnownPosition;
-    private GameObject player;
-
-    private bool navigatingToLastKnownPos;
+    private bool navigatingToSnapshot;
     private bool chaseTimerStarted;
+
+    private float fruitlessSnapshotChaseTime;
+    private bool snapshotFruitlessChaseExceeded;
+
+    private Vector3 currentSnapshotDestination;
+    private bool hasCurrentSnapshotDestination;
 
     private Coroutine chaseRoutine;
 
     private enum ChaseMode
     {
         None,
-        ToLastKnownPosition,
+        ToSnapshot,
         ToPlayer
     }
 
     private ChaseMode chaseMode = ChaseMode.None;
+
+    public float MaxFruitlessChaseTime => maxFruitlessChaseTime;
+    public float FruitlessSnapshotChaseTime => fruitlessSnapshotChaseTime;
+    public bool SnapshotFruitlessChaseExceeded => snapshotFruitlessChaseExceeded;
 
     private void Awake()
     {
@@ -37,12 +51,15 @@ public class NpcChaseBehavior : MonoBehaviour
     private void OnEnable()
     {
         LazyInstantiate();
-        nav.DestinationReached += ResolveDestinationReached;
+
+        if (nav != null)
+            nav.DestinationReached += ResolveDestinationReached;
     }
 
     private void OnDisable()
     {
-        nav.DestinationReached -= ResolveDestinationReached;
+        if (nav != null)
+            nav.DestinationReached -= ResolveDestinationReached;
     }
 
     public void Supervisor()
@@ -70,11 +87,19 @@ public class NpcChaseBehavior : MonoBehaviour
         CleanupChase(stopNav: true, stopTimer: true);
     }
 
+    public void ResetFruitlessSnapshotChase()
+    {
+        fruitlessSnapshotChaseTime = 0f;
+        snapshotFruitlessChaseExceeded = false;
+    }
+
     private void ChaseAndFindPlayer()
     {
+        LazyInstantiate();
         StartChaseTimerIfNeeded();
 
-        anim.PlayLocomotion();
+        if (anim != null)
+            anim.PlayLocomotion();
 
         if (chaseRoutine != null)
             return;
@@ -84,36 +109,41 @@ public class NpcChaseBehavior : MonoBehaviour
 
     private IEnumerator ChaseRoutine()
     {
-        // Irritation should always capture the player's current position first,
-        // regardless of PlayerInView.
-        bool snapshotCaptured = CapturePlayerPositionSnapshot();
-
-        if (PlayerInView)
+        if (!PlayerInView)
         {
-            SwitchToPlayerChase();
-        }
-        else if (snapshotCaptured)
-        {
-            SwitchToLastKnownPositionChase();
-        }
-        else
-        {
-            Debug.LogWarning(
-                $"[NPC] {controller.NpcId}: no player snapshot available, switching to Search."
-            );
-
-            TransitionOutOfChase(NpcState.Search);
-            yield break;
+            // A rage-triggered chase should still begin with a snapshot if possible.
+            if (view != null && view.CapturePlayerPositionSnapshot())
+                Debug.Log($"[NPC] {controller.NpcId}: chase started from fresh player snapshot.");
         }
 
         yield return null;
 
         while (controller.CurrentNpcState == NpcState.Chase)
         {
-            if (chaseMode == ChaseMode.ToLastKnownPosition && PlayerInView)
+            if (view == null || !view.TryGetKnownPlayerPosition(out Vector3 targetPosition, out NpcPlayerTargetKind targetKind))
             {
-                CapturePlayerPositionSnapshot();
+                Debug.Log($"[NPC] {controller.NpcId}: no actual or snapshot target left, switching to Search.");
+                TransitionOutOfChase(NpcState.Search);
+                yield break;
+            }
+
+            if (targetKind == NpcPlayerTargetKind.Actual)
+            {
+                ResetFruitlessSnapshotChase();
                 SwitchToPlayerChase();
+            }
+            else
+            {
+                SwitchToSnapshotChase(targetPosition);
+                TickFruitlessSnapshotChaseTimer();
+
+                if (snapshotFruitlessChaseExceeded)
+                {
+                    Debug.Log($"[NPC] {controller.NpcId}: snapshot chase exceeded {maxFruitlessChaseTime:0.00}s, switching to Search.");
+                    view.ClearActivePlayerSnapshot();
+                    TransitionOutOfChase(NpcState.Search);
+                    yield break;
+                }
             }
 
             yield return null;
@@ -122,70 +152,29 @@ public class NpcChaseBehavior : MonoBehaviour
         chaseRoutine = null;
     }
 
-    private bool CapturePlayerPositionSnapshot()
+    private void SwitchToSnapshotChase(Vector3 snapshotPosition)
     {
-        LazyInstantiate();
+        bool destinationChanged = !hasCurrentSnapshotDestination ||
+            (snapshotPosition - currentSnapshotDestination).sqrMagnitude > snapshotDestinationRefreshDistance * snapshotDestinationRefreshDistance;
 
-        if (view != null && view.TryGetPlayerPositionSnapshot(out Vector3 snapshot))
-        {
-            LastKnownPosition = snapshot;
-            hasLastKnownPosition = true;
-
-            Debug.Log(
-                $"[NPC] {controller.NpcId}: captured player snapshot at {LastKnownPosition}."
-            );
-
-            return true;
-        }
-
-        if (player != null)
-        {
-            LastKnownPosition = player.transform.position;
-            hasLastKnownPosition = true;
-
-            Debug.Log(
-                $"[NPC] {controller.NpcId}: captured fallback player snapshot at {LastKnownPosition}."
-            );
-
-            return true;
-        }
-
-        hasLastKnownPosition = false;
-
-        Debug.LogWarning(
-            $"[NPC] {controller.NpcId}: failed to capture player snapshot."
-        );
-
-        return false;
-    }
-
-    private void SwitchToLastKnownPositionChase()
-    {
-        if (chaseMode == ChaseMode.ToLastKnownPosition)
+        if (chaseMode == ChaseMode.ToSnapshot && !destinationChanged)
             return;
 
-        if (!hasLastKnownPosition)
-        {
-            if (!CapturePlayerPositionSnapshot())
-            {
-                Debug.LogWarning(
-                    $"[NPC] {controller.NpcId}: cannot chase last known position because no snapshot exists."
-                );
+        currentSnapshotDestination = snapshotPosition;
+        hasCurrentSnapshotDestination = true;
+        navigatingToSnapshot = true;
+        chaseMode = ChaseMode.ToSnapshot;
 
-                TransitionOutOfChase(NpcState.Search);
-                return;
-            }
+        if (nav != null)
+        {
+            nav.ToggleChasePlayer(false);
+            nav.StartNavToPoint(currentSnapshotDestination, true);
         }
 
-        navigatingToLastKnownPos = true;
-        chaseMode = ChaseMode.ToLastKnownPosition;
+        if (anim != null)
+            anim.PlayLocomotion();
 
-        nav.StartNavToPoint(LastKnownPosition, true);
-        anim.PlayLocomotion();
-
-        Debug.Log(
-            $"[NPC] {controller.NpcId}: chasing player snapshot at {LastKnownPosition}."
-        );
+        Debug.Log($"[NPC] {controller.NpcId}: chasing snapshot at {currentSnapshotDestination}.");
     }
 
     private void SwitchToPlayerChase()
@@ -193,19 +182,33 @@ public class NpcChaseBehavior : MonoBehaviour
         if (chaseMode == ChaseMode.ToPlayer)
             return;
 
-        navigatingToLastKnownPos = false;
+        navigatingToSnapshot = false;
+        hasCurrentSnapshotDestination = false;
         chaseMode = ChaseMode.ToPlayer;
 
-        // This cancels NavToPoint and starts FollowTarget(player).
-        nav.ToggleChasePlayer(true);
-        anim.PlayLocomotion();
+        if (nav != null)
+            nav.ToggleChasePlayer(true);
 
-        Debug.Log($"[NPC] {controller.NpcId}: player acquired, switching chase target to player.");
+        if (anim != null)
+            anim.PlayLocomotion();
+
+        Debug.Log($"[NPC] {controller.NpcId}: actual player acquired, chasing player.");
+    }
+
+    private void TickFruitlessSnapshotChaseTimer()
+    {
+        if (maxFruitlessChaseTime <= 0f)
+            return;
+
+        fruitlessSnapshotChaseTime += Time.deltaTime;
+
+        if (fruitlessSnapshotChaseTime >= maxFruitlessChaseTime)
+            snapshotFruitlessChaseExceeded = true;
     }
 
     private void StartChaseTimerIfNeeded()
     {
-        if (chaseTimerStarted)
+        if (chaseTimerStarted || timer == null)
             return;
 
         chaseTimerStarted = true;
@@ -227,21 +230,19 @@ public class NpcChaseBehavior : MonoBehaviour
         if (controller.CurrentNpcState != NpcState.Chase)
             return;
 
-        // Ignore stale destination events after we have already switched to player chase.
-        if (chaseMode != ChaseMode.ToLastKnownPosition)
+        if (chaseMode != ChaseMode.ToSnapshot || !navigatingToSnapshot)
             return;
 
-        if (!navigatingToLastKnownPos)
-            return;
-
-        if (PlayerInView)
+        if (PlayerInActualView)
         {
+            ResetFruitlessSnapshotChase();
             SwitchToPlayerChase();
             return;
         }
 
-        Debug.Log($"[NPC] {controller.NpcId}: reached last known position, player not seen, switching to Search.");
+        Debug.Log($"[NPC] {controller.NpcId}: reached snapshot, player not seen, switching to Search.");
 
+        view.ClearActivePlayerSnapshot();
         TransitionOutOfChase(NpcState.Search);
     }
 
@@ -259,21 +260,19 @@ public class NpcChaseBehavior : MonoBehaviour
             chaseRoutine = null;
         }
 
-        navigatingToLastKnownPos = false;
+        navigatingToSnapshot = false;
         chaseMode = ChaseMode.None;
-        hasLastKnownPosition = false;
+        hasCurrentSnapshotDestination = false;
 
-        if (stopTimer && chaseTimerStarted)
+        if (stopTimer && chaseTimerStarted && timer != null)
         {
             timer.StopTimer(NpcTimerType.Chase);
             timer.ResetTimer(NpcTimerType.Chase);
             chaseTimerStarted = false;
         }
 
-        if (stopNav)
-        {
+        if (stopNav && nav != null)
             nav.ToggleChasePlayer(false);
-        }
     }
 
     private void LazyInstantiate()
@@ -289,13 +288,6 @@ public class NpcChaseBehavior : MonoBehaviour
 
         if (view == null)
             view = GetComponent<NpcView>();
-
-        if (player == null)
-        {
-            PlayerController playerController = FindFirstObjectByType<PlayerController>();
-            if (playerController != null)
-                player = playerController.gameObject;
-        }
 
         if (anim == null)
             anim = GetComponent<NpcAnimationMachine>();

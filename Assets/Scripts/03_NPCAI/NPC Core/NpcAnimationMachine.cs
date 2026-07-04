@@ -40,11 +40,28 @@ public class NpcAnimationMachine : MonoBehaviour
     [Header("Code Driven Horizontal Motion")]
     [SerializeField] private bool enableCodeDrivenHorizontalMotion = true;
 
+    [Tooltip("If true, code-driven horizontal motion uses absolute placement from a precomputed start/target instead of accumulating per-frame deltas. This makes the final horizontal distance deterministic.")]
+    [SerializeField] private bool deterministicCodeDrivenHorizontalMotion = true;
+
+    [Tooltip("If true, Animator root motion, child root-motion relay, and NavMeshAgent transform updates are suppressed while code-driven horizontal motion is controlling the NPC root.")]
+    [SerializeField] private bool isolateCodeDrivenHorizontalMotion = true;
+
+    [Tooltip("If true, completed code-driven horizontal motion is snapped exactly onto its precomputed target point.")]
+    [SerializeField] private bool snapCodeDrivenMotionToTargetOnComplete = true;
+
+    [Header("Close Range Dive Warp")]
+    [Tooltip("If true, a Dive started while the player is inside the close-range threshold will warp directly to the player position instead of using code-driven horizontal shift.")]
+    [SerializeField] private bool enableCloseRangeDiveWarp = true;
+
+    [Tooltip("If the player is closer than this horizontal distance when Dive starts, the NPC warps to the player position and skips horizontal shift. NpcView can use this as its close-range trigger threshold.")]
+    [SerializeField, Min(0f)] private float closeRangeDiveDistanceThreshold = 0.75f;
+
     private bool codeMotionActive;
     private AnimParam codeMotionParam;
     private AnimState codeMotionAnimState;
     private Vector3 codeMotionDirection;
     private Vector3 codeMotionStartPosition;
+    private Vector3 codeMotionTargetPosition;
     private float codeMotionElapsed;
     private float codeMotionPreviousCurveValue;
 
@@ -62,8 +79,10 @@ public class NpcAnimationMachine : MonoBehaviour
     private AnimState? currentAnimState;
 
     private AnimParam currentAnimParam;
+    private NpcView view;
 
     public AnimState? CurrentAnimState => currentAnimState;
+    public float CloseRangeDiveDistanceThreshold => closeRangeDiveDistanceThreshold;
 
     private void Awake()
     {
@@ -89,6 +108,9 @@ public class NpcAnimationMachine : MonoBehaviour
     private void RelayChildRootMotionToNpcRoot()
     {
         if (!relayingRootMotion)
+            return;
+
+        if (codeMotionActive && isolateCodeDrivenHorizontalMotion)
             return;
 
         if (visualRoot == null)
@@ -131,10 +153,12 @@ public class NpcAnimationMachine : MonoBehaviour
         if (!TryResolveAnimState(animState, out AnimParam param, out int shortHash, out int fullHash))
             return;
 
-        currentAnimParam = param;
-
         if (!forceReplay && currentAnimState.HasValue && currentAnimState.Value == animState)
             return;
+
+        StopCodeDrivenHorizontalMotion(false);
+
+        currentAnimParam = param;
 
         int stateHash;
 
@@ -287,7 +311,8 @@ public class NpcAnimationMachine : MonoBehaviour
 
     private void ConfigureCodeDrivenHorizontalMotion(AnimState animState, AnimParam param)
     {
-        StopCodeDrivenHorizontalMotion();
+        if (TryApplyCloseRangeDiveWarp(animState))
+            return;
 
         if (!enableCodeDrivenHorizontalMotion)
             return;
@@ -315,12 +340,109 @@ public class NpcAnimationMachine : MonoBehaviour
             codeMotionDirection = Vector3.forward;
 
         codeMotionDirection.Normalize();
+        codeMotionTargetPosition = codeMotionStartPosition + codeMotionDirection * param.horizontalMotionDistance;
+
+        if (deterministicCodeDrivenHorizontalMotion && isolateCodeDrivenHorizontalMotion)
+        {
+            // Gameplay root is now controlled only by this script.
+            // Animation remains visual; root-motion relay cannot add extra distance.
+            if (animator != null)
+                animator.applyRootMotion = false;
+
+            EndChildRootMotionRelay();
+
+            if (agent != null && agent.enabled && agent.isOnNavMesh)
+            {
+                agent.updatePosition = false;
+                agent.updateRotation = false;
+                agent.nextPosition = transform.position;
+            }
+        }
 
         Debug.Log(
             $"[NPC Anim] {name}: Code motion started. " +
             $"State={animState}, Distance={param.horizontalMotionDistance}, " +
-            $"Duration={param.horizontalMotionDuration}, Direction={codeMotionDirection}"
+            $"Duration={param.horizontalMotionDuration}, Direction={codeMotionDirection}, " +
+            $"Target={codeMotionTargetPosition}"
         );
+    }
+
+    private bool TryApplyCloseRangeDiveWarp(AnimState animState)
+    {
+        if (animState != AnimState.Dive)
+            return false;
+
+        if (!enableCloseRangeDiveWarp)
+            return false;
+
+        if (!TryGetCloseRangeDiveWarpTarget(out Vector3 warpTarget))
+            return false;
+
+        // This dive is already close enough to connect. Do not apply the designed
+        // horizontal-shift distance, and suppress visual root-motion relay so the
+        // gameplay root lands exactly on the sampled player position.
+        if (animator != null)
+            animator.applyRootMotion = false;
+
+        EndChildRootMotionRelay();
+
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            agent.updatePosition = false;
+            agent.updateRotation = false;
+            agent.nextPosition = transform.position;
+        }
+
+        warpTarget.y = transform.position.y;
+        WarpNpcRootPosition(warpTarget);
+
+        Debug.Log(
+            $"[NPC Anim] {name}: Close-range dive warp. " +
+            $"Threshold={closeRangeDiveDistanceThreshold:0.000}, Target={warpTarget}"
+        );
+
+        return true;
+    }
+
+    private bool TryGetCloseRangeDiveWarpTarget(out Vector3 target)
+    {
+        LazyInstantiate();
+
+        target = transform.position;
+
+        if (view != null && view.TryGetCloseRangeDiveWarpTarget(out target))
+            return true;
+
+        if (view == null)
+            return false;
+
+        if (!view.TryGetPlayerPositionSnapshot(out Vector3 playerPosition))
+            return false;
+
+        Vector3 toPlayer = playerPosition - transform.position;
+        toPlayer.y = 0f;
+
+        if (toPlayer.sqrMagnitude > closeRangeDiveDistanceThreshold * closeRangeDiveDistanceThreshold)
+            return false;
+
+        target = playerPosition;
+        return true;
+    }
+
+    private void WarpNpcRootPosition(Vector3 position)
+    {
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            bool warped = agent.Warp(position);
+
+            if (!warped)
+                transform.position = position;
+
+            agent.nextPosition = transform.position;
+            return;
+        }
+
+        transform.position = position;
     }
 
     private void UpdateCodeDrivenHorizontalMotion()
@@ -330,7 +452,7 @@ public class NpcAnimationMachine : MonoBehaviour
 
         if (codeMotionParam == null)
         {
-            StopCodeDrivenHorizontalMotion();
+            StopCodeDrivenHorizontalMotion(false);
             return;
         }
 
@@ -346,21 +468,80 @@ public class NpcAnimationMachine : MonoBehaviour
 
         curveValue = Mathf.Clamp01(curveValue);
 
-        float deltaCurve = curveValue - codeMotionPreviousCurveValue;
-
-        if (deltaCurve > 0f)
+        if (deterministicCodeDrivenHorizontalMotion)
         {
-            float deltaDistance = deltaCurve * codeMotionParam.horizontalMotionDistance;
-            Vector3 delta = codeMotionDirection * deltaDistance;
+            ApplyCodeDrivenHorizontalCurveValue(curveValue);
+        }
+        else
+        {
+            float deltaCurve = curveValue - codeMotionPreviousCurveValue;
 
-            ApplyCodeDrivenHorizontalDelta(delta);
+            if (deltaCurve > 0f)
+            {
+                float deltaDistance = deltaCurve * codeMotionParam.horizontalMotionDistance;
+                Vector3 delta = codeMotionDirection * deltaDistance;
+
+                ApplyCodeDrivenHorizontalDelta(delta);
+            }
         }
 
         codeMotionPreviousCurveValue = curveValue;
 
         if (progress >= 1f)
         {
-            StopCodeDrivenHorizontalMotion();
+            if (deterministicCodeDrivenHorizontalMotion && snapCodeDrivenMotionToTargetOnComplete)
+                ApplyCodeDrivenHorizontalCurveValue(1f);
+
+            StopCodeDrivenHorizontalMotion(true);
+        }
+    }
+
+    private void ApplyCodeDrivenHorizontalCurveValue(float curveValue)
+    {
+        if (codeMotionParam == null)
+            return;
+
+        curveValue = Mathf.Clamp01(curveValue);
+
+        Vector3 target = Vector3.LerpUnclamped(
+            codeMotionStartPosition,
+            codeMotionTargetPosition,
+            curveValue
+        );
+
+        // This motion is intentionally horizontal. Preserve the current Y so gravity,
+        // slopes, or other vertical systems are not overwritten.
+        target.y = transform.position.y;
+
+        SetNpcRootPosition(target);
+    }
+
+    private void SetNpcRootPosition(Vector3 position)
+    {
+        if (deterministicCodeDrivenHorizontalMotion && isolateCodeDrivenHorizontalMotion)
+        {
+            // Do not ask the NavMeshAgent to solve or project this movement.
+            // The deterministic dive target is the gameplay authority.
+            transform.position = position;
+
+            if (agent != null && agent.enabled && agent.isOnNavMesh)
+                agent.nextPosition = transform.position;
+
+            return;
+        }
+
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            bool warped = agent.Warp(position);
+
+            if (!warped)
+                transform.position = position;
+
+            agent.nextPosition = transform.position;
+        }
+        else
+        {
+            transform.position = position;
         }
     }
 
@@ -386,22 +567,30 @@ public class NpcAnimationMachine : MonoBehaviour
         }
     }
 
-    private void StopCodeDrivenHorizontalMotion()
+    private void StopCodeDrivenHorizontalMotion(bool completedNormally = false)
     {
         if (!codeMotionActive)
             return;
 
-        float actualDistance = Vector3.Distance(
-            codeMotionStartPosition,
-            transform.position
-        );
+        if (completedNormally && deterministicCodeDrivenHorizontalMotion && snapCodeDrivenMotionToTargetOnComplete)
+            ApplyCodeDrivenHorizontalCurveValue(1f);
+
+        Vector3 startFlat = codeMotionStartPosition;
+        Vector3 currentFlat = transform.position;
+        startFlat.y = 0f;
+        currentFlat.y = 0f;
+
+        float actualHorizontalDistance = Vector3.Distance(startFlat, currentFlat);
+        float designedDistance = codeMotionParam != null ? codeMotionParam.horizontalMotionDistance : 0f;
 
         Debug.Log(
             $"[NPC Anim] {name}: Code motion stopped. " +
             $"State={codeMotionAnimState}, " +
-            $"Designed={codeMotionParam.horizontalMotionDistance:0.00}, " +
-            $"Actual={actualDistance:0.00}, " +
-            $"FinalCurve={codeMotionPreviousCurveValue:0.00}"
+            $"Completed={completedNormally}, " +
+            $"Designed={designedDistance:0.000}, " +
+            $"ActualHorizontal={actualHorizontalDistance:0.000}, " +
+            $"FinalCurve={codeMotionPreviousCurveValue:0.000}, " +
+            $"Target={codeMotionTargetPosition}"
         );
 
         codeMotionActive = false;
@@ -609,6 +798,20 @@ public class NpcAnimationMachine : MonoBehaviour
             agent.desiredVelocity.sqrMagnitude > 0.01f;
     }
 
+    public bool TryGetDiveDistance(out float diveDistance)
+    {
+        if (animations.TryGetAnimParam(AnimState.Dive, out AnimParam param))
+        {
+            diveDistance = param.horizontalMotionDistance;
+            return true;
+        }
+        else
+        {
+            diveDistance = 0f;
+            return false;
+        }
+    }
+
     public Coroutine PlayAndNotifyWhenFinished(
         AnimState animState,
         Action onFinished,
@@ -813,5 +1016,8 @@ public class NpcAnimationMachine : MonoBehaviour
 
         if (controller == null)
             controller = GetComponent<NpcController>();
+
+        if (view == null)
+            view = GetComponent<NpcView>();
     }
 }

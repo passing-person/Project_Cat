@@ -46,7 +46,10 @@ public class BubblePopoutLogic : MonoBehaviour
             return;
 
         if (activeRoutine != null)
+        {
             StopCoroutine(activeRoutine);
+            activeRoutine = null;
+        }
 
         currentAnchorMode = anchorMode;
 

@@ -1,12 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 
 [RequireComponent(typeof(CapsuleCollider))]
 public class NpcViewRange : MonoBehaviour
 {
+    public event Action PlayerInViewRangeChange;
     [HideInInspector] public bool playerInViewRange = false;
     [SerializeField] private bool showGizmos = true;
 
@@ -14,14 +12,23 @@ public class NpcViewRange : MonoBehaviour
     {
         if (other.GetComponentInParent<PlayerController>() != null)
         {
+            if (playerInViewRange)
+                return;
+
             playerInViewRange = true;
+            PlayerInViewRangeChange?.Invoke();
         }
     }
+
     private void OnTriggerExit(Collider other)
     {
         if (other.GetComponentInParent<PlayerController>() != null)
         {
+            if (!playerInViewRange)
+                return;
+
             playerInViewRange = false;
+            PlayerInViewRangeChange?.Invoke();
         }
     }
 
@@ -40,11 +47,9 @@ public class NpcViewRange : MonoBehaviour
         float radius = col.radius;
         float halfHeight = Mathf.Max(col.height / 2f - radius, 0f);
 
-        // Two hemispheres (wire spheres)
         Gizmos.DrawWireSphere(localCenter + Vector3.up * halfHeight, radius);
         Gizmos.DrawWireSphere(localCenter - Vector3.up * halfHeight, radius);
 
-        // Vertical edges of the cylindrical part
         int segments = 16;
         for (int i = 0; i < segments; i++)
         {
@@ -55,7 +60,6 @@ public class NpcViewRange : MonoBehaviour
             Gizmos.DrawLine(top, bottom);
         }
 
-        // Equator circles (top and bottom edges)
         DrawCircle(localCenter + Vector3.up * halfHeight, Vector3.up, radius, segments);
         DrawCircle(localCenter - Vector3.up * halfHeight, Vector3.up, radius, segments);
 
@@ -76,5 +80,4 @@ public class NpcViewRange : MonoBehaviour
             prev = current;
         }
     }
-
 }

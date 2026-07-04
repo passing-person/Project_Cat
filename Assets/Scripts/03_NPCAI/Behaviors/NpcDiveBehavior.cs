@@ -22,6 +22,9 @@ public class NpcDiveBehavior : MonoBehaviour
     [SerializeField]
     private bool snapToPlayerDirectionAfterMaxTurnTime = true;
 
+    [Tooltip("If true, the NPC is snapped exactly to the current flat player direction immediately before PlayDive. This makes the dive direction deterministic instead of allowing angle-tolerance drift.")]
+    [SerializeField] private bool snapExactlyToPlayerDirectionBeforeDive = true;
+
 
 
     private bool diveCatchWindowOpen;
@@ -261,6 +264,29 @@ public class NpcDiveBehavior : MonoBehaviour
         }
     }
 
+    private void SnapExactlyToPlayerDirectionBeforeDive()
+    {
+        if (!snapExactlyToPlayerDirectionBeforeDive)
+            return;
+
+        if (!facePlayerBeforeDive)
+            return;
+
+        if (player == null)
+            return;
+
+        Vector3 flatDirectionToPlayer = player.transform.position - transform.position;
+        flatDirectionToPlayer.y = 0f;
+
+        if (flatDirectionToPlayer.sqrMagnitude <= 0.0001f)
+            return;
+
+        transform.rotation = Quaternion.LookRotation(
+            flatDirectionToPlayer.normalized,
+            Vector3.up
+        );
+    }
+
     private IEnumerator DiveSequenceRoutine()
     {
         yield return FacePlayerBeforeDive();
@@ -270,6 +296,8 @@ public class NpcDiveBehavior : MonoBehaviour
             diveSequenceRoutine = null;
             yield break;
         }
+
+        SnapExactlyToPlayerDirectionBeforeDive();
 
         anim.PlayDive();
 

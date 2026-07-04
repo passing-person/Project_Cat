@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,13 @@ public class NpcController : MonoBehaviour, IRageReceiver
     [Header("Body Parts")]
     [SerializeField] GameObject head;
     private Transform HeadTransform => head.transform;
+
+    [Header("Chase Failure / Rage")]
+    [Tooltip("If true, ending a chase sequence in Idle reduces this NPC's rage through CoreFacade.RageManager.")]
+    [SerializeField] private bool reduceRageWhenChaseSequenceEndsInIdle = true;
+
+    [Tooltip("Rage amount reduced when a chase sequence ends in Idle.")]
+    [SerializeField, Min(0f)] private float chaseToIdleRageReduction = 20f;
 
     [Header("Debug - State Machine")]
     [SerializeField] NpcRageState debugRageState;
@@ -29,6 +37,10 @@ public class NpcController : MonoBehaviour, IRageReceiver
     private NpcDiveBehavior npcDiveBehavior;
     private NpcOverrideBehavior npcOverrideBehavior;
     private NpcCooldownBehavior npcCooldownBehavior;
+
+    public event Action OnNpcChaseFailed;
+
+    private bool chaseSequenceActive;
 
     // Implemented public APIs:
     public NpcData NpcData => npcData;
@@ -54,7 +66,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
             ResolveNpcStateChange(prevState, value);
         }
     }
-        private NpcState _npcState;
+    private NpcState _npcState;
 
     // NpcState flags
     [HideInInspector] public NpcRageState CurrentRageState;
@@ -74,7 +86,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
             OnNpcStateFlagsChange();
         }
     }
-        private bool _isTired;
+    private bool _isTired;
 
     public bool IsOverride
     {
@@ -90,7 +102,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
             OnNpcStateFlagsChange();
         }
     }
-        private bool _isOverride;
+    private bool _isOverride;
 
     // behavior delegates
     private delegate void IdleBehavior();
@@ -129,14 +141,17 @@ public class NpcController : MonoBehaviour, IRageReceiver
     private void OnEnable()
     {
         coreFacade = FindFirstObjectByType<CoreFacade>();
-        coreFacade.RegisterRageReceiver(this);
+
+        if (coreFacade != null)
+            coreFacade.RegisterRageReceiver(this);
 
         SubscribeFlagChange();
     }
 
     private void OnDisable()
     {
-        coreFacade.UnregisterRageReceiver(this);
+        if (coreFacade != null)
+            coreFacade.UnregisterRageReceiver(this);
 
         UnsubscribeFlagChange();
     }
@@ -178,6 +193,9 @@ public class NpcController : MonoBehaviour, IRageReceiver
     {
         LazyInitialize();
         Debug.Log($"[NPC] {NpcId}: NpcState changes from {prevState} to {currentState}");
+
+        if (currentState == NpcState.Chase)
+            chaseSequenceActive = true;
         // exit behavior of previous state
         switch (prevState)
         {
@@ -206,7 +224,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
         {
             case NpcState.Override:
                 Debug.Log($"[NPC] {NpcId}: perform override behavior");
-                overrideAction(); 
+                overrideAction();
                 break;
             case NpcState.Idle:
                 Debug.Log($"[NPC] {NpcId}: perform idle behavior");
@@ -239,16 +257,35 @@ public class NpcController : MonoBehaviour, IRageReceiver
             PlayerInReach
         );
         popoutController.UpdatePopout(snapshot);
+
+        if (currentState == NpcState.Idle && chaseSequenceActive)
+        {
+            chaseSequenceActive = false;
+            ApplyChaseToIdleRageReduction();
+        }
     }
 
     public void SetRageState(NpcRageState state)
     {
         CurrentRageState = state;
         Debug.Log($"[NPC] {NpcId}: RageState changes to {state}");
+
+        if (state == NpcRageState.Enraged && npcView != null)
+            npcView.CapturePlayerPositionSnapshot();
     }
 
     public void StartChase()
     {
+        LazyInitialize();
+
+        chaseSequenceActive = true;
+
+        if (npcChaseBehavior != null)
+            npcChaseBehavior.ResetFruitlessSnapshotChase();
+
+        if (npcView != null)
+            npcView.CapturePlayerPositionSnapshot();
+
         OnNpcStateFlagsChange();
         // this is effectively "ResolveRageStateChange()"
     }
@@ -261,13 +298,39 @@ public class NpcController : MonoBehaviour, IRageReceiver
 
     public void LoseTarget()
     {
+        if (npcView != null)
+            npcView.ClearAllPlayerSnapshots();
+
         StopChase();
+    }
+
+    public void NotifyNpcChaseFailed()
+    {
+        OnNpcChaseFailed?.Invoke();
+    }
+
+    private void ApplyChaseToIdleRageReduction()
+    {
+        if (!reduceRageWhenChaseSequenceEndsInIdle || chaseToIdleRageReduction <= 0f)
+            return;
+
+        if (coreFacade == null)
+            coreFacade = FindFirstObjectByType<CoreFacade>();
+
+        if (coreFacade == null || coreFacade.rageManager == null)
+        {
+            Debug.LogWarning($"[NPC] {NpcId}: cannot reduce rage after chase because RageManager is missing.");
+            return;
+        }
+
+        coreFacade.rageManager.ReduceRage(NpcId, chaseToIdleRageReduction);
+        Debug.Log($"[NPC] {NpcId}: chase ended in Idle, reduced rage by {chaseToIdleRageReduction:0.##}.");
     }
 
     public void OnPlayerCaught(PlayerController player)
     {
-        if (player != null)
-            player.PlayCaught();
+        if (coreFacade != null)
+            coreFacade.ReportPlayerCaught();
     }
 
     public void AssignBehaviors()
@@ -343,13 +406,21 @@ public class NpcController : MonoBehaviour, IRageReceiver
 
     private void SubscribeFlagChange()
     {
+        if (npcView == null)
+            return;
+
         npcView.PlayerInViewFlagChange += OnNpcStateFlagsChange;
+        npcView.PlayerActualViewFlagChange += OnNpcStateFlagsChange;
         npcView.PlayerInReachFlagChange += OnNpcStateFlagsChange;
     }
 
     private void UnsubscribeFlagChange()
     {
+        if (npcView == null)
+            return;
+
         npcView.PlayerInViewFlagChange -= OnNpcStateFlagsChange;
+        npcView.PlayerActualViewFlagChange -= OnNpcStateFlagsChange;
         npcView.PlayerInReachFlagChange -= OnNpcStateFlagsChange;
     }
 
@@ -412,7 +483,7 @@ public readonly struct NpcStateSnapshot
     public NpcStateSnapshot(NpcState currentState,
         NpcRageState currentRageState,
         bool currentPlayerInView,
-        bool currentIsTired, 
+        bool currentIsTired,
         bool currentIsOverride,
         bool currentPlayerInReach)
     {

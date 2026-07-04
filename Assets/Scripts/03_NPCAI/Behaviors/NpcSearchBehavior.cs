@@ -6,13 +6,13 @@ public class NpcSearchBehavior : MonoBehaviour
     private NpcTimer timer;
     private NpcController controller;
     private NpcNavigate nav;
+    private NpcChaseBehavior chaseBehavior;
 
     private NpcAnimationMachine anim;
     private Animator animator;
 
-    // cache
-    private bool PlayerInView => view.PlayerInView;
-    private bool PlayerInReach => view.PlayerInReach;
+    private bool PlayerInActualView => view != null && view.PlayerInActualView;
+    private bool PlayerInReach => view != null && view.PlayerInReach;
 
     private bool searchStarted;
 
@@ -25,15 +25,18 @@ public class NpcSearchBehavior : MonoBehaviour
     {
         LazyInstantiate();
 
-        view.PlayerInViewFlagChange += ResolvePlayerInViewChanged;
-        view.PlayerInReachFlagChange += ResolvePlayerInReachChanged;
+        if (view != null)
+        {
+            view.PlayerActualViewFlagChange += ResolvePlayerActualViewChanged;
+            view.PlayerInReachFlagChange += ResolvePlayerInReachChanged;
+        }
     }
 
     private void OnDisable()
     {
         if (view != null)
         {
-            view.PlayerInViewFlagChange -= ResolvePlayerInViewChanged;
+            view.PlayerActualViewFlagChange -= ResolvePlayerActualViewChanged;
             view.PlayerInReachFlagChange -= ResolvePlayerInReachChanged;
         }
     }
@@ -62,10 +65,14 @@ public class NpcSearchBehavior : MonoBehaviour
     {
         searchStarted = false;
 
-        timer.StopTimer(NpcTimerType.Search);
-        timer.ResetTimer(NpcTimerType.Search);
+        if (timer != null)
+        {
+            timer.StopTimer(NpcTimerType.Search);
+            timer.ResetTimer(NpcTimerType.Search);
+        }
 
-        anim.PlayLocomotion();
+        if (anim != null)
+            anim.PlayLocomotion();
     }
 
     private void StartSearch()
@@ -77,26 +84,37 @@ public class NpcSearchBehavior : MonoBehaviour
 
         searchStarted = true;
 
-        nav.StopPatrol();
-        nav.StopNav();
-
-        anim.PlaySearch();
-
-        if (PlayerInView)
+        if (nav != null)
         {
-            controller.CurrentNpcState = NpcState.Chase;
+            nav.StopPatrol();
+            nav.StopNav();
+        }
+
+        if (anim != null)
+            anim.PlaySearch();
+
+        if (PlayerInReach)
+        {
+            ResolvePlayerFound();
             return;
         }
 
-        timer.StartTimer(NpcTimerType.Search, ResolveSearchTimeOver);
+        if (PlayerInActualView)
+        {
+            ResolvePlayerFound();
+            return;
+        }
+
+        if (timer != null)
+            timer.StartTimer(NpcTimerType.Search, ResolveSearchTimeOver);
     }
 
-    private void ResolvePlayerInViewChanged()
+    private void ResolvePlayerActualViewChanged()
     {
         if (!IsValidSearchState())
             return;
 
-        if (!PlayerInView)
+        if (!PlayerInActualView)
             return;
 
         ResolvePlayerFound();
@@ -118,12 +136,9 @@ public class NpcSearchBehavior : MonoBehaviour
         if (!IsValidSearchState())
             return;
 
-        Debug.Log($"[NPC] {controller.NpcId}: Player found during Search.");
+        Debug.Log($"[NPC] {controller.NpcId}: player found during Search.");
 
-        searchStarted = false;
-
-        timer.StopTimer(NpcTimerType.Search);
-        timer.ResetTimer(NpcTimerType.Search);
+        StopSearchTimer();
 
         if (animator != null)
             animator.SetBool("Searching", false);
@@ -134,6 +149,9 @@ public class NpcSearchBehavior : MonoBehaviour
             return;
         }
 
+        if (chaseBehavior != null)
+            chaseBehavior.ResetFruitlessSnapshotChase();
+
         controller.CurrentNpcState = NpcState.Chase;
     }
 
@@ -142,23 +160,72 @@ public class NpcSearchBehavior : MonoBehaviour
         if (controller.CurrentNpcState != NpcState.Search)
             return;
 
-        searchStarted = false;
+        StopSearchTimer();
 
-        if (PlayerInView)
+        if (PlayerInReach)
         {
+            controller.CurrentNpcState = NpcState.Dive;
+            return;
+        }
+
+        if (PlayerInActualView)
+        {
+            if (chaseBehavior != null)
+                chaseBehavior.ResetFruitlessSnapshotChase();
+
             controller.CurrentNpcState = NpcState.Chase;
             return;
         }
 
-        anim.PlaySearchToIdle();
+        if (chaseBehavior != null && chaseBehavior.SnapshotFruitlessChaseExceeded)
+        {
+            FailSearchToIdle("snapshot chase time exceeded");
+            return;
+        }
+
+        if (view != null && view.TryPrepareSearchTimeoutChaseTarget(out Vector3 target, out NpcPlayerTargetKind targetKind))
+        {
+            Debug.Log($"[NPC] {controller.NpcId}: Search timed out, chasing {targetKind} target at {target}.");
+            controller.CurrentNpcState = NpcState.Chase;
+            return;
+        }
+
+        FailSearchToIdle("no actual or snapshot target available");
+    }
+
+    private void FailSearchToIdle(string reason)
+    {
+        Debug.Log($"[NPC] {controller.NpcId}: chase failed after Search ({reason}).");
+
+        if (view != null)
+            view.ClearAllPlayerSnapshots();
+
+        if (chaseBehavior != null)
+            chaseBehavior.ResetFruitlessSnapshotChase();
+
+        if (anim != null)
+            anim.PlaySearchToIdle();
+
+        controller.NotifyNpcChaseFailed();
         controller.CurrentNpcState = NpcState.Idle;
+    }
+
+    private void StopSearchTimer()
+    {
+        searchStarted = false;
+
+        if (timer != null)
+        {
+            timer.StopTimer(NpcTimerType.Search);
+            timer.ResetTimer(NpcTimerType.Search);
+        }
     }
 
     private bool IsValidSearchState()
     {
         LazyInstantiate();
 
-        return searchStarted && controller.CurrentNpcState == NpcState.Search;
+        return searchStarted && controller != null && controller.CurrentNpcState == NpcState.Search;
     }
 
     private void LazyInstantiate()
@@ -174,6 +241,9 @@ public class NpcSearchBehavior : MonoBehaviour
 
         if (nav == null)
             nav = GetComponent<NpcNavigate>();
+
+        if (chaseBehavior == null)
+            chaseBehavior = GetComponent<NpcChaseBehavior>();
 
         if (animator == null)
             animator = GetComponent<Animator>();

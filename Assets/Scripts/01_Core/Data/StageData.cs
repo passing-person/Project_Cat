@@ -19,9 +19,11 @@ public class StageData : ScriptableObject
     public float securityMultiplierOverride = 13f;
 
     [Header("Hiding")]
-    public float maxHideDuration = 10f;
+    [Tooltip("0 = no forced exit; player leaves hide with F")]
+    public float maxHideDuration;
     public float hiddenMultiplierScale = 0.1f;
-    public int hideSpotUsesPerStage = 1;
+    [Tooltip("0 = unlimited uses per hide spot per stage")]
+    public int hideSpotUsesPerStage;
 
     public void NormalizeValues()
     {
@@ -37,7 +39,7 @@ public class StageData : ScriptableObject
         securityMultiplierOverride = Mathf.Max(0f, securityMultiplierOverride);
         maxHideDuration = Mathf.Max(0f, maxHideDuration);
         hiddenMultiplierScale = Mathf.Clamp01(hiddenMultiplierScale);
-        hideSpotUsesPerStage = Mathf.Max(1, hideSpotUsesPerStage);
+        hideSpotUsesPerStage = Mathf.Max(0, hideSpotUsesPerStage);
     }
 
     public bool IsValid(out string message)
@@ -84,9 +86,9 @@ public class StageData : ScriptableObject
             return false;
         }
 
-        if (hideSpotUsesPerStage <= 0)
+        if (hideSpotUsesPerStage < 0)
         {
-            message = "StageData.hideSpotUsesPerStage must be greater than zero.";
+            message = "StageData.hideSpotUsesPerStage cannot be negative.";
             return false;
         }
 

@@ -262,7 +262,7 @@ public class RageManager : MonoBehaviour
         SetRage(npcId, 0f);
     }
 
-    public List<RageResult> ReduceRageAround(Vector3 position, float radius, float amount)
+    public List<RageResult> ReduceRageAround(Vector3 position, float radius, float amount, bool excludeSecurity = false)
     {
         List<RageResult> results = new List<RageResult>();
         float safeRadius = Mathf.Max(0f, radius);
@@ -273,6 +273,15 @@ public class RageManager : MonoBehaviour
             if (receiver == null || !receiver.CanReceiveRage)
             {
                 continue;
+            }
+
+            if (excludeSecurity)
+            {
+                NpcData data = receiver.NpcData;
+                if (data != null && data.npcType == NpcType.Security)
+                {
+                    continue;
+                }
             }
 
             if (Vector3.Distance(position, receiver.Position) <= safeRadius)

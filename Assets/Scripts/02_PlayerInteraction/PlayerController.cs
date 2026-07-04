@@ -3,6 +3,8 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private string playerId = "PlayerCat";
+    [SerializeField] private PlayerAnimationController animationController;
+    [SerializeField] private PlayerSfxController sfxController;
 
     public string PlayerId => playerId;
     public bool IsHidden { get; private set; }
@@ -22,8 +24,8 @@ public class PlayerController : MonoBehaviour
     {
         SetControllable(false);
         SetHidden(false);
-
-        // TODO: Play caught animation here.
+        animationController?.PlayCaught();
+        sfxController?.PlayCaught();
     }
 
     public PlayerContext GetContext()

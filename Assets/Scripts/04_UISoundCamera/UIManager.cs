@@ -4,12 +4,12 @@ public class UIManager : MonoBehaviour
 {
     public void ShowPrompt(string message)
     {
-        Debug.Log("Prompt: " + message);
+        Debug.Log("Prompt:\n" + message);
     }
 
     public void HidePrompt()
     {
-        Debug.Log("Prompt hidden");
+        Debug.Log(BilingualDebug.Line("提示已隐藏", "Prompt hidden"));
     }
 
     public void SetObjectiveText(string text)
@@ -37,9 +37,16 @@ public class UIManager : MonoBehaviour
         Debug.Log("Timer: " + time.ToString("0.0"));
     }
 
-    public void SetCuteCooldown(float normalizedValue)
+    public void SetCuteCooldown(float remainingSeconds, float totalSeconds)
     {
-        Debug.Log("Cute Cooldown: " + normalizedValue.ToString("0.00"));
+        Debug.Log(BilingualDebug.Line(
+            $"撒娇冷却: {Mathf.Max(0f, remainingSeconds):0.0}s / {totalSeconds:0.0}s",
+            $"Cute cooldown: {Mathf.Max(0f, remainingSeconds):0.0}s / {totalSeconds:0.0}s"));
+    }
+
+    public void HideCuteCooldown()
+    {
+        Debug.Log(BilingualDebug.Line("撒娇冷却: 就绪", "Cute cooldown: ready"));
     }
 
     public void ShowDangerWarning(string message)

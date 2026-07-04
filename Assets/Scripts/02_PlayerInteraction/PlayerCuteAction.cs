@@ -15,7 +15,7 @@ public class PlayerCuteAction : MonoBehaviour
     public float rageReduction = 20f;
 
     [Header("Cooldown")]
-    public float cooldown = 5f;
+    public float cooldown = 20f;
     public float cooldownUiReportInterval = 1f;
 
     private float cooldownTimer;
@@ -65,6 +65,7 @@ public class PlayerCuteAction : MonoBehaviour
         cooldownTimer = cooldown;
         cooldownUiTimer = 0f;
         uiManager?.SetCuteCooldown(cooldownTimer, cooldown);
+        uiManager?.ShowInteractionNotice("Cute action! Nearby rage -" + rageReduction.ToString("0"));
 
         animationController?.PlayCute();
         sfxController?.PlayCute();

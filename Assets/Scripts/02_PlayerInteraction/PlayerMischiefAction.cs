@@ -5,17 +5,32 @@ public class PlayerMischiefAction : MonoBehaviour
     [Header("References")]
     [SerializeField] private PlayerController playerController;
     [SerializeField] private PlayerInteraction playerInteraction;
+    [SerializeField] private CoreFacade coreFacade;
     [SerializeField] private MischiefManager mischiefManager;
     [SerializeField] private PlayerAnimationController animationController;
     [SerializeField] private PlayerSfxController sfxController;
+    [SerializeField] private UIManager uiManager;
 
     [Header("Debug")]
     public bool logMischiefDebug = true;
 
+    private void Awake()
+    {
+        if (playerController == null) playerController = GetComponent<PlayerController>();
+        if (playerInteraction == null) playerInteraction = GetComponent<PlayerInteraction>();
+        if (coreFacade == null) coreFacade = FindObjectOfType<CoreFacade>();
+        if (mischiefManager == null) mischiefManager = FindObjectOfType<MischiefManager>();
+        if (animationController == null) animationController = GetComponent<PlayerAnimationController>();
+        if (sfxController == null) sfxController = GetComponent<PlayerSfxController>();
+        if (uiManager == null) uiManager = FindObjectOfType<UIManager>();
+    }
+
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
+        {
             TryPerformMischief();
+        }
     }
 
     public void TryPerformMischief()
@@ -25,14 +40,15 @@ public class PlayerMischiefAction : MonoBehaviour
             LogDebug(BilingualDebug.Line(
                 "左键失败：PlayerInteraction 未连接",
                 "LMB failed: PlayerInteraction is not assigned"));
+            uiManager?.ShowInteractionNotice("Mischief failed: interaction is missing");
             return;
         }
 
-        if (mischiefManager == null)
+        if (coreFacade == null && mischiefManager == null)
         {
             LogDebug(BilingualDebug.Line(
-                "左键失败：MischiefManager 未连接",
-                "LMB failed: MischiefManager is not assigned"));
+                "左键失败：CoreFacade / MischiefManager 未连接",
+                "LMB failed: CoreFacade / MischiefManager is not assigned"));
             return;
         }
 
@@ -55,8 +71,9 @@ public class PlayerMischiefAction : MonoBehaviour
         if (playerInteraction.CurrentTarget == null)
         {
             LogDebug(BilingualDebug.Line(
-                "左键失败：没有交互目标（请靠近键盘/电话）",
-                "LMB failed: no interaction target (move near keyboard or phone)"));
+                "左键失败：没有交互目标",
+                "LMB failed: no interaction target"));
+            uiManager?.ShowInteractionNotice("Move close to a target and press E first");
             return;
         }
 
@@ -66,6 +83,7 @@ public class PlayerMischiefAction : MonoBehaviour
             LogDebug(BilingualDebug.Line(
                 $"左键失败：当前目标不是捣乱点 → {playerInteraction.CurrentTarget.InteractionId}",
                 $"LMB failed: current target is not a mischief target → {playerInteraction.CurrentTarget.InteractionId}"));
+            uiManager?.ShowInteractionNotice("This target cannot be mischieved");
             return;
         }
 
@@ -77,17 +95,18 @@ public class PlayerMischiefAction : MonoBehaviour
             return;
         }
 
-        if (!mischiefManager.CanApplyMischief(target.InteractionId))
+        if (!CanApplyMischief(target.InteractionId))
         {
             LogDebug(BilingualDebug.Line(
-                $"左键失败：MischiefManager 拒绝 → {target.InteractionId}，状态={mischiefManager.GetMischiefTargetState(target.InteractionId)}",
-                $"LMB failed: MischiefManager rejected → {target.InteractionId}, state={mischiefManager.GetMischiefTargetState(target.InteractionId)}"));
+                $"左键失败：Core 拒绝 → {target.InteractionId}，状态={GetTargetState(target.InteractionId)}",
+                $"LMB failed: Core rejected → {target.InteractionId}, state={GetTargetState(target.InteractionId)}"));
+            uiManager?.ShowInteractionNotice("Target unavailable: " + GetTargetState(target.InteractionId));
             return;
         }
 
         string actorId = playerController != null ? playerController.PlayerId : "Player";
         MischiefContext context = target.CreateContext(actorId);
-        bool applied = mischiefManager.ApplyMischief(context);
+        bool applied = ApplyMischief(context);
 
         if (!applied)
         {
@@ -100,14 +119,47 @@ public class PlayerMischiefAction : MonoBehaviour
         LogDebug(BilingualDebug.Line(
             $"左键成功：捣乱 → {target.InteractionId}，怒气 +{context.BaseRageAmount}",
             $"LMB success: mischief → {target.InteractionId}, rage +{context.BaseRageAmount}"));
+        uiManager?.ShowMischiefApplied(target.InteractionId, context.BaseRageAmount);
         animationController?.PlayMischief();
         sfxController?.PlayMischief();
+    }
+
+    private bool CanApplyMischief(string targetId)
+    {
+        if (coreFacade != null)
+        {
+            return coreFacade.CanApplyMischief(targetId);
+        }
+
+        return mischiefManager != null && mischiefManager.CanApplyMischief(targetId);
+    }
+
+    private MischiefTargetState GetTargetState(string targetId)
+    {
+        if (coreFacade != null)
+        {
+            return coreFacade.GetMischiefTargetState(targetId);
+        }
+
+        return mischiefManager != null ? mischiefManager.GetMischiefTargetState(targetId) : MischiefTargetState.Disabled;
+    }
+
+    private bool ApplyMischief(MischiefContext context)
+    {
+        if (coreFacade != null)
+        {
+            return coreFacade.ApplyMischief(context);
+        }
+
+        return mischiefManager != null && mischiefManager.ApplyMischief(context);
     }
 
     private void LogDebug(string message)
     {
         if (!logMischiefDebug)
+        {
             return;
+        }
 
         Debug.Log($"[PlayerMischief] {message}", this);
     }

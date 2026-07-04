@@ -8,43 +8,63 @@ public class HUDManager : MonoBehaviour
     public TMP_Text multiplierText;
     public TMP_Text targetScoreText;
 
-    [Header("Game Data")]
-    public int score = 0;
-    public float multiplier = 1.0f;
-    public int targetScore = 300;
+    private int currentScore;
+    private int currentTargetScore;
+    private float currentMultiplier = 1f;
 
-    void Start()
+    private void Start()
     {
-        UpdateHUD();
+        RefreshUI();
     }
 
-    public void UpdateHUD()
+    private void RefreshUI()
     {
-        scoreText.text = "" + score;
+        if (scoreText != null)
+        {
+            scoreText.text = currentScore.ToString();
+        }
 
-        multiplierText.text = "" + multiplier.ToString("F1") + "x";
+        if (multiplierText != null)
+        {
+            multiplierText.text = currentMultiplier.ToString("F1") + "x";
+        }
 
-        targetScoreText.text = "目标：" + targetScore;
+        if (targetScoreText != null)
+        {
+            targetScoreText.text = "目标：" + currentTargetScore;
+        }
     }
 
-    public void AddScore(int amount)
+    /// <summary>
+    /// 更新分数和目标分数
+    /// 给 UICoreBridge 调用
+    /// </summary>
+    public void SetScore(int score, int targetScore)
     {
-        score += amount;
+        currentScore = score;
+        currentTargetScore = targetScore;
 
-        UpdateHUD();
+        RefreshUI();
     }
 
-    public void SetMultiplier(float value)
+    /// <summary>
+    /// 更新倍率
+    /// 给 UICoreBridge 调用
+    /// </summary>
+    public void SetMultiplier(float multiplier)
     {
-        multiplier = value;
+        currentMultiplier = multiplier;
 
-        UpdateHUD();
+        RefreshUI();
     }
 
-    public void SetTargetScore(int value)
+    /// <summary>
+    /// 单独更新目标分数
+    /// </summary>
+    public void SetTargetScore(int targetScore)
     {
-        targetScore = value;
+        currentTargetScore = targetScore;
 
-        UpdateHUD();
+        RefreshUI();
     }
 }

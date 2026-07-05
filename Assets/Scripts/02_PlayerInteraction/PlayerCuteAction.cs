@@ -11,7 +11,7 @@ public class PlayerCuteAction : MonoBehaviour
     [SerializeField] private PlayerSfxController sfxController;
 
     [Header("Cute Action")]
-    public float radius = 4f;
+    public float radius = 5f;
     public float rageReduction = 20f;
 
     [Header("Cooldown")]
@@ -50,7 +50,10 @@ public class PlayerCuteAction : MonoBehaviour
     public void TryCuteAction()
     {
         if (cooldownTimer > 0f)
+        {
+            uiManager?.ShowActionBlocked("Cute cooldown " + cooldownTimer.ToString("0.0") + "s");
             return;
+        }
 
         List<RageResult> results = null;
 
@@ -60,12 +63,15 @@ public class PlayerCuteAction : MonoBehaviour
             results = rageManager.ReduceRageAround(transform.position, radius, rageReduction, excludeSecurity: true);
 
         if (results == null || results.Count == 0)
+        {
+            uiManager?.ShowActionBlocked("No NPC within " + radius.ToString("0") + "m");
             return;
+        }
 
         cooldownTimer = cooldown;
         cooldownUiTimer = 0f;
         uiManager?.SetCuteCooldown(cooldownTimer, cooldown);
-        uiManager?.ShowInteractionNotice("Cute action! Nearby rage -" + rageReduction.ToString("0"));
+        uiManager?.ShowCuteApplied(results, rageReduction);
 
         animationController?.PlayCute();
         sfxController?.PlayCute();

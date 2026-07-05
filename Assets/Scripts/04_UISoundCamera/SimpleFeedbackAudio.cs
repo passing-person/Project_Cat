@@ -39,6 +39,12 @@ public class SimpleFeedbackAudio : MonoBehaviour
         PlayTone("hide_exit", 520f, 0.08f, volume * 0.7f);
     }
 
+    public void PlayCute()
+    {
+        PlayTone("cute_a", 760f, 0.075f, volume * 0.8f);
+        PlayTone("cute_b", 1140f, 0.09f, volume * 0.55f);
+    }
+
     public void PlayError()
     {
         PlayTone("error", 160f, 0.12f, volume * 0.85f);

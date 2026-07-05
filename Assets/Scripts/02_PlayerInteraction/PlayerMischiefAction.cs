@@ -95,6 +95,22 @@ public class PlayerMischiefAction : MonoBehaviour
             return;
         }
 
+        MischiefWorldEventReporter worldEventReporter = GetWorldEventReporter(target);
+        if (worldEventReporter != null && !worldEventReporter.CanStartWorldEvent())
+        {
+            string reason = worldEventReporter.GetUnavailableReason();
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                reason = "World event is not ready";
+            }
+
+            LogDebug(BilingualDebug.Line(
+                $"左键失败：世界事件不可用 → {target.InteractionId}，原因={reason}",
+                $"LMB failed: world event unavailable → {target.InteractionId}, reason={reason}"));
+            uiManager?.ShowInteractionNotice(reason);
+            return;
+        }
+
         if (!CanApplyMischief(target.InteractionId))
         {
             LogDebug(BilingualDebug.Line(
@@ -120,8 +136,45 @@ public class PlayerMischiefAction : MonoBehaviour
             $"左键成功：捣乱 → {target.InteractionId}，怒气 +{context.BaseRageAmount}",
             $"LMB success: mischief → {target.InteractionId}, rage +{context.BaseRageAmount}"));
         uiManager?.ShowMischiefApplied(target.InteractionId, context.BaseRageAmount);
+        ReportWorldEvent(target, context);
         animationController?.PlayMischief();
         sfxController?.PlayMischief();
+    }
+
+
+    private void ReportWorldEvent(IMischiefTarget target, MischiefContext context)
+    {
+        MischiefWorldEventResult result = MischiefWorldEventResult.Ignored(context.TargetId, MischiefWorldEventType.None, context.Position, string.Empty);
+        bool hasReporter = false;
+
+        MischiefWorldEventReporter reporter = GetWorldEventReporter(target);
+        if (reporter != null)
+        {
+            hasReporter = true;
+            result = reporter.Report(context);
+        }
+
+        if (!hasReporter && coreFacade != null)
+        {
+            result = coreFacade.ReportMischiefEventFromMischief(context);
+        }
+
+        if (result.Dispatched)
+        {
+            uiManager?.ShowWorldEventRouted(result);
+            LogDebug($"World event routed: {result.EventType} / target={result.TargetId} / npc={result.AssignedNpcId}");
+        }
+    }
+
+    private MischiefWorldEventReporter GetWorldEventReporter(IMischiefTarget target)
+    {
+        MonoBehaviour targetBehaviour = target as MonoBehaviour;
+        if (targetBehaviour == null)
+        {
+            return null;
+        }
+
+        return targetBehaviour.GetComponent<MischiefWorldEventReporter>();
     }
 
     private bool CanApplyMischief(string targetId)

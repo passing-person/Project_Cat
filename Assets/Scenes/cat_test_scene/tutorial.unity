@@ -9880,6 +9880,42 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!114 &578640187 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6386803916316461473, guid: 2162d65336e8f204f97518c950bd891a,
+    type: 3}
+  m_PrefabInstance: {fileID: 6561725181870719144}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3374f849ba2fa8b408b0264758f7732c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &578640188 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7447006991218412425, guid: 2162d65336e8f204f97518c950bd891a,
+    type: 3}
+  m_PrefabInstance: {fileID: 6561725181870719144}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b844802dcce91a4b88fbe34e9417df7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &578640189 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7937356683041428372, guid: 2162d65336e8f204f97518c950bd891a,
+    type: 3}
+  m_PrefabInstance: {fileID: 6561725181870719144}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04d355f3432ba584fa724fbd3e38ee23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &585999896
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -46178,10 +46214,45 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1567254495662694490, guid: 2162d65336e8f204f97518c950bd891a,
+        type: 3}
+      propertyPath: playerController
+      value: 
+      objectReference: {fileID: 578640189}
     - target: {fileID: 3730411309382853356, guid: 2162d65336e8f204f97518c950bd891a,
         type: 3}
       propertyPath: jumpForce
-      value: 8
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3730411309382853356, guid: 2162d65336e8f204f97518c950bd891a,
+        type: 3}
+      propertyPath: groundCheck
+      value: 
+      objectReference: {fileID: 1863932223}
+    - target: {fileID: 3730411309382853356, guid: 2162d65336e8f204f97518c950bd891a,
+        type: 3}
+      propertyPath: sfxController
+      value: 
+      objectReference: {fileID: 578640187}
+    - target: {fileID: 3730411309382853356, guid: 2162d65336e8f204f97518c950bd891a,
+        type: 3}
+      propertyPath: playerController
+      value: 
+      objectReference: {fileID: 578640189}
+    - target: {fileID: 3730411309382853356, guid: 2162d65336e8f204f97518c950bd891a,
+        type: 3}
+      propertyPath: animationController
+      value: 
+      objectReference: {fileID: 578640188}
+    - target: {fileID: 3823647580954608885, guid: 2162d65336e8f204f97518c950bd891a,
+        type: 3}
+      propertyPath: playerController
+      value: 
+      objectReference: {fileID: 578640189}
+    - target: {fileID: 3823647580954608885, guid: 2162d65336e8f204f97518c950bd891a,
+        type: 3}
+      propertyPath: playerInteraction
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5827777631391397180, guid: 2162d65336e8f204f97518c950bd891a,
         type: 3}

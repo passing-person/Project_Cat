@@ -1861,6 +1861,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sfxSource: {fileID: 0}
   bgmSource: {fileID: 0}
+  sfxLibrary: {fileID: 0}
+  logMissingClips: 1
+  createTemporarySourceForSpatialSfx: 1
 --- !u!114 &417420914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7007,6 +7010,11 @@ PrefabInstance:
     - target: {fileID: 1326488496930251121, guid: 9918fe0a1c263a2489207de9d58bf905,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2973604398667711455, guid: 9918fe0a1c263a2489207de9d58bf905,
+        type: 3}
+      propertyPath: OverrideSchedule.Array.size
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3360094936446968650, guid: 9918fe0a1c263a2489207de9d58bf905,

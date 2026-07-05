@@ -1,85 +1,431 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class NpcOverrideBehavior : MonoBehaviour
 {
-    [SerializeField] List<OverrideScheduleEntry> OverrideSchedule;
-    
-    private NpcController controller;
+    [Header("Override Schedule")]
+    [SerializeField] private List<OverrideScheduleEntry> OverrideSchedule = new();
 
-    private string NpcId => controller.NpcId;
+    [Header("Generic Light Reaction")]
+    [SerializeField, Min(0f)] private float lightStunDuration = 1.25f;
+
+    [Header("Reactor Movement")]
+    [SerializeField] private bool useChaseSpeedForOverrideMove = false;
+    [SerializeField, Min(0.1f)] private float reactorMoveTimeout = 8f;
+
+    private NpcController controller;
+    private NpcNavigate nav;
+    private NpcAnimationMachine anim;
+
+    private readonly List<OverrideJob> pendingJobs = new();
+    private Coroutine processRoutine;
+    private OverrideJob currentJob;
+    private long nextSequence;
+
+    private string NpcId => controller != null ? controller.NpcId : gameObject.name;
+    private NpcType NpcType => controller != null ? controller.NpcType : NpcType.Worker;
 
     private void Awake()
     {
         LazyInstantiate();
     }
 
-    public void Supervisor()
-    {
-
-    }
-
-    public void Worker()
-    {
-
-    }
-
-    public void Cleaner()
-    {
-
-    }
-
-    public void Security()
-    {
-
-    }
+    // These are called by NpcController when the gameplay state becomes Override.
+    // They are not event entry points; they only begin queue processing for this NPC type.
+    public void Supervisor() => EnsureProcessing();
+    public void Worker() => EnsureProcessing();
+    public void Cleaner() => EnsureProcessing();
+    public void Security() => EnsureProcessing();
 
     public void ExitState()
     {
+        if (processRoutine != null)
+        {
+            StopCoroutine(processRoutine);
+            processRoutine = null;
+        }
 
+        currentJob = null;
+
+        if (nav != null)
+            nav.StopNav();
     }
 
     public void OnMischiefWorldEvent(MischiefWorldEventContext context)
     {
-        var WorldEventType = context.EventType;
-        switch (WorldEventType)
+        LazyInstantiate();
+
+        bool enqueued = false;
+
+        switch (context.EventType)
         {
-            case MischiefWorldEventType.None:
-                Debug.LogWarning($"[NPC] {NpcId}: cannot resolve world event of type {WorldEventType}.");
+            case MischiefWorldEventType.LightToggle:
+                // Generic light reaction applies to every NPC that receives the global broadcast.
+                EnqueueJob(context, OverrideReactionRole.Generic);
+                enqueued = true;
+
+                // Core guarantees only one NPC receives ShouldReact == true.
+                if (context.ShouldReact)
+                {
+                    EnqueueJob(context, OverrideReactionRole.Reactor);
+                    enqueued = true;
+                }
                 break;
-            case MischiefWorldEventType.Auto:
+
+            case MischiefWorldEventType.PrinterMess:
+            case MischiefWorldEventType.WaterDispenserMess:
             case MischiefWorldEventType.GenericMess:
-                Debug.LogWarning($"[NPC] {NpcId}: world event of type {WorldEventType} not implemented.");
+                // Mess has no generic reaction. Only the assigned reactor handles it.
+                if (context.ShouldReact)
+                {
+                    EnqueueJob(context, OverrideReactionRole.Reactor);
+                    enqueued = true;
+                }
+                break;
+
+            case MischiefWorldEventType.MicrophoneBroadcast:
+                // This event is handled elsewhere as generic rage/audio behavior.
+                return;
+
+            case MischiefWorldEventType.Auto:
+                // CoreFacade normally resolves Auto before dispatching to NPCs. If it reaches here,
+                // the caller bypassed normal routing or Core could not infer a concrete event type.
+                Debug.LogWarning($"[NPC Override] {NpcId}: received unresolved Auto world event for target '{context.TargetId}'. Ignored.");
+                return;
+
+            case MischiefWorldEventType.None:
+                Debug.LogWarning($"[NPC Override] {NpcId}: cannot resolve world event of type None for target '{context.TargetId}'.");
+                return;
+
+            default:
+                Debug.LogWarning($"[NPC Override] {NpcId}: world event of type {context.EventType} is not implemented.");
+                return;
+        }
+
+        if (!enqueued)
+            return;
+
+        SortPendingJobs();
+
+        if (controller != null)
+            controller.RequestOverrideState();
+
+        EnsureProcessing();
+    }
+
+    private void EnqueueJob(MischiefWorldEventContext context, OverrideReactionRole role)
+    {
+        int priority = ResolvePriority(context.EventType, role, context.TargetId);
+
+        pendingJobs.Add(new OverrideJob(
+            context,
+            role,
+            priority,
+            nextSequence++
+        ));
+
+        Debug.Log(
+            $"[NPC Override] {NpcId}: queued {role} {context.EventType}. " +
+            $"Target={context.TargetId}, Priority={priority}."
+        );
+    }
+
+    private void EnsureProcessing()
+    {
+        LazyInstantiate();
+
+        if (processRoutine != null)
+            return;
+
+        if (pendingJobs.Count <= 0)
+        {
+            if (controller != null && controller.CurrentNpcState == NpcState.Override)
+                controller.FinishOverrideState();
+            return;
+        }
+
+        processRoutine = StartCoroutine(ProcessOverrideQueueRoutine());
+    }
+
+    private IEnumerator ProcessOverrideQueueRoutine()
+    {
+        while (pendingJobs.Count > 0)
+        {
+            SortPendingJobs();
+
+            currentJob = pendingJobs[0];
+            pendingJobs.RemoveAt(0);
+
+            Debug.Log(
+                $"[NPC Override] {NpcId}: start {currentJob.Role} {currentJob.Context.EventType}. " +
+                $"Target={currentJob.Context.TargetId}, Priority={currentJob.Priority}, Sequence={currentJob.Sequence}."
+            );
+
+            if (currentJob.Role == OverrideReactionRole.Generic)
+            {
+                yield return ExecuteGenericReaction(currentJob.Context);
+            }
+            else
+            {
+                yield return ExecuteReactorReaction(currentJob.Context);
+            }
+
+            currentJob = null;
+            yield return null;
+        }
+
+        processRoutine = null;
+
+        if (controller != null)
+            controller.FinishOverrideState();
+    }
+
+    private IEnumerator ExecuteGenericReaction(MischiefWorldEventContext context)
+    {
+        switch (context.EventType)
+        {
+            case MischiefWorldEventType.LightToggle:
+                yield return ExecuteGenericLightReaction(context);
                 break;
         }
     }
 
-    // make sure non-reacter doesn't call these signal methods.
+    private IEnumerator ExecuteGenericLightReaction(MischiefWorldEventContext context)
+    {
+        // Abstraction layer for NPC-type-specific generic reactions.
+        // Security can later override this to turn on a flashlight while other NPCs stun.
+        switch (NpcType)
+        {
+            case NpcType.Security:
+                yield return ExecuteSecurityLightReaction(context);
+                break;
+
+            default:
+                yield return ExecuteNonSecurityLightStun(context);
+                break;
+        }
+    }
+
+    private IEnumerator ExecuteSecurityLightReaction(MischiefWorldEventContext context)
+    {
+        // TODO: replace this with Security flashlight behavior when that animation/tool exists.
+        yield return ExecuteNonSecurityLightStun(context);
+    }
+
+    private IEnumerator ExecuteNonSecurityLightStun(MischiefWorldEventContext context)
+    {
+        if (nav != null)
+        {
+            nav.StopPatrol();
+            nav.StopNav();
+        }
+
+        if (anim != null)
+            anim.PlayOverrideMove();
+
+        if (lightStunDuration > 0f)
+            yield return new WaitForSeconds(lightStunDuration);
+    }
+
+    private IEnumerator ExecuteReactorReaction(MischiefWorldEventContext context)
+    {
+        if (!context.ShouldReact)
+        {
+            Debug.LogWarning($"[NPC Override] {NpcId}: tried to execute reactor job with ShouldReact=false. Ignored.");
+            yield break;
+        }
+
+        if (nav != null)
+        {
+            nav.StopPatrol();
+            nav.StopNav();
+        }
+
+        if (anim != null)
+            anim.PlayOverrideMove();
+
+        bool arrived = false;
+        void OnArrived() => arrived = true;
+
+        if (nav != null)
+        {
+            nav.DestinationReached += OnArrived;
+            nav.StartNavToPoint(context.Position, useChaseSpeedForOverrideMove);
+        }
+        else
+        {
+            arrived = true;
+        }
+
+        float elapsed = 0f;
+        while (!arrived && elapsed < reactorMoveTimeout)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (nav != null)
+        {
+            nav.DestinationReached -= OnArrived;
+            nav.StopNav();
+        }
+
+        if (!arrived)
+        {
+            Debug.LogWarning(
+                $"[NPC Override] {NpcId}: reactor move to {context.TargetId} timed out after {reactorMoveTimeout:0.00}s. " +
+                "Completing the world event anyway so Core does not stay locked."
+            );
+        }
+
+        CompleteWorldEventForReactor(context);
+    }
+
+    private void CompleteWorldEventForReactor(MischiefWorldEventContext context)
+    {
+        if (!context.ShouldReact)
+            return;
+
+        if (string.IsNullOrWhiteSpace(context.TargetId))
+            return;
+
+        switch (context.EventType)
+        {
+            case MischiefWorldEventType.LightToggle:
+                // Light is turned off and made usable again immediately.
+                CompleteMischiefWorldEvent(context.TargetId, false, 0f);
+                break;
+
+            case MischiefWorldEventType.PrinterMess:
+            case MischiefWorldEventType.WaterDispenserMess:
+            case MischiefWorldEventType.GenericMess:
+                // Mess targets are cleaned and disabled for this stage.
+                CompleteMischiefWorldEvent(context.TargetId);
+                break;
+        }
+    }
+
     private void CompleteMischiefWorldEvent(string targetId)
     {
-        controller.CompleteMischiefWorldEvent(targetId);
+        if (controller != null)
+            controller.CompleteMischiefWorldEvent(targetId);
     }
-    private void CompleteMischiefWorldEvent(string targetId, bool value1, float value2)
+
+    private void CompleteMischiefWorldEvent(string targetId, bool disableTarget, float cooldownDuration)
     {
-        controller.CompleteMischiefWorldEvent(targetId, value1, value2);
+        if (controller != null)
+            controller.CompleteMischiefWorldEvent(targetId, disableTarget, cooldownDuration);
+    }
+
+    private int ResolvePriority(MischiefWorldEventType eventType, OverrideReactionRole role, string targetId)
+    {
+        int bestPriority = int.MaxValue;
+        bool found = false;
+
+        for (int i = 0; i < OverrideSchedule.Count; i++)
+        {
+            OverrideScheduleEntry entry = OverrideSchedule[i];
+            if (!entry.Matches(eventType, role, targetId))
+                continue;
+
+            if (!found || entry.Priority < bestPriority)
+            {
+                found = true;
+                bestPriority = entry.Priority;
+            }
+        }
+
+        if (found)
+            return bestPriority;
+
+        return GetDefaultPriority(eventType, role);
+    }
+
+    private int GetDefaultPriority(MischiefWorldEventType eventType, OverrideReactionRole role)
+    {
+        // Smaller number = higher priority.
+        // Default Light behavior: everyone stuns first; assigned reactor then goes to fix the light.
+        if (eventType == MischiefWorldEventType.LightToggle && role == OverrideReactionRole.Generic)
+            return 0;
+
+        if (role == OverrideReactionRole.Reactor)
+            return 10;
+
+        return 100;
+    }
+
+    private void SortPendingJobs()
+    {
+        pendingJobs.Sort((a, b) =>
+        {
+            int priorityCompare = a.Priority.CompareTo(b.Priority);
+            if (priorityCompare != 0)
+                return priorityCompare;
+
+            return a.Sequence.CompareTo(b.Sequence);
+        });
     }
 
     private void LazyInstantiate()
     {
         if (controller == null)
             controller = GetComponent<NpcController>();
+
+        if (nav == null)
+            nav = GetComponent<NpcNavigate>();
+
+        if (anim == null)
+            anim = GetComponent<NpcAnimationMachine>();
+    }
+
+    private enum OverrideReactionRole
+    {
+        Any,
+        Generic,
+        Reactor
+    }
+
+    private sealed class OverrideJob
+    {
+        public readonly MischiefWorldEventContext Context;
+        public readonly OverrideReactionRole Role;
+        public readonly int Priority;
+        public readonly long Sequence;
+
+        public OverrideJob(MischiefWorldEventContext context, OverrideReactionRole role, int priority, long sequence)
+        {
+            Context = context;
+            Role = role;
+            Priority = priority;
+            Sequence = sequence;
+        }
     }
 
     [System.Serializable]
     private struct OverrideScheduleEntry
     {
-        [SerializeField] MischiefWorldEventType OverrideType;
-        [Tooltip("Smaller entries have higher priority")]
-        [SerializeField] int priority;
-        [Tooltip("FIFO order for events with the same level of priority. Smaller entries are handled eariler.")]
-        [SerializeField] int order;
-        [SerializeField] string targetId;
+        [SerializeField] private MischiefWorldEventType OverrideType;
+        [SerializeField] private OverrideReactionRole reactionRole;
+        [Tooltip("Optional. Leave empty to match any target id.")]
+        [SerializeField] private string targetId;
+        [Tooltip("Smaller entries have higher priority.")]
+        [SerializeField] private int priority;
+
+        public readonly int Priority => priority;
+
+        public bool Matches(MischiefWorldEventType eventType, OverrideReactionRole role, string eventTargetId)
+        {
+            if (OverrideType != eventType)
+                return false;
+
+            if (reactionRole != OverrideReactionRole.Any && reactionRole != role)
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(targetId) && targetId != eventTargetId)
+                return false;
+
+            return true;
+        }
     }
 }

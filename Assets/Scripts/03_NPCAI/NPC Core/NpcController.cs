@@ -166,18 +166,92 @@ public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventRe
 
     public void OnMischiefWorldEvent(MischiefWorldEventContext context)
     {
-        // CoreFacade calls it for you
+        LazyInitialize();
+
+        if (npcOverrideBehavior == null)
+        {
+            Debug.LogWarning($"[NPC] {NpcId}: received world event but NpcOverrideBehavior is missing.");
+            return;
+        }
+
         npcOverrideBehavior.OnMischiefWorldEvent(context);
     }
 
     public void CompleteMischiefWorldEvent(string targetId)
     {
+        if (coreFacade == null)
+            coreFacade = FindFirstObjectByType<CoreFacade>();
+
+        if (coreFacade == null)
+        {
+            Debug.LogWarning($"[NPC] {NpcId}: cannot complete world event '{targetId}' because CoreFacade is missing.");
+            return;
+        }
+
         coreFacade.CompleteMischiefWorldEvent(targetId);
     }
 
-    public void CompleteMischiefWorldEvent(string targetId, bool value1, float value2)
+    public void CompleteMischiefWorldEvent(string targetId, bool disableTarget, float cooldownDuration)
     {
-        coreFacade.CompleteMischiefWorldEvent(targetId, value1, value2);
+        if (coreFacade == null)
+            coreFacade = FindFirstObjectByType<CoreFacade>();
+
+        if (coreFacade == null)
+        {
+            Debug.LogWarning($"[NPC] {NpcId}: cannot complete world event '{targetId}' because CoreFacade is missing.");
+            return;
+        }
+
+        coreFacade.CompleteMischiefWorldEvent(targetId, disableTarget, cooldownDuration);
+    }
+
+    public void RequestOverrideState()
+    {
+        LazyInitialize();
+
+        _isOverride = true;
+
+        // Override must be able to interrupt every other behavior immediately,
+        // so bypass NpcStateMachine.TryTransition/CanInterrupt here.
+        if (CurrentNpcState != NpcState.Override)
+            SwitchNpcState(NpcState.Override);
+    }
+
+    public void FinishOverrideState()
+    {
+        LazyInitialize();
+
+        _isOverride = false;
+
+        if (CurrentNpcState == NpcState.Override)
+        {
+            NpcState fallbackState = GetOverrideFallbackState();
+
+            if (npcStateMachine != null)
+                npcStateMachine.NotifyStateFinished(fallbackState);
+            else
+                SwitchNpcState(fallbackState);
+
+            return;
+        }
+
+        OnNpcStateFlagsChange();
+    }
+
+    private NpcState GetOverrideFallbackState()
+    {
+        RefreshNpcStateFlags();
+
+        if (IsTired)
+            return NpcState.Cooldown;
+
+        if (CurrentRageState != NpcRageState.Enraged)
+            return NpcState.Idle;
+
+        if (npcView != null && PlayerInReach && npcView.DiveRequestIsValid && !npcView.PlayerHidden)
+            return NpcState.Dive;
+
+        return PlayerInView ? NpcState.Chase : NpcState.Search;
     }
 
     private void OnNpcStateFlagsChange()

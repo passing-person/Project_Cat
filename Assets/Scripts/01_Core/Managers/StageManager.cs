@@ -54,6 +54,9 @@ public class StageManager : MonoBehaviour
         stageFailed = false;
         lastFailReason = string.Empty;
 
+        Debug.Log("Current Stage = " + currentStageData);
+
+        Debug.Log("TargetScore = " + currentStageData.targetScore);
         if (scoreManager != null)
         {
             scoreManager.InitializeScore(

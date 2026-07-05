@@ -6,7 +6,7 @@ public class ScoreManager : MonoBehaviour
     public MonoBehaviour uiBridgeBehaviour;
 
     [Header("Config")]
-    public int targetScore = 300;
+    public int targetScore = 2000;
     public float baseScoreRate = 10f;
     public float maxScoreMultiplierBonus = 12f;
     public bool autoTick = true;

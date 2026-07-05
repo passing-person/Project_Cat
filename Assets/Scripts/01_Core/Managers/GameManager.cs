@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     {
         ResolveUIBridge();
         InitializeGame();
+        
     }
 
     public void InitializeGame()

@@ -15,7 +15,7 @@ MonoBehaviour:
   stageId: CoreSmoke
   nextStageId: 
   objectiveType: 0
-  targetScore: 100
+  targetScore: 2000
   survivalTime: 30
   caughtRule: 2
   baseScoreRate: 10

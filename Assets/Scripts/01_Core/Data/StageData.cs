@@ -9,7 +9,7 @@ public class StageData : ScriptableObject
 
     [Header("Objective")]
     public ObjectiveType objectiveType = ObjectiveType.SurviveChase;
-    public int targetScore = 300;
+    public int targetScore = 2000;
     public float survivalTime = 30f;
     public CaughtRule caughtRule = CaughtRule.PendingDesignDecision;
 

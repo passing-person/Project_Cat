@@ -58,6 +58,7 @@ public class CoreUIBridge : MonoBehaviour, ICoreUIBridge
 
     public void SetScore(int currentScore, int targetScore)
     {
+        Debug.Log($"Bridge Score={currentScore}, Target={targetScore}");
         if (hudManager != null)
         {
             hudManager.SetScore(currentScore, targetScore);
@@ -68,6 +69,7 @@ public class CoreUIBridge : MonoBehaviour, ICoreUIBridge
     {
         if (hudManager != null)
         {
+
             hudManager.SetMultiplier(multiplier);
         }
     }

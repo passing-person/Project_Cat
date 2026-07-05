@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NpcController : MonoBehaviour, IRageReceiver
+public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventReceiver
 {
     private CoreFacade coreFacade;
 
@@ -162,6 +162,22 @@ public class NpcController : MonoBehaviour, IRageReceiver
     private void Update()
     {
         RefreshNpcStateFlags();
+    }
+
+    public void OnMischiefWorldEvent(MischiefWorldEventContext context)
+    {
+        // CoreFacade calls it for you
+        npcOverrideBehavior.OnMischiefWorldEvent(context);
+    }
+
+    public void CompleteMischiefWorldEvent(string targetId)
+    {
+        coreFacade.CompleteMischiefWorldEvent(targetId);
+    }
+
+    public void CompleteMischiefWorldEvent(string targetId, bool value1, float value2)
+    {
+        coreFacade.CompleteMischiefWorldEvent(targetId, value1, value2);
     }
 
     private void OnNpcStateFlagsChange()

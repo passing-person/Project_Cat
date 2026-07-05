@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skin_1
-  m_Shader: {fileID: 4800000, guid: be1fca6efdd6fbf438989440ba692382, type: 3}
+  m_Name: Eyebrows
+  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -17,7 +17,8 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Opaque
   disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
@@ -52,10 +53,6 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _NormalMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -99,45 +96,31 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _Fallof: 0
     - _GlossMapScale: 1
-    - _Glossiness: 0
+    - _Glossiness: 0.30996522
     - _GlossyReflections: 1
-    - _LightAcceptance: 15
-    - _LightDarkShadeRate: 1000
     - _Metallic: 0
     - _Mode: 0
-    - _NormalMapStrength: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _ScatterOverSurface: 0.5
-    - _SheenPower: 2.95
-    - _Smoothness: 0
+    - _Smoothness: 0.30996522
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _UVSec: 0
-    - _Width: 0.2
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _AOColor: {r: 0.01, g: 0.01, b: 0.01, a: 1}
-    - _BaseColor: {r: 0.9063317, g: 0.8243166, b: 0.75350595, a: 1}
-    - _BrightColor: {r: 0.9882353, g: 0.86283123, b: 0.7607843, a: 1}
-    - _Color: {r: 0.9063317, g: 0.8243166, b: 0.7535059, a: 1}
-    - _DarkShadeColor: {r: 0.5031446, g: 0.25473672, b: 0.28913155, a: 1}
-    - _DarkZoneColor: {r: 0.3773585, g: 0.24069406, b: 0.21241246, a: 1}
+    - _BaseColor: {r: 0.36556458, g: 0.33096245, b: 0.29646325, a: 1}
+    - _Color: {r: 0.36556455, g: 0.33096242, b: 0.29646322, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MidColor: {r: 0.8235294, g: 0.61490715, b: 0.5921569, a: 1}
-    - _SheenColor: {r: 0.8490566, g: 0.551311, b: 0.53666776, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _SpecularColor: {r: 1, g: 0.79456335, b: 0.627451, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &9046819110439163422
+--- !u!114 &3729965931414747422
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

@@ -39,13 +39,21 @@ public class PlayerBootstrap : MonoBehaviour
         SetPrivateField(GetComponent<PlayerInteraction>(), "uiManager", FindObjectOfType<UIManager>());
         SetPrivateField(GetComponent<PlayerInteraction>(), "playerController", GetComponent<PlayerController>());
         SetPrivateField(GetComponent<PlayerSfxController>(), "audioManager", FindObjectOfType<AudioManager>());
+        SetPrivateField(GetComponent<PlayerController>(), "animationController", GetComponent<PlayerAnimationController>());
+        SetPrivateField(GetComponent<PlayerController>(), "sfxController", GetComponent<PlayerSfxController>());
         SetPrivateField(GetComponent<PlayerMovement>(), "playerController", GetComponent<PlayerController>());
         SetPrivateField(GetComponent<PlayerMovement>(), "animationController", GetComponent<PlayerAnimationController>());
         SetPrivateField(GetComponent<PlayerMovement>(), "sfxController", GetComponent<PlayerSfxController>());
         SetPrivateField(GetComponent<PlayerMischiefAction>(), "playerController", GetComponent<PlayerController>());
         SetPrivateField(GetComponent<PlayerMischiefAction>(), "playerInteraction", GetComponent<PlayerInteraction>());
+        SetPrivateField(GetComponent<PlayerMischiefAction>(), "animationController", GetComponent<PlayerAnimationController>());
+        SetPrivateField(GetComponent<PlayerMischiefAction>(), "sfxController", GetComponent<PlayerSfxController>());
+        SetPrivateField(GetComponent<PlayerCuteAction>(), "animationController", GetComponent<PlayerAnimationController>());
+        SetPrivateField(GetComponent<PlayerCuteAction>(), "sfxController", GetComponent<PlayerSfxController>());
         SetPrivateField(GetComponent<PlayerHide>(), "playerController", GetComponent<PlayerController>());
         SetPrivateField(GetComponent<PlayerHide>(), "playerInteraction", GetComponent<PlayerInteraction>());
+        SetPrivateField(GetComponent<PlayerHide>(), "animationController", GetComponent<PlayerAnimationController>());
+        SetPrivateField(GetComponent<PlayerHide>(), "sfxController", GetComponent<PlayerSfxController>());
     }
 
     private void EnsureComponent<T>() where T : Component

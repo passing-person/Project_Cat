@@ -2657,6 +2657,37 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &147863487
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 147863488}
+  m_Layer: 0
+  m_Name: TrashEmitPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &147863488
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 147863487}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.371}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1985984440}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &149326965
 Mesh:
   m_ObjectHideFlags: 0
@@ -33028,7 +33059,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2e05a747a6709c347be39ce67225f341,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 147863488}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2e05a747a6709c347be39ce67225f341,
         type: 3}
@@ -33038,14 +33073,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1985984438}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2e05a747a6709c347be39ce67225f341,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1985984439}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2e05a747a6709c347be39ce67225f341,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1985984440}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2e05a747a6709c347be39ce67225f341,
         type: 3}
       insertIndex: -1
@@ -39988,12 +40015,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1632301951}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &1985984436 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 2e05a747a6709c347be39ce67225f341,
-    type: 3}
-  m_PrefabInstance: {fileID: 1632301951}
-  m_PrefabAsset: {fileID: 0}
 --- !u!54 &1985984437
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -40044,45 +40065,12 @@ CapsuleCollider:
   m_Height: 0.36
   m_Direction: 1
   m_Center: {x: 0, y: 0.18, z: 0}
---- !u!114 &1985984439
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+--- !u!4 &1985984440 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2e05a747a6709c347be39ce67225f341,
+    type: 3}
+  m_PrefabInstance: {fileID: 1632301951}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1985984435}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b844802dcce91a4b88fbe34e9417df7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  modelRoot: {fileID: 0}
-  animator: {fileID: 1985984436}
---- !u!114 &1985984440
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1985984435}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb1fdf4596e674048baf8f0c4c0a7c76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerController: {fileID: 1985984441}
-  animationController: {fileID: 1985984439}
-  sfxController: {fileID: 0}
-  groundCheck: {fileID: 0}
-  moveSpeed: 3
-  sprintMultiplier: 1.55
-  sprintKey: 304
-  jumpForce: 6
-  groundCheckRadius: 0.2
-  groundRayLength: 0.18
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 1
 --- !u!114 &1985984441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40092,12 +40080,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 1985984435}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04d355f3432ba584fa724fbd3e38ee23, type: 3}
+  m_Script: {fileID: 11500000, guid: 5b9c630aca232de4f84b7fe1865c944e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerId: PlayerCat
-  animationController: {fileID: 1985984439}
-  sfxController: {fileID: 0}
+  trashCubePrefab: {fileID: 3425176783288438273, guid: 2cbb3c129a2ed7741afe0b2f51b10557,
+    type: 3}
+  emitPoint: {fileID: 147863488}
+  emissionDuration: 2.6
+  minSpawnInterval: 0.035
+  maxSpawnInterval: 0.09
+  minScale: 0.015
+  maxScale: 0.05
+  particleSizeScale: 1
+  minForce: 1.1
+  maxForce: 2.4
+  fanAngle: 70
+  launchAngle: 42
+  spawnJitter: 0.08
+  maxUpwardVelocity: 2.4
+  minLifeTime: 1.5
+  maxLifeTime: 3
 --- !u!43 &1988237284
 Mesh:
   m_ObjectHideFlags: 0

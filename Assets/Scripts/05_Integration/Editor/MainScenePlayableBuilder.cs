@@ -12,11 +12,13 @@ public static class MainScenePlayableBuilder
     private const string RootName = "MainScenePlayableRoot";
     private const string CoreAssetFolder = "Assets/ScriptableObjects/01_Core";
     private const string DefaultStagePath = CoreAssetFolder + "/DefaultStageData.asset";
+    private const string DefaultSfxLibraryPath = "Assets/ScriptableObjects/04_UISoundCamera/DefaultSfxLibrary.asset";
     private const string KeyboardDataPath = CoreAssetFolder + "/KeyboardTargetData.asset";
     private const string PhoneDataPath = CoreAssetFolder + "/PhoneTargetData.asset";
     private const string WaterDataPath = CoreAssetFolder + "/WaterDispenserTargetData.asset";
     private const string PrinterDataPath = CoreAssetFolder + "/PrinterTargetData.asset";
     private const string LightSwitchDataPath = CoreAssetFolder + "/LightSwitchTargetData.asset";
+    private const string MicrophoneDataPath = CoreAssetFolder + "/MicrophoneTargetData.asset";
     private const string PlayerPrefabPath = "Assets/Prefabs/02_Player/PlayerCat.prefab";
     private const string SupervisorPrefabPath = "Assets/Prefabs/03_NPCAI/Final NPCs/Supervisor.prefab";
 
@@ -33,15 +35,17 @@ public static class MainScenePlayableBuilder
         }
 
         StageData stageData = CreateOrLoadDefaultStageData();
+        AudioSfxLibrary sfxLibrary = CreateOrLoadDefaultSfxLibrary();
         MischiefTargetData keyboardData = CreateOrLoadTargetData(KeyboardDataPath, "Keyboard", MischiefType.Press, 10f, 8f, "Supervisor");
         MischiefTargetData phoneData = CreateOrLoadTargetData(PhoneDataPath, "Phone", MischiefType.Press, 15f, 8f, "Supervisor");
         MischiefTargetData waterData = CreateOrLoadTargetData(WaterDataPath, "WaterDispenser", MischiefType.Push, 15f, 8f, "Supervisor");
         MischiefTargetData printerData = CreateOrLoadTargetData(PrinterDataPath, "Printer", MischiefType.Press, 15f, 8f, "");
         MischiefTargetData lightSwitchData = CreateOrLoadTargetData(LightSwitchDataPath, "LightSwitch", MischiefType.Press, 5f, 8f, "");
+        MischiefTargetData microphoneData = CreateOrLoadTargetData(MicrophoneDataPath, "Microphone", MischiefType.Meow, 12f, 10f, "");
 
         GameObject root = CreateEmpty(RootName, null, Vector3.zero);
         CreateEnvironment(root.transform);
-        GameObject systems = CreateSystems(root.transform, stageData);
+        GameObject systems = CreateSystems(root.transform, stageData, sfxLibrary);
         GameObject player = CreatePlayer(root.transform);
         Light officeLight = CreateOfficeLight(root.transform);
         CreateMischiefTarget("Keyboard", root.transform, keyboardData, new Vector3(0f, 0.92f, 2f), new Vector3(0.7f, 0.08f, 0.25f));
@@ -49,6 +53,7 @@ public static class MainScenePlayableBuilder
         CreateMischiefTarget("WaterDispenser", root.transform, waterData, new Vector3(-2.8f, 0.7f, 1.6f), new Vector3(0.45f, 1.4f, 0.45f), MischiefWorldEventType.WaterDispenserMess, MischiefWorldEventResolveMode.NearestCleaner);
         CreateMischiefTarget("Printer", root.transform, printerData, new Vector3(2.7f, 0.45f, 1.4f), new Vector3(0.8f, 0.5f, 0.6f), MischiefWorldEventType.PrinterMess, MischiefWorldEventResolveMode.NearestCleaner);
         CreateMischiefTarget("LightSwitch", root.transform, lightSwitchData, new Vector3(-3.75f, 1.2f, 0.6f), new Vector3(0.12f, 0.35f, 0.25f), MischiefWorldEventType.LightToggle, MischiefWorldEventResolveMode.NearestNpc, officeLight);
+        CreateMischiefTarget("Microphone", root.transform, microphoneData, new Vector3(2.3f, 0.95f, -1.8f), new Vector3(0.18f, 0.45f, 0.18f), MischiefWorldEventType.MicrophoneBroadcast, MischiefWorldEventResolveMode.AllNpcs, null, true, 4f, "microphone_broadcast_meow", "");
         CreateHideSpot(root.transform, new Vector3(-2.4f, 0.35f, -1.2f));
         CreateSupervisorOrSpawnPoint(root.transform);
         SetupPlayerCamera(player);
@@ -123,6 +128,7 @@ public static class MainScenePlayableBuilder
         light.intensity = 1.4f;
         light.color = new Color(1f, 0.95f, 0.75f);
         light.enabled = false;
+        lightObject.AddComponent<LightSwitchControlledLight>();
         return light;
     }
 
@@ -137,7 +143,7 @@ public static class MainScenePlayableBuilder
         wall.isStatic = true;
     }
 
-    private static GameObject CreateSystems(Transform parent, StageData stageData)
+    private static GameObject CreateSystems(Transform parent, StageData stageData, AudioSfxLibrary sfxLibrary)
     {
         GameObject systems = CreateEmpty("Systems", parent, Vector3.zero);
 
@@ -223,6 +229,7 @@ public static class MainScenePlayableBuilder
 
         SetPrivateField(audioManager, "sfxSource", sfxSource);
         SetPrivateField(audioManager, "bgmSource", bgmSource);
+        audioManager.SetSfxLibrary(sfxLibrary);
         SetPrivateField(uiManager, "coreFacade", coreFacade);
         SetPrivateField(uiManager, "feedbackAudio", feedbackAudio);
         SetPrivateField(starter, "coreFacade", coreFacade);
@@ -419,7 +426,11 @@ public static class MainScenePlayableBuilder
         Vector3 scale,
         MischiefWorldEventType eventType = MischiefWorldEventType.None,
         MischiefWorldEventResolveMode resolveMode = MischiefWorldEventResolveMode.None,
-        Light controlledLight = null)
+        Light controlledLight = null,
+        bool autoCompleteWorldEvent = false,
+        float autoCompleteCooldown = 0f,
+        string startSfxId = "",
+        string completeSfxId = "")
     {
         GameObject targetObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
         Undo.RegisterCreatedObjectUndo(targetObject, "Create Mischief Target");
@@ -438,7 +449,7 @@ public static class MainScenePlayableBuilder
             bool disableAfterNpcResponse = eventType == MischiefWorldEventType.PrinterMess
                 || eventType == MischiefWorldEventType.WaterDispenserMess
                 || eventType == MischiefWorldEventType.GenericMess;
-            reporter.Configure(eventType, resolveMode, disableAfterNpcResponse);
+            reporter.Configure(eventType, resolveMode, disableAfterNpcResponse, autoCompleteWorldEvent, autoCompleteCooldown, startSfxId, completeSfxId);
 
             if (controlledLight != null)
             {
@@ -564,6 +575,59 @@ public static class MainScenePlayableBuilder
         stageData.hideSpotUsesPerStage = 1;
         EditorUtility.SetDirty(stageData);
         return stageData;
+    }
+
+    private static AudioSfxLibrary CreateOrLoadDefaultSfxLibrary()
+    {
+        EnsureAssetFolder("Assets/ScriptableObjects");
+        EnsureAssetFolder("Assets/ScriptableObjects/04_UISoundCamera");
+
+        AudioSfxLibrary library = AssetDatabase.LoadAssetAtPath<AudioSfxLibrary>(DefaultSfxLibraryPath);
+        if (library == null)
+        {
+            library = ScriptableObject.CreateInstance<AudioSfxLibrary>();
+            AssetDatabase.CreateAsset(library, DefaultSfxLibraryPath);
+        }
+
+        string[] ids = new[]
+        {
+            "ui_select",
+            "ui_error",
+            "ui_clear",
+            "ui_fail",
+            "cat_mischief",
+            "cat_cute",
+            "cat_jump",
+            "cat_hide_enter",
+            "cat_hide_exit",
+            "cat_caught",
+            "cat_meow",
+            "microphone_broadcast_meow",
+            "world_light_on",
+            "world_mess_start",
+            "world_mess_clean"
+        };
+
+        SerializedObject serialized = new SerializedObject(library);
+        SerializedProperty entries = serialized.FindProperty("entries");
+        if (entries != null && entries.arraySize == 0)
+        {
+            entries.arraySize = ids.Length;
+            for (int i = 0; i < ids.Length; i++)
+            {
+                SerializedProperty element = entries.GetArrayElementAtIndex(i);
+                element.FindPropertyRelative("id").stringValue = ids[i];
+                element.FindPropertyRelative("clip").objectReferenceValue = null;
+                element.FindPropertyRelative("volume").floatValue = 1f;
+                element.FindPropertyRelative("pitch").floatValue = 1f;
+                element.FindPropertyRelative("spatial").boolValue = ids[i].StartsWith("world_") || ids[i].StartsWith("microphone_");
+            }
+
+            serialized.ApplyModifiedProperties();
+            EditorUtility.SetDirty(library);
+        }
+
+        return library;
     }
 
     private static MischiefTargetData CreateOrLoadTargetData(string path, string targetId, MischiefType type, float rageAmount, float radius, string primaryNpcId)

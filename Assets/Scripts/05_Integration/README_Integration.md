@@ -122,3 +122,12 @@ OfficePointLight
 ```
 
 `OfficePointLight` starts off. Player turns it on. NPC should turn it off by completing the event.
+
+## v5-5 Light / SFX / Microphone Notes
+
+- LightSwitch controls only the explicit `OfficePointLight` reference created by the builder.
+- Directional Light is never controlled by LightSwitch and should remain as ambient/base lighting.
+- Security spotlights or other additional lights should not be assigned to `MischiefWorldEventReporter.controlledLights`.
+- `LightSwitchControlledLight` is added to the office point light as a marker.
+- `AudioSfxLibrary` is a clip holder. Assign actual clips to `Assets/ScriptableObjects/04_UISoundCamera/DefaultSfxLibrary.asset`.
+- Microphone is now a `MicrophoneBroadcast` world event. It plays `microphone_broadcast_meow`, broadcasts to all NPCs with `ShouldReact = false`, and auto-completes into cooldown.

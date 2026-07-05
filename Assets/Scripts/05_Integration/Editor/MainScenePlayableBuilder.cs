@@ -15,6 +15,8 @@ public static class MainScenePlayableBuilder
     private const string KeyboardDataPath = CoreAssetFolder + "/KeyboardTargetData.asset";
     private const string PhoneDataPath = CoreAssetFolder + "/PhoneTargetData.asset";
     private const string WaterDataPath = CoreAssetFolder + "/WaterDispenserTargetData.asset";
+    private const string PrinterDataPath = CoreAssetFolder + "/PrinterTargetData.asset";
+    private const string LightSwitchDataPath = CoreAssetFolder + "/LightSwitchTargetData.asset";
     private const string PlayerPrefabPath = "Assets/Prefabs/02_Player/PlayerCat.prefab";
     private const string SupervisorPrefabPath = "Assets/Prefabs/03_NPCAI/Final NPCs/Supervisor.prefab";
 
@@ -34,14 +36,19 @@ public static class MainScenePlayableBuilder
         MischiefTargetData keyboardData = CreateOrLoadTargetData(KeyboardDataPath, "Keyboard", MischiefType.Press, 10f, 8f, "Supervisor");
         MischiefTargetData phoneData = CreateOrLoadTargetData(PhoneDataPath, "Phone", MischiefType.Press, 15f, 8f, "Supervisor");
         MischiefTargetData waterData = CreateOrLoadTargetData(WaterDataPath, "WaterDispenser", MischiefType.Push, 15f, 8f, "Supervisor");
+        MischiefTargetData printerData = CreateOrLoadTargetData(PrinterDataPath, "Printer", MischiefType.Press, 15f, 8f, "");
+        MischiefTargetData lightSwitchData = CreateOrLoadTargetData(LightSwitchDataPath, "LightSwitch", MischiefType.Press, 5f, 8f, "");
 
         GameObject root = CreateEmpty(RootName, null, Vector3.zero);
         CreateEnvironment(root.transform);
         GameObject systems = CreateSystems(root.transform, stageData);
         GameObject player = CreatePlayer(root.transform);
+        Light officeLight = CreateOfficeLight(root.transform);
         CreateMischiefTarget("Keyboard", root.transform, keyboardData, new Vector3(0f, 0.92f, 2f), new Vector3(0.7f, 0.08f, 0.25f));
         CreateMischiefTarget("Phone", root.transform, phoneData, new Vector3(1.1f, 0.92f, 2f), new Vector3(0.25f, 0.12f, 0.25f));
-        CreateMischiefTarget("WaterDispenser", root.transform, waterData, new Vector3(-2.8f, 0.7f, 1.6f), new Vector3(0.45f, 1.4f, 0.45f));
+        CreateMischiefTarget("WaterDispenser", root.transform, waterData, new Vector3(-2.8f, 0.7f, 1.6f), new Vector3(0.45f, 1.4f, 0.45f), MischiefWorldEventType.WaterDispenserMess, MischiefWorldEventResolveMode.NearestCleaner);
+        CreateMischiefTarget("Printer", root.transform, printerData, new Vector3(2.7f, 0.45f, 1.4f), new Vector3(0.8f, 0.5f, 0.6f), MischiefWorldEventType.PrinterMess, MischiefWorldEventResolveMode.NearestCleaner);
+        CreateMischiefTarget("LightSwitch", root.transform, lightSwitchData, new Vector3(-3.75f, 1.2f, 0.6f), new Vector3(0.12f, 0.35f, 0.25f), MischiefWorldEventType.LightToggle, MischiefWorldEventResolveMode.NearestNpc, officeLight);
         CreateHideSpot(root.transform, new Vector3(-2.4f, 0.35f, -1.2f));
         CreateSupervisorOrSpawnPoint(root.transform);
         SetupPlayerCamera(player);
@@ -104,6 +111,19 @@ public static class MainScenePlayableBuilder
         CreateWall(env.transform, "BackWall", new Vector3(0f, 1f, 4f), new Vector3(8f, 2f, 0.15f));
         CreateWall(env.transform, "LeftWall", new Vector3(-4f, 1f, 0f), new Vector3(0.15f, 2f, 8f));
         CreateWall(env.transform, "RightWall", new Vector3(4f, 1f, 0f), new Vector3(0.15f, 2f, 8f));
+    }
+
+
+    private static Light CreateOfficeLight(Transform parent)
+    {
+        GameObject lightObject = CreateEmpty("OfficePointLight", parent, new Vector3(0f, 2.6f, 0.4f));
+        Light light = lightObject.AddComponent<Light>();
+        light.type = LightType.Point;
+        light.range = 7f;
+        light.intensity = 1.4f;
+        light.color = new Color(1f, 0.95f, 0.75f);
+        light.enabled = false;
+        return light;
     }
 
     private static void CreateWall(Transform parent, string name, Vector3 position, Vector3 scale)
@@ -391,7 +411,15 @@ public static class MainScenePlayableBuilder
         SetPrivateField(sfxController, "audioManager", audioManager);
     }
 
-    private static void CreateMischiefTarget(string name, Transform parent, MischiefTargetData data, Vector3 position, Vector3 scale)
+    private static void CreateMischiefTarget(
+        string name,
+        Transform parent,
+        MischiefTargetData data,
+        Vector3 position,
+        Vector3 scale,
+        MischiefWorldEventType eventType = MischiefWorldEventType.None,
+        MischiefWorldEventResolveMode resolveMode = MischiefWorldEventResolveMode.None,
+        Light controlledLight = null)
     {
         GameObject targetObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
         Undo.RegisterCreatedObjectUndo(targetObject, "Create Mischief Target");
@@ -403,6 +431,21 @@ public static class MainScenePlayableBuilder
         MischiefTarget target = targetObject.AddComponent<MischiefTarget>();
         targetObject.AddComponent<InteractableHighlighter>();
         SetPrivateField(target, "data", data);
+
+        if (eventType != MischiefWorldEventType.None)
+        {
+            MischiefWorldEventReporter reporter = targetObject.AddComponent<MischiefWorldEventReporter>();
+            bool disableAfterNpcResponse = eventType == MischiefWorldEventType.PrinterMess
+                || eventType == MischiefWorldEventType.WaterDispenserMess
+                || eventType == MischiefWorldEventType.GenericMess;
+            reporter.Configure(eventType, resolveMode, disableAfterNpcResponse);
+
+            if (controlledLight != null)
+            {
+                Renderer renderer = targetObject.GetComponent<Renderer>();
+                reporter.ConfigureLights(new[] { controlledLight }, renderer != null ? new[] { renderer } : null);
+            }
+        }
     }
 
     private static void CreateHideSpot(Transform parent, Vector3 position)

@@ -133,6 +133,83 @@ public class RageManager : MonoBehaviour
         return true;
     }
 
+
+    public bool TryGetReceiver(string npcId, out IRageReceiver receiver)
+    {
+        receiver = null;
+
+        if (string.IsNullOrWhiteSpace(npcId))
+        {
+            return false;
+        }
+
+        return receivers.TryGetValue(npcId, out receiver) && receiver != null;
+    }
+
+    public bool TryFindNearestNpc(Vector3 position, out string npcId, out IRageReceiver receiver, bool excludeSecurity = true)
+    {
+        npcId = string.Empty;
+        receiver = null;
+        float bestDistanceSqr = float.PositiveInfinity;
+
+        foreach (KeyValuePair<string, IRageReceiver> pair in receivers)
+        {
+            IRageReceiver candidate = pair.Value;
+            if (candidate == null || !candidate.CanReceiveRage)
+            {
+                continue;
+            }
+
+            NpcData data = candidate.NpcData;
+            if (excludeSecurity && data != null && data.npcType == NpcType.Security)
+            {
+                continue;
+            }
+
+            float distanceSqr = (candidate.Position - position).sqrMagnitude;
+            if (distanceSqr < bestDistanceSqr)
+            {
+                bestDistanceSqr = distanceSqr;
+                npcId = pair.Key;
+                receiver = candidate;
+            }
+        }
+
+        return receiver != null;
+    }
+
+    public bool TryFindNearestNpcOfType(NpcType npcType, Vector3 position, out string npcId, out IRageReceiver receiver)
+    {
+        npcId = string.Empty;
+        receiver = null;
+        float bestDistanceSqr = float.PositiveInfinity;
+
+        foreach (KeyValuePair<string, IRageReceiver> pair in receivers)
+        {
+            IRageReceiver candidate = pair.Value;
+            if (candidate == null || !candidate.CanReceiveRage)
+            {
+                continue;
+            }
+
+            NpcData data = candidate.NpcData;
+            if (data == null || data.npcType != npcType)
+            {
+                continue;
+            }
+
+            float distanceSqr = (candidate.Position - position).sqrMagnitude;
+            if (distanceSqr < bestDistanceSqr)
+            {
+                bestDistanceSqr = distanceSqr;
+                npcId = pair.Key;
+                receiver = candidate;
+            }
+        }
+
+        return receiver != null;
+    }
+
     public float GetEnragedThreshold(string npcId)
     {
         if (!string.IsNullOrWhiteSpace(npcId) && receivers.TryGetValue(npcId, out IRageReceiver receiver) && receiver != null && receiver.NpcData != null)
@@ -459,7 +536,7 @@ public class RageManager : MonoBehaviour
         uiBridge = uiBridgeBehaviour as ICoreUIBridge;
     }
 
-    private sealed class MonoBehaviourRageReceiverAdapter : IRageReceiver
+    private sealed class MonoBehaviourRageReceiverAdapter : IRageReceiver, IMischiefWorldEventReceiver
     {
         private readonly string fallbackNpcId;
         private readonly MonoBehaviour behaviour;
@@ -497,6 +574,29 @@ public class RageManager : MonoBehaviour
             Invoke("LoseTarget");
         }
 
+
+        public void OnMischiefWorldEvent(MischiefWorldEventContext context)
+        {
+            if (Invoke("OnMischiefWorldEvent", context)) return;
+            if (Invoke("OnMischiefEvent", context)) return;
+            if (Invoke("HandleMischiefWorldEvent", context)) return;
+
+            if (context.EventType == MischiefWorldEventType.LightToggle)
+            {
+                if (Invoke("OnLightEvent", context.TargetId, context.Position)) return;
+                Invoke("OnLightEvent", context.TargetId, context.Position, context.EventType);
+                return;
+            }
+
+            if (context.EventType == MischiefWorldEventType.PrinterMess
+                || context.EventType == MischiefWorldEventType.WaterDispenserMess
+                || context.EventType == MischiefWorldEventType.GenericMess)
+            {
+                if (Invoke("OnMessEvent", context.TargetId, context.Position, context.EventType)) return;
+                Invoke("OnMessEvent", context.TargetId, context.Position);
+            }
+        }
+
         private T ReadProperty<T>(string propertyName, T fallback)
         {
             if (behaviour == null || behaviourType == null)
@@ -521,26 +621,72 @@ public class RageManager : MonoBehaviour
             return fallback;
         }
 
-        private void Invoke(string methodName)
+        private bool Invoke(string methodName)
         {
             if (behaviour == null || behaviourType == null)
             {
-                return;
+                return false;
             }
 
             MethodInfo method = behaviourType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
-            method?.Invoke(behaviour, null);
+            if (method == null)
+            {
+                return false;
+            }
+
+            method.Invoke(behaviour, null);
+            return true;
         }
 
-        private void Invoke<T>(string methodName, T argument)
+        private bool Invoke<T>(string methodName, T argument)
         {
             if (behaviour == null || behaviourType == null)
             {
-                return;
+                return false;
             }
 
             MethodInfo method = behaviourType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(T) }, null);
-            method?.Invoke(behaviour, new object[] { argument });
+            if (method == null)
+            {
+                return false;
+            }
+
+            method.Invoke(behaviour, new object[] { argument });
+            return true;
+        }
+
+        private bool Invoke<T1, T2>(string methodName, T1 argument1, T2 argument2)
+        {
+            if (behaviour == null || behaviourType == null)
+            {
+                return false;
+            }
+
+            MethodInfo method = behaviourType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(T1), typeof(T2) }, null);
+            if (method == null)
+            {
+                return false;
+            }
+
+            method.Invoke(behaviour, new object[] { argument1, argument2 });
+            return true;
+        }
+
+        private bool Invoke<T1, T2, T3>(string methodName, T1 argument1, T2 argument2, T3 argument3)
+        {
+            if (behaviour == null || behaviourType == null)
+            {
+                return false;
+            }
+
+            MethodInfo method = behaviourType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(T1), typeof(T2), typeof(T3) }, null);
+            if (method == null)
+            {
+                return false;
+            }
+
+            method.Invoke(behaviour, new object[] { argument1, argument2, argument3 });
+            return true;
         }
     }
 }

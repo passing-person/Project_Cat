@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 public class CoreFacade : MonoBehaviour
@@ -26,6 +27,9 @@ public class CoreFacade : MonoBehaviour
     [Header("Options")]
     public bool autoResolveReferences = true;
     public bool autoWireReferences = true;
+
+    private readonly Dictionary<string, IMischiefWorldEventTarget> worldEventTargets = new Dictionary<string, IMischiefWorldEventTarget>();
+    private readonly Dictionary<string, bool> pendingWorldEventDisableByTargetId = new Dictionary<string, bool>();
 
     public bool HasValidCoreReferences => ValidateCoreReferences(out _);
     public GameState CurrentGameState => gameManager != null ? gameManager.CurrentState : GameState.Boot;
@@ -456,6 +460,356 @@ public class CoreFacade : MonoBehaviour
         }
 
         rageManager.SetSecurityMultiplierOverride(enabled, multiplier);
+    }
+
+    public void RegisterMischiefWorldEventTarget(IMischiefWorldEventTarget target)
+    {
+        if (target == null || string.IsNullOrWhiteSpace(target.WorldEventTargetId))
+        {
+            return;
+        }
+
+        worldEventTargets[target.WorldEventTargetId] = target;
+    }
+
+    public void UnregisterMischiefWorldEventTarget(IMischiefWorldEventTarget target)
+    {
+        if (target == null || string.IsNullOrWhiteSpace(target.WorldEventTargetId))
+        {
+            return;
+        }
+
+        if (worldEventTargets.TryGetValue(target.WorldEventTargetId, out IMischiefWorldEventTarget current) && ReferenceEquals(current, target))
+        {
+            worldEventTargets.Remove(target.WorldEventTargetId);
+        }
+    }
+
+    public bool TryGetMischiefWorldEventTarget(string targetId, out IMischiefWorldEventTarget target)
+    {
+        target = null;
+        return !string.IsNullOrWhiteSpace(targetId) && worldEventTargets.TryGetValue(targetId, out target) && target != null;
+    }
+
+    public MischiefWorldEventResult ReportMischiefEventFromMischief(MischiefContext context)
+    {
+        MischiefWorldEventType eventType = MischiefWorldEventContext.InferEventType(context.TargetId, context.MischiefType);
+        if (eventType == MischiefWorldEventType.None)
+        {
+            return MischiefWorldEventResult.Ignored(context.TargetId, eventType, context.Position, "No world event route for this target.");
+        }
+
+        MischiefWorldEventContext eventContext = new MischiefWorldEventContext(
+            context.ActorId,
+            context.TargetId,
+            eventType,
+            context.Position,
+            MischiefWorldEventContext.GetDefaultResolveMode(eventType),
+            string.Empty,
+            NpcType.Special,
+            MischiefWorldEventContext.ShouldDisableTargetAfterResponse(eventType));
+
+        return ReportMischiefWorldEvent(eventContext);
+    }
+
+    public MischiefWorldEventResult ReportMischiefWorldEvent(string targetId, MischiefWorldEventType eventType, Vector3 position)
+    {
+        MischiefWorldEventContext context = new MischiefWorldEventContext(
+            "World",
+            targetId,
+            eventType,
+            position,
+            MischiefWorldEventContext.GetDefaultResolveMode(eventType),
+            string.Empty,
+            NpcType.Special,
+            MischiefWorldEventContext.ShouldDisableTargetAfterResponse(eventType));
+
+        return ReportMischiefWorldEvent(context);
+    }
+
+    public MischiefWorldEventResult ReportMischiefWorldEvent(MischiefWorldEventContext context)
+    {
+        if (rageManager == null)
+        {
+            Debug.LogWarning("CoreFacade.ReportMischiefWorldEvent failed: RageManager is missing.");
+            return MischiefWorldEventResult.Ignored(context.TargetId, context.EventType, context.Position, "RageManager is missing.");
+        }
+
+        MischiefWorldEventType eventType = context.EventType;
+        if (eventType == MischiefWorldEventType.Auto)
+        {
+            eventType = MischiefWorldEventContext.InferEventType(context.TargetId, MischiefType.Custom);
+            context = context.WithEventType(eventType);
+        }
+
+        if (eventType == MischiefWorldEventType.None)
+        {
+            return MischiefWorldEventResult.Ignored(context.TargetId, eventType, context.Position, "No world event route for this target.");
+        }
+
+        MischiefWorldEventResolveMode resolveMode = context.ResolveMode;
+        if (resolveMode == MischiefWorldEventResolveMode.None)
+        {
+            resolveMode = MischiefWorldEventContext.GetDefaultResolveMode(eventType);
+            context = context.WithResolveMode(resolveMode);
+        }
+
+        if (TryGetMischiefWorldEventTarget(context.TargetId, out IMischiefWorldEventTarget eventTarget) && !eventTarget.CanStartWorldEvent())
+        {
+            string reason = eventTarget.GetUnavailableReason();
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                reason = context.TargetId + " cannot start world event now.";
+            }
+
+            Debug.LogWarning("CoreFacade.ReportMischiefWorldEvent: " + reason);
+            return MischiefWorldEventResult.Ignored(context.TargetId, eventType, context.Position, reason);
+        }
+
+        // Start and lock the world event before NPC routing.
+        // The object state must change even if no NPC is currently available or the NPC API is not implemented yet.
+        MarkMischiefWorldEventStarted(context);
+
+        if (resolveMode == MischiefWorldEventResolveMode.AllNpcs)
+        {
+            MischiefWorldEventResult allResult = DispatchWorldEventToAllRegisteredNpcs(context);
+            if (!allResult.Dispatched)
+            {
+                return MischiefWorldEventResult.Routed(context.TargetId, eventType, "PendingNPC", context.Position, 0);
+            }
+
+            return allResult;
+        }
+
+        string npcId;
+        IRageReceiver receiver;
+        bool found = TryResolveWorldEventReceiver(context, resolveMode, out npcId, out receiver);
+        if (!found || receiver == null)
+        {
+            string reason = "No matching NPC found for " + eventType + ". Event target is locked locally.";
+            Debug.LogWarning("CoreFacade.ReportMischiefWorldEvent: " + reason);
+            return MischiefWorldEventResult.Routed(context.TargetId, eventType, "PendingNPC", context.Position, 0);
+        }
+
+        bool dispatched = DispatchWorldEventToReceiver(receiver, context);
+        if (!dispatched)
+        {
+            string reason = npcId + " does not implement a supported world event API. Event target is locked locally.";
+            Debug.LogWarning("CoreFacade.ReportMischiefWorldEvent: " + reason);
+            return MischiefWorldEventResult.Routed(context.TargetId, eventType, "PendingNPC", context.Position, 0);
+        }
+
+        return MischiefWorldEventResult.Routed(context.TargetId, eventType, npcId, context.Position, 1);
+    }
+
+    public void CompleteMischiefWorldEvent(string targetId)
+    {
+        bool disableTarget = true;
+        if (!string.IsNullOrWhiteSpace(targetId) && pendingWorldEventDisableByTargetId.TryGetValue(targetId, out bool pendingDisable))
+        {
+            disableTarget = pendingDisable;
+        }
+
+        CompleteMischiefWorldEvent(targetId, disableTarget, 0f);
+    }
+
+    public void CompleteMischiefWorldEvent(string targetId, bool disableTarget, float cooldownDuration)
+    {
+        if (string.IsNullOrWhiteSpace(targetId))
+        {
+            Debug.LogWarning("CoreFacade.CompleteMischiefWorldEvent failed: targetId is empty.");
+            return;
+        }
+
+        pendingWorldEventDisableByTargetId.Remove(targetId);
+
+        if (worldEventTargets.TryGetValue(targetId, out IMischiefWorldEventTarget eventTarget) && eventTarget != null)
+        {
+            eventTarget.OnWorldEventCompleted(disableTarget, cooldownDuration);
+        }
+
+        if (disableTarget)
+        {
+            DisableMischiefTarget(targetId);
+            return;
+        }
+
+        if (cooldownDuration > 0f)
+        {
+            StartMischiefTargetCooldown(targetId, cooldownDuration);
+            return;
+        }
+
+        SetMischiefTargetState(targetId, MischiefTargetState.Available);
+    }
+
+    public void ReportMischiefEventCompleted(string targetId)
+    {
+        CompleteMischiefWorldEvent(targetId, true, 0f);
+    }
+
+    public void ReportMischiefEventCompleted(string targetId, bool disableTarget, float cooldownDuration)
+    {
+        CompleteMischiefWorldEvent(targetId, disableTarget, cooldownDuration);
+    }
+
+    private void MarkMischiefWorldEventStarted(MischiefWorldEventContext context)
+    {
+        if (string.IsNullOrWhiteSpace(context.TargetId))
+        {
+            return;
+        }
+
+        SetMischiefTargetState(context.TargetId, MischiefTargetState.Locked);
+        pendingWorldEventDisableByTargetId[context.TargetId] = context.DisableTargetAfterResponse;
+
+        if (worldEventTargets.TryGetValue(context.TargetId, out IMischiefWorldEventTarget eventTarget) && eventTarget != null)
+        {
+            eventTarget.OnWorldEventStarted(context);
+        }
+    }
+
+    private bool TryResolveWorldEventReceiver(MischiefWorldEventContext context, MischiefWorldEventResolveMode resolveMode, out string npcId, out IRageReceiver receiver)
+    {
+        npcId = string.Empty;
+        receiver = null;
+
+        if (rageManager == null)
+        {
+            return false;
+        }
+
+        switch (resolveMode)
+        {
+            case MischiefWorldEventResolveMode.SpecificNpc:
+                return !string.IsNullOrWhiteSpace(context.PreferredNpcId)
+                    && rageManager.TryGetReceiver(context.PreferredNpcId, out receiver)
+                    && SetResolvedNpcId(context.PreferredNpcId, out npcId);
+
+            case MischiefWorldEventResolveMode.NearestCleaner:
+                return rageManager.TryFindNearestNpcOfType(NpcType.Cleaner, context.Position, out npcId, out receiver);
+
+            case MischiefWorldEventResolveMode.NearestNpc:
+                return rageManager.TryFindNearestNpc(context.Position, out npcId, out receiver, excludeSecurity: true);
+
+            default:
+                return false;
+        }
+    }
+
+    private bool SetResolvedNpcId(string value, out string npcId)
+    {
+        npcId = value;
+        return true;
+    }
+
+    private MischiefWorldEventResult DispatchWorldEventToAllRegisteredNpcs(MischiefWorldEventContext context)
+    {
+        List<string> ids = rageManager.GetRegisteredNpcIds();
+        int dispatchedCount = 0;
+        string firstNpcId = string.Empty;
+
+        for (int i = 0; i < ids.Count; i++)
+        {
+            if (!rageManager.TryGetReceiver(ids[i], out IRageReceiver receiver) || receiver == null)
+            {
+                continue;
+            }
+
+            if (DispatchWorldEventToReceiver(receiver, context))
+            {
+                if (string.IsNullOrEmpty(firstNpcId))
+                {
+                    firstNpcId = ids[i];
+                }
+
+                dispatchedCount++;
+            }
+        }
+
+        if (dispatchedCount == 0)
+        {
+            return MischiefWorldEventResult.Ignored(context.TargetId, context.EventType, context.Position, "No NPC accepted the world event.");
+        }
+
+        return MischiefWorldEventResult.Routed(context.TargetId, context.EventType, firstNpcId, context.Position, dispatchedCount);
+    }
+
+    private bool DispatchWorldEventToReceiver(IRageReceiver receiver, MischiefWorldEventContext context)
+    {
+        if (receiver == null)
+        {
+            return false;
+        }
+
+        if (receiver is IMischiefWorldEventReceiver typedReceiver)
+        {
+            typedReceiver.OnMischiefWorldEvent(context);
+            return true;
+        }
+
+        object receiverObject = receiver;
+        if (TryInvoke(receiverObject, "OnMischiefWorldEvent", context)) return true;
+        if (TryInvoke(receiverObject, "OnMischiefEvent", context)) return true;
+        if (TryInvoke(receiverObject, "HandleMischiefWorldEvent", context)) return true;
+
+        if (context.EventType == MischiefWorldEventType.LightToggle)
+        {
+            if (TryInvoke(receiverObject, "OnLightEvent", context.TargetId, context.Position)) return true;
+            if (TryInvoke(receiverObject, "OnLightEvent", context.TargetId, context.Position, context.EventType)) return true;
+        }
+        else
+        {
+            if (TryInvoke(receiverObject, "OnMessEvent", context.TargetId, context.Position, context.EventType)) return true;
+            if (TryInvoke(receiverObject, "OnMessEvent", context.TargetId, context.Position)) return true;
+        }
+
+        return false;
+    }
+
+    private bool TryInvoke(object target, string methodName, params object[] arguments)
+    {
+        if (target == null)
+        {
+            return false;
+        }
+
+        BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        MethodInfo[] methods = target.GetType().GetMethods(flags);
+        for (int i = 0; i < methods.Length; i++)
+        {
+            MethodInfo method = methods[i];
+            if (method.Name != methodName)
+            {
+                continue;
+            }
+
+            ParameterInfo[] parameters = method.GetParameters();
+            if (parameters.Length != arguments.Length)
+            {
+                continue;
+            }
+
+            bool matches = true;
+            for (int j = 0; j < parameters.Length; j++)
+            {
+                if (arguments[j] != null && !parameters[j].ParameterType.IsInstanceOfType(arguments[j]))
+                {
+                    matches = false;
+                    break;
+                }
+            }
+
+            if (!matches)
+            {
+                continue;
+            }
+
+            method.Invoke(target, arguments);
+            return true;
+        }
+
+        return false;
     }
 
     public bool ValidateCoreReferences(out string report)

@@ -269,6 +269,36 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
         cameraController?.AddImpulse(0.08f, 0.18f);
     }
 
+
+    public void ShowWorldEventRouted(MischiefWorldEventResult result)
+    {
+        if (!result.Dispatched)
+        {
+            return;
+        }
+
+        string title = "EVENT";
+        switch (result.EventType)
+        {
+            case MischiefWorldEventType.LightToggle:
+                title = "LIGHT";
+                break;
+            case MischiefWorldEventType.PrinterMess:
+                title = "PRINTER";
+                break;
+            case MischiefWorldEventType.WaterDispenserMess:
+                title = "WATER";
+                break;
+            case MischiefWorldEventType.GenericMess:
+                title = "MESS";
+                break;
+        }
+
+        string npcLabel = string.IsNullOrEmpty(result.AssignedNpcId) ? "NPC" : result.AssignedNpcId;
+        string detail = result.TargetId + " → " + npcLabel;
+        ShowActionFeedback(title, detail, new Color(0.35f, 0.85f, 1f, 0.26f));
+    }
+
     public void ShowActionBlocked(string reason)
     {
         ShowActionFeedback("BLOCKED", string.IsNullOrEmpty(reason) ? "Action unavailable" : reason, new Color(0.75f, 0.1f, 0.1f, 0.26f));

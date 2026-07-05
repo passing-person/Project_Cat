@@ -72,3 +72,22 @@ public enum CaughtRule
     AlwaysFail,
     ClearIfEnoughScore
 }
+
+public enum MischiefWorldEventType
+{
+    None,
+    Auto,
+    LightToggle,
+    PrinterMess,
+    WaterDispenserMess,
+    GenericMess
+}
+
+public enum MischiefWorldEventResolveMode
+{
+    None,
+    NearestNpc,
+    NearestCleaner,
+    SpecificNpc,
+    AllNpcs
+}

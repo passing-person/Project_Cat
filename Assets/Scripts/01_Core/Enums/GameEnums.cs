@@ -80,7 +80,8 @@ public enum MischiefWorldEventType
     LightToggle,
     PrinterMess,
     WaterDispenserMess,
-    GenericMess
+    GenericMess,
+    MicrophoneBroadcast
 }
 
 public enum MischiefWorldEventResolveMode

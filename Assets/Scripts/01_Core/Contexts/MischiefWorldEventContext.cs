@@ -104,6 +104,11 @@ public readonly struct MischiefWorldEventContext
             return MischiefWorldEventType.WaterDispenserMess;
         }
 
+        if (normalized.Contains("microphone") || normalized.Contains("mic"))
+        {
+            return MischiefWorldEventType.MicrophoneBroadcast;
+        }
+
         if (normalized.Contains("mess") || normalized.Contains("spill") || normalized.Contains("trash"))
         {
             return MischiefWorldEventType.GenericMess;
@@ -122,6 +127,8 @@ public readonly struct MischiefWorldEventContext
             case MischiefWorldEventType.WaterDispenserMess:
             case MischiefWorldEventType.GenericMess:
                 return MischiefWorldEventResolveMode.NearestCleaner;
+            case MischiefWorldEventType.MicrophoneBroadcast:
+                return MischiefWorldEventResolveMode.AllNpcs;
             default:
                 return MischiefWorldEventResolveMode.None;
         }

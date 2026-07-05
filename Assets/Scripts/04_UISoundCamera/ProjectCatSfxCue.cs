@@ -1,0 +1,19 @@
+public enum ProjectCatSfxCue
+{
+    None,
+    Select,
+    Mischief,
+    Cute,
+    HideEnter,
+    HideExit,
+    Error,
+    Clear,
+    Fail,
+    LightOn,
+    LightOff,
+    PrinterMess,
+    WaterMess,
+    WorldEventComplete,
+    ButtonUnavailable,
+    MicrophoneBroadcastMeow
+}

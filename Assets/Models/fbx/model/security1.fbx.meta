@@ -3,7 +3,37 @@ guid: ee60bab90bb38d24faa5b2826e4fd4ce
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Black
+    second: {fileID: 2100000, guid: 0aa6590df4457e44e8b5117bb97676ef, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Eye
+    second: {fileID: 2100000, guid: ecd9823165f47fb4194d3177d3013c22, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: LightBrown
+    second: {fileID: 2100000, guid: 3216270fd360f3c458553cca691f3b73, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Skin
+    second: {fileID: 2100000, guid: eabc063aafd992a4b8982380741077c5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Worker_Vest
+    second: {fileID: 2100000, guid: 0aa6590df4457e44e8b5117bb97676ef, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Worker_Yellow
+    second: {fileID: 2100000, guid: 4e5a3240f3c9c1c428cac7ad1e04d2e4, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

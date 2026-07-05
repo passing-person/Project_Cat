@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Tie_1
-  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
+  m_Shader: {fileID: 4800000, guid: be1fca6efdd6fbf438989440ba692382, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -17,8 +17,7 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap:
-    RenderType: Opaque
+  stringTagMap: {}
   disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
@@ -53,6 +52,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -96,15 +99,21 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
+    - _Fallof: 0
     - _GlossMapScale: 1
     - _Glossiness: 0
     - _GlossyReflections: 1
+    - _LightAcceptance: 46.1
+    - _LightDarkShadeRate: 1000
     - _Metallic: 0
     - _Mode: 0
+    - _NormalMapStrength: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _ScatterOverSurface: 0.5
+    - _SheenPower: 2
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -112,13 +121,21 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _UVSec: 0
+    - _Width: 0.2
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - _AOColor: {r: 0.01, g: 0.01, b: 0.01, a: 1}
     - _BaseColor: {r: 0.8301887, g: 0.33952823, b: 0.23756956, a: 1}
+    - _BrightColor: {r: 0.6289307, g: 0.34966576, b: 0.30259866, a: 1}
     - _Color: {r: 0.8301887, g: 0.3395282, b: 0.23756948, a: 1}
+    - _DarkShadeColor: {r: 0.29559743, g: 0.06413902, b: 0.19431739, a: 1}
+    - _DarkZoneColor: {r: 0.3207547, g: 0.09784023, b: 0.15961166, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _MidColor: {r: 0.45911938, g: 0.20068422, b: 0.22250544, a: 1}
+    - _SheenColor: {r: 0.22918314, g: 0, b: 0.2578616, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _SpecularColor: {r: 1, g: 0.8168235, b: 0.7201257, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &7540570047013853342
 MonoBehaviour:

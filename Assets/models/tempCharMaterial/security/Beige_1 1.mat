@@ -117,7 +117,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 1
     - _LightAcceptance: 8
-    - _LightDarkShadeRate: 50
+    - _LightDarkShadeRate: 1000
     - _Metallic: 0
     - _Mode: 0
     - _NormalMapStrength: 1
@@ -125,6 +125,7 @@ Material:
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _ScatterOverSurface: 0.5
     - _SheenPower: 2
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
@@ -137,11 +138,12 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - _AOColor: {r: 0.01, g: 0.01, b: 0.01, a: 1}
     - _BaseColor: {r: 0.6853872, g: 0.7585878, b: 0.5791941, a: 1}
     - _BrightColor: {r: 0.6157704, g: 0.7798742, b: 0.5517977, a: 1}
     - _Color: {r: 0.6853872, g: 0.7585878, b: 0.57919407, a: 1}
     - _DarkShadeColor: {r: 0.16466904, g: 0.23015738, b: 0.28930807, a: 1}
-    - _DarkZoneColor: {r: 0.15076533, g: 0.3962264, b: 0.16316994, a: 1}
+    - _DarkZoneColor: {r: 0.09119487, g: 1, b: 0.8376499, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MidColor: {r: 0.32156864, g: 0.5803922, b: 0.48588407, a: 1}
     - _SheenColor: {r: 0.14744268, g: 0.44654083, b: 0.38802162, a: 1}

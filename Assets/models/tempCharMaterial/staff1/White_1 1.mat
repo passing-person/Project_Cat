@@ -112,6 +112,7 @@ Material:
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _ScatterOverSurface: 0.5
     - _SheenPower: 2
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
@@ -124,13 +125,14 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - _AOColor: {r: 0.01, g: 0.01, b: 0.01, a: 1}
     - _BaseColor: {r: 0.754717, g: 0.754717, b: 0.754717, a: 1}
     - _BrightColor: {r: 0.8490566, g: 0.79298675, b: 0.79298675, a: 1}
     - _Color: {r: 0.75471693, g: 0.75471693, b: 0.75471693, a: 1}
-    - _DarkShadeColor: {r: 0.15647107, g: 0.15561086, b: 0.17610055, a: 1}
-    - _DarkZoneColor: {r: 0.13717811, g: 0.14251864, b: 0.1509434, a: 1}
+    - _DarkShadeColor: {r: 0.32008222, g: 0.32008222, b: 0.35220122, a: 1}
+    - _DarkZoneColor: {r: 0.38867128, g: 0.40167183, b: 0.42767292, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MidColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _MidColor: {r: 0.67295593, g: 0.6454451, b: 0.6454451, a: 1}
     - _SheenColor: {r: 0.21383637, g: 0.21383637, b: 0.19433556, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}

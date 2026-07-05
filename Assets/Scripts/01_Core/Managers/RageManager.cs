@@ -581,6 +581,13 @@ public class RageManager : MonoBehaviour
             if (Invoke("OnMischiefEvent", context)) return;
             if (Invoke("HandleMischiefWorldEvent", context)) return;
 
+            // Compatibility fallback methods do not receive shouldReact.
+            // Only call them for the unique reactor to avoid making every NPC perform the main reaction.
+            if (!context.ShouldReact)
+            {
+                return;
+            }
+
             if (context.EventType == MischiefWorldEventType.LightToggle)
             {
                 if (Invoke("OnLightEvent", context.TargetId, context.Position)) return;

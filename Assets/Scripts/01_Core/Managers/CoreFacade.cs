@@ -570,36 +570,25 @@ public class CoreFacade : MonoBehaviour
         // The object state must change even if no NPC is currently available or the NPC API is not implemented yet.
         MarkMischiefWorldEventStarted(context);
 
-        if (resolveMode == MischiefWorldEventResolveMode.AllNpcs)
-        {
-            MischiefWorldEventResult allResult = DispatchWorldEventToAllRegisteredNpcs(context);
-            if (!allResult.Dispatched)
-            {
-                return MischiefWorldEventResult.Routed(context.TargetId, eventType, "PendingNPC", context.Position, 0);
-            }
+        string reactorNpcId;
+        IRageReceiver reactorReceiver;
+        bool hasUniqueReactor = TryResolveWorldEventReceiver(context, resolveMode, out reactorNpcId, out reactorReceiver)
+            && reactorReceiver != null
+            && !string.IsNullOrWhiteSpace(reactorNpcId);
 
-            return allResult;
+        if (!hasUniqueReactor)
+        {
+            reactorNpcId = string.Empty;
+            Debug.LogWarning("CoreFacade.ReportMischiefWorldEvent: No unique reactor found for " + eventType + ". Broadcasting with shouldReact=false for all NPCs.");
         }
 
-        string npcId;
-        IRageReceiver receiver;
-        bool found = TryResolveWorldEventReceiver(context, resolveMode, out npcId, out receiver);
-        if (!found || receiver == null)
+        MischiefWorldEventResult result = DispatchWorldEventGlobally(context, hasUniqueReactor ? reactorNpcId : string.Empty);
+        if (!result.Dispatched)
         {
-            string reason = "No matching NPC found for " + eventType + ". Event target is locked locally.";
-            Debug.LogWarning("CoreFacade.ReportMischiefWorldEvent: " + reason);
-            return MischiefWorldEventResult.Routed(context.TargetId, eventType, "PendingNPC", context.Position, 0);
+            return MischiefWorldEventResult.Routed(context.TargetId, eventType, hasUniqueReactor ? reactorNpcId : "PendingNPC", context.Position, 0);
         }
 
-        bool dispatched = DispatchWorldEventToReceiver(receiver, context);
-        if (!dispatched)
-        {
-            string reason = npcId + " does not implement a supported world event API. Event target is locked locally.";
-            Debug.LogWarning("CoreFacade.ReportMischiefWorldEvent: " + reason);
-            return MischiefWorldEventResult.Routed(context.TargetId, eventType, "PendingNPC", context.Position, 0);
-        }
-
-        return MischiefWorldEventResult.Routed(context.TargetId, eventType, npcId, context.Position, 1);
+        return result;
     }
 
     public void CompleteMischiefWorldEvent(string targetId)
@@ -703,36 +692,51 @@ public class CoreFacade : MonoBehaviour
         return true;
     }
 
-    private MischiefWorldEventResult DispatchWorldEventToAllRegisteredNpcs(MischiefWorldEventContext context)
+    private MischiefWorldEventResult DispatchWorldEventGlobally(MischiefWorldEventContext context, string reactorNpcId)
     {
         List<string> ids = rageManager.GetRegisteredNpcIds();
         int dispatchedCount = 0;
+        int reactorTrueCount = 0;
         string firstNpcId = string.Empty;
+        string assignedNpcId = string.IsNullOrWhiteSpace(reactorNpcId) ? "PendingNPC" : reactorNpcId;
 
         for (int i = 0; i < ids.Count; i++)
         {
-            if (!rageManager.TryGetReceiver(ids[i], out IRageReceiver receiver) || receiver == null)
+            string currentNpcId = ids[i];
+            if (!rageManager.TryGetReceiver(currentNpcId, out IRageReceiver receiver) || receiver == null)
             {
                 continue;
             }
 
-            if (DispatchWorldEventToReceiver(receiver, context))
+            bool shouldReact = !string.IsNullOrWhiteSpace(reactorNpcId) && currentNpcId == reactorNpcId;
+            if (shouldReact)
+            {
+                reactorTrueCount++;
+            }
+
+            MischiefWorldEventContext npcContext = context.WithReactionAssignment(shouldReact, assignedNpcId);
+            if (DispatchWorldEventToReceiver(receiver, npcContext))
             {
                 if (string.IsNullOrEmpty(firstNpcId))
                 {
-                    firstNpcId = ids[i];
+                    firstNpcId = currentNpcId;
                 }
 
                 dispatchedCount++;
             }
         }
 
-        if (dispatchedCount == 0)
+        if (reactorTrueCount > 1)
         {
-            return MischiefWorldEventResult.Ignored(context.TargetId, context.EventType, context.Position, "No NPC accepted the world event.");
+            Debug.LogError("CoreFacade.DispatchWorldEventGlobally assigned shouldReact=true to more than one NPC. This should never happen.");
         }
 
-        return MischiefWorldEventResult.Routed(context.TargetId, context.EventType, firstNpcId, context.Position, dispatchedCount);
+        if (dispatchedCount == 0)
+        {
+            return MischiefWorldEventResult.Ignored(context.TargetId, context.EventType, context.Position, "No NPC accepted the global world event.");
+        }
+
+        return MischiefWorldEventResult.Routed(context.TargetId, context.EventType, assignedNpcId, context.Position, dispatchedCount);
     }
 
     private bool DispatchWorldEventToReceiver(IRageReceiver receiver, MischiefWorldEventContext context)
@@ -752,6 +756,13 @@ public class CoreFacade : MonoBehaviour
         if (TryInvoke(receiverObject, "OnMischiefWorldEvent", context)) return true;
         if (TryInvoke(receiverObject, "OnMischiefEvent", context)) return true;
         if (TryInvoke(receiverObject, "HandleMischiefWorldEvent", context)) return true;
+
+        // Compatibility fallback methods do not receive shouldReact.
+        // Only call them for the unique reactor to avoid making every NPC perform the main reaction.
+        if (!context.ShouldReact)
+        {
+            return false;
+        }
 
         if (context.EventType == MischiefWorldEventType.LightToggle)
         {

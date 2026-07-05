@@ -1,6 +1,6 @@
-# Project Cat Integration Patch v5-1
+# Project Cat Integration Patch v5-4
 
-This patch fixes world-event target state handling for light switches, printers, and water dispensers.
+This patch changes world events to global NPC broadcast.
 
 ## Main Rules
 
@@ -14,16 +14,24 @@ This patch fixes world-event target state handling for light switches, printers,
   - Cleaner response should complete the event through Core.
   - Default completion disables printer / dispenser for the stage.
 
+- World events are broadcast to every registered NPC.
+  - Core guarantees one unique reactor.
+  - Reactor receives `context.ShouldReact == true`.
+  - Non-reactors receive `context.ShouldReact == false`.
+  - `context.ReactorNpcId` contains the selected reactor id.
+
 ## Core Flow
 
 ```text
 Player uses MischiefTarget
 -> PlayerMischiefAction calls CoreFacade.ApplyMischief(context)
 -> MischiefWorldEventReporter reports world event
--> CoreFacade resolves nearest NPC / Cleaner
--> Core locks the target
--> NPC reacts
--> NPC calls CoreFacade.CompleteMischiefWorldEvent(targetId)
+-> Core locks the target immediately
+-> Core selects one unique reactor
+-> Core broadcasts event to all registered NPCs
+-> Reactor performs the main response
+-> Non-reactors can play minor reactions or ignore
+-> Reactor calls CoreFacade.CompleteMischiefWorldEvent(targetId)
 -> Core turns off / clears local target state and updates MischiefTarget state
 ```
 
@@ -40,16 +48,23 @@ CoreFacade.CompleteMischiefWorldEvent(targetId, disableTarget, cooldownDuration)
 
 ## NPC World Event API
 
-NPC side can receive events with one of these method shapes:
+Recommended API:
 
 ```csharp
 public void OnMischiefWorldEvent(MischiefWorldEventContext context)
 {
-    // React based on context.EventType and context.TargetId.
+    if (context.ShouldReact)
+    {
+        // Move to context.Position and resolve the event.
+        // When done, call CoreFacade.CompleteMischiefWorldEvent(context.TargetId).
+        return;
+    }
+
+    // Optional non-reactor behavior: look at the event, play surprise, or ignore.
 }
 ```
 
-Compatibility methods are also supported:
+Compatibility methods are still supported for the unique reactor only:
 
 ```csharp
 public void OnLightEvent(string targetId, Vector3 position)
@@ -62,6 +77,17 @@ public void OnMessEvent(string targetId, Vector3 position, MischiefWorldEventTyp
     // Move to position, clean printer/water dispenser, then complete.
 }
 ```
+
+## Reactor Selection
+
+```text
+LightToggle        -> nearest non-security NPC gets ShouldReact = true
+PrinterMess        -> nearest Cleaner gets ShouldReact = true
+WaterDispenserMess -> nearest Cleaner gets ShouldReact = true
+GenericMess        -> nearest Cleaner gets ShouldReact = true
+```
+
+Every other registered NPC still receives the same event with `ShouldReact = false`.
 
 ## Completion Rules
 

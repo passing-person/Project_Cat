@@ -11,6 +11,11 @@ public readonly struct MischiefWorldEventContext
     public readonly NpcType PreferredNpcType;
     public readonly bool DisableTargetAfterResponse;
 
+    // Global event routing fields.
+    // Core broadcasts the same world event to every registered NPC, but exactly one NPC may receive ShouldReact = true.
+    public readonly bool ShouldReact;
+    public readonly string ReactorNpcId;
+
     public MischiefWorldEventContext(
         string actorId,
         string targetId,
@@ -19,7 +24,9 @@ public readonly struct MischiefWorldEventContext
         MischiefWorldEventResolveMode resolveMode = MischiefWorldEventResolveMode.None,
         string preferredNpcId = "",
         NpcType preferredNpcType = NpcType.Special,
-        bool disableTargetAfterResponse = false)
+        bool disableTargetAfterResponse = false,
+        bool shouldReact = false,
+        string reactorNpcId = "")
     {
         ActorId = string.IsNullOrWhiteSpace(actorId) ? "Player" : actorId;
         TargetId = string.IsNullOrWhiteSpace(targetId) ? "UnknownTarget" : targetId;
@@ -29,16 +36,53 @@ public readonly struct MischiefWorldEventContext
         PreferredNpcId = preferredNpcId ?? string.Empty;
         PreferredNpcType = preferredNpcType;
         DisableTargetAfterResponse = disableTargetAfterResponse;
+        ShouldReact = shouldReact;
+        ReactorNpcId = reactorNpcId ?? string.Empty;
     }
 
     public MischiefWorldEventContext WithEventType(MischiefWorldEventType eventType)
     {
-        return new MischiefWorldEventContext(ActorId, TargetId, eventType, Position, ResolveMode, PreferredNpcId, PreferredNpcType, DisableTargetAfterResponse);
+        return new MischiefWorldEventContext(
+            ActorId,
+            TargetId,
+            eventType,
+            Position,
+            ResolveMode,
+            PreferredNpcId,
+            PreferredNpcType,
+            DisableTargetAfterResponse,
+            ShouldReact,
+            ReactorNpcId);
     }
 
     public MischiefWorldEventContext WithResolveMode(MischiefWorldEventResolveMode resolveMode)
     {
-        return new MischiefWorldEventContext(ActorId, TargetId, EventType, Position, resolveMode, PreferredNpcId, PreferredNpcType, DisableTargetAfterResponse);
+        return new MischiefWorldEventContext(
+            ActorId,
+            TargetId,
+            EventType,
+            Position,
+            resolveMode,
+            PreferredNpcId,
+            PreferredNpcType,
+            DisableTargetAfterResponse,
+            ShouldReact,
+            ReactorNpcId);
+    }
+
+    public MischiefWorldEventContext WithReactionAssignment(bool shouldReact, string reactorNpcId)
+    {
+        return new MischiefWorldEventContext(
+            ActorId,
+            TargetId,
+            EventType,
+            Position,
+            ResolveMode,
+            PreferredNpcId,
+            PreferredNpcType,
+            DisableTargetAfterResponse,
+            shouldReact,
+            reactorNpcId);
     }
 
     public static MischiefWorldEventType InferEventType(string targetId, MischiefType mischiefType)

@@ -22,6 +22,15 @@ public class PlayerCuteAction : MonoBehaviour
     private float cooldownUiTimer;
     private bool wasOnCooldown;
 
+    private void Awake()
+    {
+        if (coreFacade == null) coreFacade = FindObjectOfType<CoreFacade>();
+        if (rageManager == null) rageManager = FindObjectOfType<RageManager>();
+        if (uiManager == null) uiManager = FindObjectOfType<UIManager>();
+        if (animationController == null) animationController = GetComponent<PlayerAnimationController>();
+        if (sfxController == null) sfxController = GetComponent<PlayerSfxController>();
+    }
+
     private void Update()
     {
         if (cooldownTimer > 0f)

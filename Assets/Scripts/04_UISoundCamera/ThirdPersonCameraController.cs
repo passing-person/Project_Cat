@@ -16,7 +16,8 @@ public class ThirdPersonCameraController : MonoBehaviour
     [SerializeField] private float rotationSharpness = 20f;
     [SerializeField] private float normalFov = 60f;
 
-    [Header("Hidden First Person Camera")]
+    [Header("Hidden Box Camera")]
+    [SerializeField] private bool useFixedHideAnchorView = true;
     [SerializeField] private Vector3 hiddenEyeOffset = new Vector3(0f, 0.55f, 0.08f);
     [SerializeField] private float hiddenDistance = 0.05f;
     [SerializeField] private float hiddenFov = 42f;
@@ -44,6 +45,7 @@ public class ThirdPersonCameraController : MonoBehaviour
     private float yaw;
     private float pitch = 18f;
     private float hiddenYawCenter;
+    private Transform hiddenViewAnchor;
     private bool wasHidden;
     private Vector3 currentVelocity;
     private float shakeTimer;
@@ -102,7 +104,10 @@ public class ThirdPersonCameraController : MonoBehaviour
 
         if (isHidden)
         {
-            UpdateHiddenInput();
+            if (!(useFixedHideAnchorView && hiddenViewAnchor != null))
+            {
+                UpdateHiddenInput();
+            }
             UpdateHiddenCameraPosition();
         }
         else
@@ -127,6 +132,18 @@ public class ThirdPersonCameraController : MonoBehaviour
         distance = Mathf.Clamp(newDistance, minDistance, maxDistance);
     }
 
+    public void SetHiddenViewAnchor(Transform anchor)
+    {
+        hiddenViewAnchor = anchor;
+        if (anchor != null)
+        {
+            hiddenYawCenter = anchor.eulerAngles.y;
+            yaw = hiddenYawCenter;
+            pitch = NormalizePitch(anchor.eulerAngles.x);
+            currentVelocity = Vector3.zero;
+        }
+    }
+
     public void AddImpulse(float magnitude, float duration)
     {
         shakeMagnitude = Mathf.Max(shakeMagnitude, magnitude);
@@ -135,9 +152,18 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     private void EnterHiddenCameraMode()
     {
-        hiddenYawCenter = target.eulerAngles.y;
-        yaw = hiddenYawCenter;
-        pitch = 0f;
+        if (hiddenViewAnchor != null)
+        {
+            hiddenYawCenter = hiddenViewAnchor.eulerAngles.y;
+            yaw = hiddenYawCenter;
+            pitch = NormalizePitch(hiddenViewAnchor.eulerAngles.x);
+        }
+        else
+        {
+            hiddenYawCenter = target.eulerAngles.y;
+            yaw = hiddenYawCenter;
+            pitch = 0f;
+        }
         currentVelocity = Vector3.zero;
     }
 
@@ -202,9 +228,21 @@ public class ThirdPersonCameraController : MonoBehaviour
             attachedCamera.fieldOfView = Mathf.Lerp(attachedCamera.fieldOfView, hiddenFov, 1f - Mathf.Exp(-12f * Time.deltaTime));
         }
 
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
-        Vector3 pivot = target.position + hiddenEyeOffset;
-        Vector3 desiredPosition = pivot + rotation * Vector3.back * hiddenDistance + GetShakeOffset() * 0.4f;
+        Quaternion rotation;
+        Vector3 desiredPosition;
+
+        if (useFixedHideAnchorView && hiddenViewAnchor != null)
+        {
+            rotation = hiddenViewAnchor.rotation;
+            desiredPosition = hiddenViewAnchor.position + GetShakeOffset() * 0.25f;
+        }
+        else
+        {
+            rotation = Quaternion.Euler(pitch, yaw, 0f);
+            Vector3 pivot = target.position + hiddenEyeOffset;
+            desiredPosition = pivot + rotation * Vector3.back * hiddenDistance + GetShakeOffset() * 0.4f;
+        }
+
         transform.position = Vector3.Lerp(transform.position, desiredPosition, 1f - Mathf.Exp(-20f * Time.deltaTime));
         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 1f - Mathf.Exp(-20f * Time.deltaTime));
     }
@@ -224,6 +262,11 @@ public class ThirdPersonCameraController : MonoBehaviour
             shakeMagnitude = 0f;
         }
         return offset;
+    }
+
+    private static float NormalizePitch(float angle)
+    {
+        return Mathf.DeltaAngle(0f, angle);
     }
 
     private static float ClampAngleAroundCenter(float angle, float center, float limit)

@@ -5,6 +5,7 @@ public class HideSpot : MonoBehaviour, IHideSpot
     [SerializeField] private string interactionId = "HideSpot";
     [SerializeField] private bool canInteract = true;
     [SerializeField] private Transform hidePoint;
+    [SerializeField] private Transform hideCameraAnchor;
     [SerializeField] private CoreFacade coreFacade;
     [SerializeField] private HidingManager hidingManager;
 
@@ -37,6 +38,7 @@ public class HideSpot : MonoBehaviour, IHideSpot
         }
     }
     public Transform HidePoint => hidePoint;
+    public Transform HideCameraAnchor => hideCameraAnchor != null ? hideCameraAnchor : hidePoint;
 
     private void Awake()
     {
@@ -46,6 +48,15 @@ public class HideSpot : MonoBehaviour, IHideSpot
             if (existingHidePoint != null)
             {
                 hidePoint = existingHidePoint;
+            }
+        }
+
+        if (hideCameraAnchor == null)
+        {
+            Transform existingCameraAnchor = transform.Find("HideCameraAnchor");
+            if (existingCameraAnchor != null)
+            {
+                hideCameraAnchor = existingCameraAnchor;
             }
         }
 

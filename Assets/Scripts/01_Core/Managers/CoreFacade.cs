@@ -334,6 +334,44 @@ public class CoreFacade : MonoBehaviour
         return rageManager != null ? rageManager.GetAverageRage() : 0f;
     }
 
+    public List<string> GetRegisteredNpcIds()
+    {
+        return rageManager != null ? rageManager.GetRegisteredNpcIds() : new List<string>();
+    }
+
+    public bool TryGetNpcWorldPosition(string npcId, out Vector3 position)
+    {
+        position = Vector3.zero;
+        return rageManager != null && rageManager.TryGetNpcPosition(npcId, out position);
+    }
+
+    public RageResult ReduceNpcRage(string npcId, float amount)
+    {
+        if (rageManager == null)
+        {
+            Debug.LogWarning("CoreFacade.ReduceNpcRage failed: RageManager is missing.");
+            return new RageResult(npcId, 0f, 0f, NpcRageState.Calm, NpcRageState.Calm, false);
+        }
+
+        return rageManager.ReduceRage(npcId, amount);
+    }
+
+    public void SetNpcRage(string npcId, float value)
+    {
+        if (rageManager == null)
+        {
+            Debug.LogWarning("CoreFacade.SetNpcRage failed: RageManager is missing.");
+            return;
+        }
+
+        rageManager.SetRage(npcId, value);
+    }
+
+    public RageResult ReportNpcLostPlayer(string npcId)
+    {
+        return ReduceNpcRage(npcId, 10f);
+    }
+
     public List<RageResult> TryCuteAction(Vector3 origin)
     {
         return TryCuteAction(origin, cuteActionRadius, cuteActionRageReduction);

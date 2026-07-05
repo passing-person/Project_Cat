@@ -14,6 +14,8 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
     [SerializeField] private string watchedNpcId = "Supervisor";
     [SerializeField] private float pollInterval = 0.05f;
     [SerializeField] private float feedbackMessageDuration = 1.35f;
+    [SerializeField] private bool showWorldRageBars = true;
+    [SerializeField] private Vector3 worldRageBarOffset = new Vector3(0f, 2.1f, 0f);
 
     private float pollTimer;
     private float feedbackTimer;
@@ -236,6 +238,43 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
         cameraController?.AddImpulse(0.13f, 0.22f);
     }
 
+    public void ShowCuteApplied(List<RageResult> results, float reductionAmount)
+    {
+        if (results == null || results.Count == 0)
+        {
+            ShowActionFeedback("CUTE FAILED", "No NPC in range", new Color(0.4f, 0.4f, 0.4f, 0.25f));
+            feedbackAudio?.PlayError();
+            return;
+        }
+
+        string targetLabel = results.Count == 1 ? results[0].NpcId : results.Count + " NPCs";
+        bool stoppedChase = false;
+        for (int i = 0; i < results.Count; i++)
+        {
+            if (results[i].PreviousRage >= 100f && results[i].CurrentRage < 100f)
+            {
+                stoppedChase = true;
+                break;
+            }
+        }
+
+        string detail = targetLabel + "  |  Rage -" + reductionAmount.ToString("0");
+        if (stoppedChase)
+        {
+            detail += "  |  Chase stopped";
+        }
+
+        ShowActionFeedback("CUTE!", detail, new Color(1f, 0.35f, 0.85f, 0.32f));
+        feedbackAudio?.PlayCute();
+        cameraController?.AddImpulse(0.08f, 0.18f);
+    }
+
+    public void ShowActionBlocked(string reason)
+    {
+        ShowActionFeedback("BLOCKED", string.IsNullOrEmpty(reason) ? "Action unavailable" : reason, new Color(0.75f, 0.1f, 0.1f, 0.26f));
+        feedbackAudio?.PlayError();
+    }
+
     public void ShowHideVisual(bool hidden, float remainingSeconds)
     {
         bool changed = isHidden != hidden;
@@ -244,7 +283,7 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
 
         if (changed && hidden)
         {
-            ShowActionFeedback("HIDDEN", "First-person view. F to exit.", new Color(0f, 0f, 0f, 0.38f));
+            ShowActionFeedback("HIDDEN", "Box view. F to exit.", new Color(0f, 0f, 0f, 0.38f));
             feedbackAudio?.PlayHideEnter();
         }
         else if (changed)
@@ -355,6 +394,7 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
         DrawFlashOverlay();
         DrawTopLeftStatus();
         DrawTopRightRage();
+        DrawWorldRageBars();
         DrawBottomControls();
         DrawPromptAndFeedback();
         DrawEventLog();
@@ -382,6 +422,49 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
         DrawBar(new Rect(panel.x + 16f, panel.y + 78f, width - 32f, 24f), Mathf.Clamp01(lastRage / 100f), GetRageColor(lastRage));
         string cuteText = cuteCooldownRemaining > 0f ? "Q Cute cooldown: " + cuteCooldownRemaining.ToString("0.0") + "s" : "Q Cute: READY";
         GUI.Label(new Rect(panel.x + 16f, panel.y + 104f, width - 32f, 24f), cuteText, smallTextStyle);
+    }
+
+    private void DrawWorldRageBars()
+    {
+        if (!showWorldRageBars || coreFacade == null)
+        {
+            return;
+        }
+
+        Camera camera = Camera.main;
+        if (camera == null)
+        {
+            return;
+        }
+
+        List<string> npcIds = coreFacade.GetRegisteredNpcIds();
+        for (int i = 0; i < npcIds.Count; i++)
+        {
+            string npcId = npcIds[i];
+            if (string.IsNullOrEmpty(npcId))
+            {
+                continue;
+            }
+
+            if (!coreFacade.TryGetNpcWorldPosition(npcId, out Vector3 worldPosition))
+            {
+                continue;
+            }
+
+            Vector3 screenPosition = camera.WorldToScreenPoint(worldPosition + worldRageBarOffset);
+            if (screenPosition.z <= 0f)
+            {
+                continue;
+            }
+
+            float rage = coreFacade.GetRage(npcId);
+            float width = 160f;
+            float height = 46f;
+            Rect panel = new Rect(screenPosition.x - width * 0.5f, Screen.height - screenPosition.y - height * 0.5f, width, height);
+            GUI.Box(panel, GUIContent.none, panelStyle);
+            GUI.Label(new Rect(panel.x + 8f, panel.y + 4f, width - 16f, 18f), npcId + " " + rage.ToString("0") + "%", smallTextStyle);
+            DrawBar(new Rect(panel.x + 8f, panel.y + 26f, width - 16f, 12f), rage / 100f, GetRageColor(rage));
+        }
     }
 
     private void DrawBottomControls()
@@ -432,7 +515,7 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
         Rect box = new Rect(Screen.width * 0.5f - 240f, 74f, 480f, 92f);
         GUI.Box(box, GUIContent.none, panelStyle);
         GUI.Label(new Rect(box.x, box.y + 10f, box.width, 38f), "HIDDEN", resultStyle);
-        GUI.Label(new Rect(box.x, box.y + 54f, box.width, 28f), "Limited view  |  F to exit  |  " + hideRemaining.ToString("0.0") + "s", centerPromptStyle);
+        GUI.Label(new Rect(box.x, box.y + 54f, box.width, 28f), "Box view  |  F to exit  |  " + hideRemaining.ToString("0.0") + "s", centerPromptStyle);
 
         float vignette = 58f;
         GUI.color = new Color(0f, 0f, 0f, 0.58f);

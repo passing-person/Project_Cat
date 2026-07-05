@@ -115,6 +115,39 @@ public class RageManager : MonoBehaviour
         return state;
     }
 
+    public List<string> GetRegisteredNpcIds()
+    {
+        return new List<string>(receivers.Keys);
+    }
+
+    public bool TryGetNpcPosition(string npcId, out Vector3 position)
+    {
+        position = Vector3.zero;
+
+        if (string.IsNullOrWhiteSpace(npcId) || !receivers.TryGetValue(npcId, out IRageReceiver receiver) || receiver == null)
+        {
+            return false;
+        }
+
+        position = receiver.Position;
+        return true;
+    }
+
+    public float GetEnragedThreshold(string npcId)
+    {
+        if (!string.IsNullOrWhiteSpace(npcId) && receivers.TryGetValue(npcId, out IRageReceiver receiver) && receiver != null && receiver.NpcData != null)
+        {
+            return receiver.NpcData.enragedThreshold;
+        }
+
+        return 100f;
+    }
+
+    public float GetCuteActionRadiusHint()
+    {
+        return 5f;
+    }
+
     public float GetAverageRage()
     {
         float total = 0f;
@@ -211,7 +244,8 @@ public class RageManager : MonoBehaviour
         EnsureScoringStarted();
         RecalculateScoreMultiplier();
 
-        bool reachedMax = previousRage < 100f && currentRage >= 100f;
+        float enragedThreshold = GetEnragedThreshold(npcId);
+        bool reachedMax = previousRage < enragedThreshold && currentRage >= enragedThreshold;
         if (reachedMax && receivers.TryGetValue(npcId, out IRageReceiver receiver) && receiver != null)
         {
             receiver.StartChase();
@@ -231,6 +265,7 @@ public class RageManager : MonoBehaviour
         rageStates[npcId] = currentState;
 
         ApplyStateToReceiver(npcId, currentState, previousState);
+        ApplyChaseStopIfRageDropped(npcId, previousRage, currentRage);
         RefreshRageUI(npcId);
         RecalculateScoreMultiplier();
 
@@ -248,10 +283,11 @@ public class RageManager : MonoBehaviour
         rageStates[npcId] = currentState;
 
         ApplyStateToReceiver(npcId, currentState, previousState);
+        ApplyChaseStopIfRageDropped(npcId, previousRage, currentRage);
         RefreshRageUI(npcId);
         RecalculateScoreMultiplier();
 
-        if (previousRage < 100f && currentRage >= 100f && receivers.TryGetValue(npcId, out IRageReceiver receiver) && receiver != null)
+        if (previousRage < GetEnragedThreshold(npcId) && currentRage >= GetEnragedThreshold(npcId) && receivers.TryGetValue(npcId, out IRageReceiver receiver) && receiver != null)
         {
             receiver.StartChase();
         }
@@ -378,6 +414,18 @@ public class RageManager : MonoBehaviour
         }
 
         return NpcRageState.Calm;
+    }
+
+    private void ApplyChaseStopIfRageDropped(string npcId, float previousRage, float currentRage)
+    {
+        float enragedThreshold = GetEnragedThreshold(npcId);
+        if (previousRage >= enragedThreshold && currentRage < enragedThreshold)
+        {
+            if (receivers.TryGetValue(npcId, out IRageReceiver receiver) && receiver != null)
+            {
+                receiver.StopChase();
+            }
+        }
     }
 
     private void ApplyStateToReceiver(string npcId, NpcRageState currentState, NpcRageState previousState)

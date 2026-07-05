@@ -8,6 +8,7 @@ public class PlayerHide : MonoBehaviour
     [SerializeField] private HidingManager hidingManager;
     [SerializeField] private CoreFacade coreFacade;
     [SerializeField] private UIManager uiManager;
+    [SerializeField] private ThirdPersonCameraController cameraController;
     [SerializeField] private PlayerAnimationController animationController;
     [SerializeField] private PlayerSfxController sfxController;
 
@@ -21,6 +22,7 @@ public class PlayerHide : MonoBehaviour
         if (coreFacade == null) coreFacade = FindObjectOfType<CoreFacade>();
         if (hidingManager == null) hidingManager = FindObjectOfType<HidingManager>();
         if (uiManager == null) uiManager = FindObjectOfType<UIManager>();
+        if (cameraController == null) cameraController = FindObjectOfType<ThirdPersonCameraController>();
         if (animationController == null) animationController = GetComponent<PlayerAnimationController>();
         if (sfxController == null) sfxController = GetComponent<PlayerSfxController>();
     }
@@ -115,6 +117,16 @@ public class PlayerHide : MonoBehaviour
             transform.position = hideSpot.HidePoint.position;
         }
 
+        if (cameraController != null)
+        {
+            Transform anchor = null;
+            if (hideSpot is HideSpot concreteHideSpot)
+            {
+                anchor = concreteHideSpot.HideCameraAnchor;
+            }
+            cameraController.SetHiddenViewAnchor(anchor);
+        }
+
         if (playerController != null)
         {
             playerController.SetHidden(true);
@@ -171,6 +183,8 @@ public class PlayerHide : MonoBehaviour
             playerController.SetHidden(false);
             playerController.SetControllable(true);
         }
+
+        cameraController?.SetHiddenViewAnchor(null);
 
         if (reportToCore)
         {

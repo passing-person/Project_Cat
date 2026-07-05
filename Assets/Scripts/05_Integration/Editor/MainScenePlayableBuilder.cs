@@ -183,7 +183,7 @@ public static class MainScenePlayableBuilder
         coreFacade.failManager = failManager;
         coreFacade.hidingManager = hidingManager;
         coreFacade.uiBridgeBehaviour = uiManager;
-        coreFacade.cuteActionRadius = 4f;
+        coreFacade.cuteActionRadius = 5f;
         coreFacade.cuteActionRageReduction = 20f;
         coreFacade.defaultSecurityMultiplier = stageData.securityMultiplierOverride;
         coreFacade.autoResolveReferences = false;
@@ -341,6 +341,7 @@ public static class MainScenePlayableBuilder
         HidingManager hidingManager = Object.FindObjectOfType<HidingManager>();
         UIManager uiManager = Object.FindObjectOfType<UIManager>();
         AudioManager audioManager = Object.FindObjectOfType<AudioManager>();
+        ThirdPersonCameraController cameraController = Object.FindObjectOfType<ThirdPersonCameraController>();
         PlayerController controller = player.GetComponent<PlayerController>();
         PlayerInteraction interaction = player.GetComponent<PlayerInteraction>();
         PlayerAnimationController animationController = player.GetComponent<PlayerAnimationController>();
@@ -373,7 +374,7 @@ public static class MainScenePlayableBuilder
         SetPrivateField(cute, "uiManager", uiManager);
         SetPrivateField(cute, "animationController", animationController);
         SetPrivateField(cute, "sfxController", sfxController);
-        cute.radius = 4f;
+        cute.radius = 5f;
         cute.rageReduction = 20f;
         cute.cooldown = 20f;
 
@@ -383,6 +384,7 @@ public static class MainScenePlayableBuilder
         SetPrivateField(hide, "coreFacade", coreFacade);
         SetPrivateField(hide, "hidingManager", hidingManager);
         SetPrivateField(hide, "uiManager", uiManager);
+        SetPrivateField(hide, "cameraController", cameraController);
         SetPrivateField(hide, "animationController", animationController);
         SetPrivateField(hide, "sfxController", sfxController);
 
@@ -416,8 +418,11 @@ public static class MainScenePlayableBuilder
         box.AddComponent<InteractableHighlighter>();
 
         GameObject hidePoint = CreateEmpty("HidePoint", box.transform, new Vector3(0f, 0.2f, 0f));
+        GameObject hideCameraAnchor = CreateEmpty("HideCameraAnchor", box.transform, new Vector3(0f, 0.45f, -0.48f));
+        hideCameraAnchor.transform.localRotation = Quaternion.Euler(8f, 0f, 0f);
         SetPrivateField(hideSpot, "interactionId", "HideSpot_Box");
         SetPrivateField(hideSpot, "hidePoint", hidePoint.transform);
+        SetPrivateField(hideSpot, "hideCameraAnchor", hideCameraAnchor.transform);
         SetPrivateField(hideSpot, "coreFacade", Object.FindObjectOfType<CoreFacade>());
         SetPrivateField(hideSpot, "hidingManager", Object.FindObjectOfType<HidingManager>());
     }

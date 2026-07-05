@@ -4,11 +4,18 @@ using UnityEngine;
 public class NpcChaseBehavior : MonoBehaviour
 {
     [Header("Snapshot Chase")]
-    [Tooltip("Maximum consecutive time the NPC may spend chasing snapshot positions without reacquiring actual view. 0 means unlimited.")]
-    [SerializeField, Min(0f)] private float maxFruitlessChaseTime = 3f;
+    [Tooltip("Maximum consecutive attempts the NPC may spend chasing snapshot positions without reacquiring actual view. 0 means unlimited.")]
+    [SerializeField, Min(0f)] private int maxFruitlessChaseAttempt = 3;
 
     [Tooltip("Minimum movement of the active snapshot before the NavMesh destination is refreshed.")]
     [SerializeField, Min(0f)] private float snapshotDestinationRefreshDistance = 0.15f;
+
+    [Header("Dive Transition")]
+    [Tooltip("If true, Chase explicitly checks the current NpcView dive flags on entry and before chase navigation. This fixes the case where PlayerInReach was already true before Chase began, so no PlayerInReachFlagChange event fires.")]
+    [SerializeField] private bool transitionToDiveImmediatelyWhenAvailable = true;
+
+    [Tooltip("If true, Chase calls NpcView.Refresh() before checking DiveRequestIsValid so stale same-frame view data cannot block an immediate Chase -> Dive transition.")]
+    [SerializeField] private bool refreshViewBeforeImmediateDiveCheck = true;
 
     private NpcNavigate nav;
     private NpcController controller;
@@ -22,8 +29,8 @@ public class NpcChaseBehavior : MonoBehaviour
     private bool navigatingToSnapshot;
     private bool chaseTimerStarted;
 
-    private float fruitlessSnapshotChaseTime;
-    private bool snapshotFruitlessChaseExceeded;
+    private int fruitlessSnapshotChaseAttempt;
+
 
     private Vector3 currentSnapshotDestination;
     private bool hasCurrentSnapshotDestination;
@@ -39,9 +46,10 @@ public class NpcChaseBehavior : MonoBehaviour
 
     private ChaseMode chaseMode = ChaseMode.None;
 
-    public float MaxFruitlessChaseTime => maxFruitlessChaseTime;
-    public float FruitlessSnapshotChaseTime => fruitlessSnapshotChaseTime;
-    public bool SnapshotFruitlessChaseExceeded => snapshotFruitlessChaseExceeded;
+    public float MaxFruitlessChaseAttempt => maxFruitlessChaseAttempt;
+    public float FruitlessSnapshotChaseTime => fruitlessSnapshotChaseAttempt;
+    public bool SnapshotFruitlessChaseExceeded =>
+        fruitlessSnapshotChaseAttempt > maxFruitlessChaseAttempt;
 
     private void Awake()
     {
@@ -89,13 +97,20 @@ public class NpcChaseBehavior : MonoBehaviour
 
     public void ResetFruitlessSnapshotChase()
     {
-        fruitlessSnapshotChaseTime = 0f;
-        snapshotFruitlessChaseExceeded = false;
+        fruitlessSnapshotChaseAttempt = 0;
     }
 
     private void ChaseAndFindPlayer()
     {
         LazyInstantiate();
+
+        // Important:
+        // PlayerInReach / DiveRequestIsValid can already be true before the NPC enters Chase.
+        // In that case NpcView will not emit PlayerInReachFlagChange again, so the state
+        // machine may not get a fresh chance to resolve Chase -> Dive. Check it explicitly.
+        if (TryTransitionToDiveIfAvailable("chase enter"))
+            return;
+
         StartChaseTimerIfNeeded();
 
         if (anim != null)
@@ -105,6 +120,38 @@ public class NpcChaseBehavior : MonoBehaviour
             return;
 
         chaseRoutine = StartCoroutine(ChaseRoutine());
+    }
+
+    private bool TryTransitionToDiveIfAvailable(string reason)
+    {
+        if (!transitionToDiveImmediatelyWhenAvailable)
+            return false;
+
+        if (controller == null || controller.CurrentNpcState != NpcState.Chase)
+            return false;
+
+        if (view == null)
+            return false;
+
+        if (refreshViewBeforeImmediateDiveCheck)
+            view.Refresh();
+
+        // Refresh() can invoke view flag events. If those events already caused the state
+        // machine to leave Chase, treat this as handled and stop the chase entry/loop.
+        if (controller.CurrentNpcState != NpcState.Chase)
+            return true;
+
+        if (!view.DiveRequestIsValid)
+            return false;
+
+        Debug.Log(
+            $"[NPC] {controller.NpcId}: dive is available during {reason}, " +
+            "switching from Chase to Dive immediately."
+        );
+
+        if (!view.PlayerHidden)
+            TransitionOutOfChase(NpcState.Dive);
+        return true;
     }
 
     private IEnumerator ChaseRoutine()
@@ -118,28 +165,33 @@ public class NpcChaseBehavior : MonoBehaviour
 
         yield return null;
 
+        NpcChaseTargetKind cacheChaseTargetKind = NpcChaseTargetKind.Snapshot;
         while (controller.CurrentNpcState == NpcState.Chase)
         {
-            if (view == null || !view.TryGetKnownPlayerPosition(out Vector3 targetPosition, out NpcPlayerTargetKind targetKind))
+            if (TryTransitionToDiveIfAvailable("chase loop"))
+                yield break;
+
+            if (view == null || !view.TryGetKnownPlayerPosition(out Vector3 targetPosition, out NpcChaseTargetKind targetKind))
             {
                 Debug.Log($"[NPC] {controller.NpcId}: no actual or snapshot target left, switching to Search.");
                 TransitionOutOfChase(NpcState.Search);
                 yield break;
             }
 
-            if (targetKind == NpcPlayerTargetKind.Actual)
+            ResolveFruitlessChaseCapacity(prev: cacheChaseTargetKind, current: targetKind);
+            cacheChaseTargetKind = targetKind;
+
+            if (targetKind == NpcChaseTargetKind.Actual)
             {
-                ResetFruitlessSnapshotChase();
                 SwitchToPlayerChase();
             }
             else
             {
                 SwitchToSnapshotChase(targetPosition);
-                TickFruitlessSnapshotChaseTimer();
 
-                if (snapshotFruitlessChaseExceeded)
+                if (SnapshotFruitlessChaseExceeded)
                 {
-                    Debug.Log($"[NPC] {controller.NpcId}: snapshot chase exceeded {maxFruitlessChaseTime:0.00}s, switching to Search.");
+                    Debug.Log($"[NPC] {controller.NpcId}: snapshot chase exceeded {maxFruitlessChaseAttempt} time(s), switching to Search.");
                     view.ClearActivePlayerSnapshot();
                     TransitionOutOfChase(NpcState.Search);
                     yield break;
@@ -158,6 +210,9 @@ public class NpcChaseBehavior : MonoBehaviour
             (snapshotPosition - currentSnapshotDestination).sqrMagnitude > snapshotDestinationRefreshDistance * snapshotDestinationRefreshDistance;
 
         if (chaseMode == ChaseMode.ToSnapshot && !destinationChanged)
+            return;
+
+        if (SnapshotFruitlessChaseExceeded)
             return;
 
         currentSnapshotDestination = snapshotPosition;
@@ -184,6 +239,7 @@ public class NpcChaseBehavior : MonoBehaviour
 
         navigatingToSnapshot = false;
         hasCurrentSnapshotDestination = false;
+        fruitlessSnapshotChaseAttempt = 0;
         chaseMode = ChaseMode.ToPlayer;
 
         if (nav != null)
@@ -195,15 +251,19 @@ public class NpcChaseBehavior : MonoBehaviour
         Debug.Log($"[NPC] {controller.NpcId}: actual player acquired, chasing player.");
     }
 
-    private void TickFruitlessSnapshotChaseTimer()
+    private void ResolveFruitlessChaseCapacity(NpcChaseTargetKind prev, NpcChaseTargetKind current)
     {
-        if (maxFruitlessChaseTime <= 0f)
+
+        if (prev == current) return;
+        if (current == NpcChaseTargetKind.Snapshot)
+            fruitlessSnapshotChaseAttempt++;
+        else if (current == NpcChaseTargetKind.Actual)
+            ResetFruitlessSnapshotChase();
+        else
+        {
+            Debug.LogWarning($"[NPC] {controller.NpcId}: unidentified target of type NpcChaseTargetKind.None. Skip counter update.");
             return;
-
-        fruitlessSnapshotChaseTime += Time.deltaTime;
-
-        if (fruitlessSnapshotChaseTime >= maxFruitlessChaseTime)
-            snapshotFruitlessChaseExceeded = true;
+        }
     }
 
     private void StartChaseTimerIfNeeded()
@@ -263,6 +323,7 @@ public class NpcChaseBehavior : MonoBehaviour
         navigatingToSnapshot = false;
         chaseMode = ChaseMode.None;
         hasCurrentSnapshotDestination = false;
+        fruitlessSnapshotChaseAttempt = 0;
 
         if (stopTimer && chaseTimerStarted && timer != null)
         {

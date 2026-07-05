@@ -25,6 +25,18 @@ public class NpcDiveBehavior : MonoBehaviour
     [Tooltip("If true, the NPC is snapped exactly to the current flat player direction immediately before PlayDive. This makes the dive direction deterministic instead of allowing angle-tolerance drift.")]
     [SerializeField] private bool snapExactlyToPlayerDirectionBeforeDive = true;
 
+    [Header("Cleaner Double Dive")]
+    [Tooltip("If true, Cleaner NPCs perform two Dive plays inside one Dive state before entering cooldown.")]
+    [SerializeField] private bool cleanerUsesDoubleDive = true;
+
+    [Tooltip("Number of consecutive dives for Cleaner. Keep this at 2 for the requested Cleaner double-dive behavior.")]
+    [SerializeField, Min(1)] private int cleanerDiveCount = 2;
+
+    [Tooltip("The first dive can be replayed when the Dive state reaches this normalized time or exits. This bypasses DiveCooldown between dives.")]
+    [SerializeField, Range(0f, 1f)] private float replayNextDiveNormalizedTime = 0.98f;
+
+    [Tooltip("Optional delay between consecutive Cleaner dives. Leave at 0 for immediate double dive.")]
+    [SerializeField, Min(0f)] private float delayBetweenCleanerDives = 0f;
 
 
     private bool diveCatchWindowOpen;
@@ -34,13 +46,13 @@ public class NpcDiveBehavior : MonoBehaviour
     private NpcController controller;
     private NpcView view;
     private NpcAnimationMachine anim;
+    private Animator animator;
 
     private PlayerController player;
 
     private Coroutine diveSequenceRoutine;
     private bool diveStarted;
 
-    private bool PlayerInReach => view != null && view.PlayerInReach;
 
     private void Awake()
     {
@@ -63,7 +75,12 @@ public class NpcDiveBehavior : MonoBehaviour
 
     public void Supervisor() => StartDive();
     public void Worker() => StartDive();
-    public void Cleaner() => StartDive();
+    public void Cleaner() 
+    {
+        if (cleanerUsesDoubleDive)
+            StartDiveSequence(cleanerDiveCount);
+        else StartDive();
+    } 
     public void Security() => StartDive();
 
     public void ExitState()
@@ -73,6 +90,11 @@ public class NpcDiveBehavior : MonoBehaviour
 
     private void StartDive()
     {
+        StartDiveSequence(1);
+    }
+
+    private void StartDiveSequence(int diveCount)
+    {
         LazyInstantiate();
 
         if (diveStarted)
@@ -81,13 +103,16 @@ public class NpcDiveBehavior : MonoBehaviour
         diveStarted = true;
         diveCatchWindowOpen = false;
 
-        nav.StopPatrol();
-        nav.StopNav();
+        if (nav != null)
+        {
+            nav.StopPatrol();
+            nav.StopNav();
+        }
 
         if (diveSequenceRoutine != null)
             StopCoroutine(diveSequenceRoutine);
 
-        diveSequenceRoutine = StartCoroutine(DiveSequenceRoutine());
+        diveSequenceRoutine = StartCoroutine(DiveSequenceRoutine(Mathf.Max(1, diveCount)));
     }
 
     private IEnumerator WaitForDiveSequenceFinished()
@@ -143,6 +168,47 @@ public class NpcDiveBehavior : MonoBehaviour
 
         diveSequenceRoutine = null;
         ResolveDiveAnimationFinished();
+    }
+
+    private IEnumerator WaitForDiveReplayPoint(int completedDiveIndex, int totalDiveCount)
+    {
+        bool finishedDive = false;
+
+        yield return anim.WaitForStateFinished(
+            AnimState.Dive,
+            success => finishedDive = success,
+            replayNextDiveNormalizedTime,
+            animationStateWaitTimeout
+        );
+
+        if (!IsValidDiveState())
+        {
+            diveSequenceRoutine = null;
+            yield break;
+        }
+
+        if (!finishedDive)
+        {
+            Debug.LogWarning(
+                $"[NPC Dive] {name}: Cleaner dive {completedDiveIndex}/{totalDiveCount} " +
+                "did not reach the replay point before timeout. Replaying the next dive anyway."
+            );
+        }
+    }
+
+    private bool TryResolvePlayerCaughtImmediately()
+    {
+        if (!IsValidDiveState())
+            return false;
+
+        if (!diveCatchWindowOpen)
+            return false;
+
+        if (!PlayerInCatchRange)
+            return false;
+
+        ResolvePlayerCaught();
+        return true;
     }
 
     private void ResolvePlayerCatchRangeChanged()
@@ -287,21 +353,63 @@ public class NpcDiveBehavior : MonoBehaviour
         );
     }
 
-    private IEnumerator DiveSequenceRoutine()
+    private IEnumerator DiveSequenceRoutine(int diveCount)
     {
-        yield return FacePlayerBeforeDive();
-
-        if (!IsValidDiveState())
+        for (int diveIndex = 1; diveIndex <= diveCount; diveIndex++)
         {
-            diveSequenceRoutine = null;
-            yield break;
+            // Re-aim before every individual dive. This is what allows Cleaner to
+            // change direction between the first and second dive without leaving
+            // the gameplay Dive state.
+            diveCatchWindowOpen = false;
+
+            yield return FacePlayerBeforeDive();
+
+            if (!IsValidDiveState())
+            {
+                diveSequenceRoutine = null;
+                yield break;
+            }
+
+            SnapExactlyToPlayerDirectionBeforeDive();
+
+            // PlayDive(forceReplay=true) is used inside NpcAnimationMachine, so this
+            // can replay Dive even if the Animator has already entered or is blending
+            // toward TransitionDiveToCooldown after the previous dive.
+            anim.PlayDive();
+
+            diveCatchWindowOpen = true;
+
+            // Do not rely only on the flag-change event. If the player is already
+            // inside catch range when the window opens, catch immediately.
+            if (TryResolvePlayerCaughtImmediately())
+                yield break;
+
+            bool isFinalDive = diveIndex >= diveCount;
+
+            if (isFinalDive)
+            {
+                // Only the final dive is allowed to finish the normal Dive ->
+                // TransitionDiveToCooldown -> gameplay Cooldown path.
+                yield return WaitForDiveSequenceFinished();
+                yield break;
+            }
+
+            // For intermediate Cleaner dives, wait only until Dive reaches its
+            // replay point. Do not call ResolveDiveAnimationFinished and do not
+            // switch controller.CurrentNpcState to Cooldown here.
+            yield return WaitForDiveReplayPoint(diveIndex, diveCount);
+
+            if (!IsValidDiveState())
+            {
+                diveSequenceRoutine = null;
+                yield break;
+            }
+
+            diveCatchWindowOpen = false;
+
+            if (delayBetweenCleanerDives > 0f)
+                yield return new WaitForSeconds(delayBetweenCleanerDives);
         }
-
-        SnapExactlyToPlayerDirectionBeforeDive();
-
-        anim.PlayDive();
-
-        yield return WaitForDiveSequenceFinished();
     }
 
     private void LazyInstantiate()
@@ -320,5 +428,8 @@ public class NpcDiveBehavior : MonoBehaviour
 
         if (player == null)
             player = FindFirstObjectByType<PlayerController>();
+
+        if (animator == null)
+            animator = GetComponent<Animator>();
     }
 }

@@ -13,8 +13,6 @@ public class NpcNavigate : MonoBehaviour
     [Header("Path Mapping (per state)")]
     [SerializeField] private List<StatePathMapping> statePaths = new();
 
-    [Header("Debug")]
-    [SerializeField] bool debugIsChasing;
 
     // NPC components
     private NpcController controller

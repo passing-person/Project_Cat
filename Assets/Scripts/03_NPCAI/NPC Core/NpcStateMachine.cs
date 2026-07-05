@@ -52,7 +52,8 @@ public class NpcStateMachine : MonoBehaviour
                 // PlayerInReach is already validated by NpcView:
                 // normal dive requires targeting interval + space rect;
                 // close-range dive bypasses the space rect and is handled as a warp dive.
-                if (s.currentPlayerInReach && view != null && view.DiveRequestIsValid)
+                if (s.currentPlayerInReach && view != null 
+                    && view.DiveRequestIsValid && !view.PlayerHidden)
                     return NpcState.Dive;
 
                 // PlayerInView means the NPC has an actual or snapshot target.
@@ -65,7 +66,8 @@ public class NpcStateMachine : MonoBehaviour
 
             case NpcState.Search:
 
-                if (s.currentPlayerInReach && view != null && view.DiveRequestIsValid)
+                if (s.currentPlayerInReach && view != null 
+                    && view.DiveRequestIsValid && !view.PlayerHidden)
                     return NpcState.Dive;
 
                 // Search should resume Chase only on actual sector reacquire.

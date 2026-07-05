@@ -179,11 +179,11 @@ public class NpcSearchBehavior : MonoBehaviour
 
         if (chaseBehavior != null && chaseBehavior.SnapshotFruitlessChaseExceeded)
         {
-            FailSearchToIdle("snapshot chase time exceeded");
+            FailSearchToIdle("snapshot chase attempt maximum exceeded");
             return;
         }
 
-        if (view != null && view.TryPrepareSearchTimeoutChaseTarget(out Vector3 target, out NpcPlayerTargetKind targetKind))
+        if (view != null && view.TryPrepareSearchTimeoutChaseTarget(out Vector3 target, out NpcChaseTargetKind targetKind))
         {
             Debug.Log($"[NPC] {controller.NpcId}: Search timed out, chasing {targetKind} target at {target}.");
             controller.CurrentNpcState = NpcState.Chase;

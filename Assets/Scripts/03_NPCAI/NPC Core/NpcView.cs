@@ -2,12 +2,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using System;
 
-public enum NpcPlayerTargetKind
-{
-    None,
-    Actual,
-    Snapshot
-}
+
 
 public class NpcView : MonoBehaviour
 {
@@ -78,6 +73,14 @@ public class NpcView : MonoBehaviour
     /// </summary>
     public bool PlayerInActualView => _playerInActualView;
 
+    public bool PlayerHidden
+    {
+        get
+        {
+            LazyInstantiate();
+            return player.GetComponent<PlayerController>().IsHidden;
+        }
+    }
     public bool PlayerInViewRange => _playerInViewRange;
     public bool HasPlayerPositionSnapshot => _hasPlayerPositionSnapshot;
     public bool HasExitRangeSnapshot => _hasExitRangeSnapshot;
@@ -194,9 +197,9 @@ public class NpcView : MonoBehaviour
     {
         LazyInstantiate();
 
-        if (player == null)
+        if (player == null && PlayerHidden)
         {
-            position = transform.position;
+            position = transform.position; // meaningless
             return false;
         }
 
@@ -218,24 +221,24 @@ public class NpcView : MonoBehaviour
         return TryGetKnownPlayerPosition(out position, out _);
     }
 
-    public bool TryGetKnownPlayerPosition(out Vector3 position, out NpcPlayerTargetKind targetKind)
+    public bool TryGetKnownPlayerPosition(out Vector3 position, out NpcChaseTargetKind targetKind)
     {
         if (_playerInActualView && _hasActualPlayerPosition)
         {
             position = _actualPlayerPosition;
-            targetKind = NpcPlayerTargetKind.Actual;
+            targetKind = NpcChaseTargetKind.Actual;
             return true;
         }
 
         if (_hasPlayerPositionSnapshot)
         {
             position = _playerPositionSnapshot;
-            targetKind = NpcPlayerTargetKind.Snapshot;
+            targetKind = NpcChaseTargetKind.Snapshot;
             return true;
         }
 
         position = transform.position;
-        targetKind = NpcPlayerTargetKind.None;
+        targetKind = NpcChaseTargetKind.None;
         return false;
     }
 
@@ -293,19 +296,19 @@ public class NpcView : MonoBehaviour
     /// 2. Else, if the player is still inside the larger view range, sample current position as a snapshot.
     /// 3. Else, reactivate the last exit-range snapshot.
     /// </summary>
-    public bool TryPrepareSearchTimeoutChaseTarget(out Vector3 position, out NpcPlayerTargetKind targetKind)
+    public bool TryPrepareSearchTimeoutChaseTarget(out Vector3 position, out NpcChaseTargetKind targetKind)
     {
         if (_playerInActualView && _hasActualPlayerPosition)
         {
             position = _actualPlayerPosition;
-            targetKind = NpcPlayerTargetKind.Actual;
+            targetKind = NpcChaseTargetKind.Actual;
             return true;
         }
 
         if (allowSearchTimeoutSnapshotInsideViewRange && _playerInViewRange && CapturePlayerPositionSnapshot())
         {
             position = _playerPositionSnapshot;
-            targetKind = NpcPlayerTargetKind.Snapshot;
+            targetKind = NpcChaseTargetKind.Snapshot;
             return true;
         }
 
@@ -313,12 +316,12 @@ public class NpcView : MonoBehaviour
         {
             SetActivePlayerSnapshot(_exitRangeSnapshotPosition);
             position = _playerPositionSnapshot;
-            targetKind = NpcPlayerTargetKind.Snapshot;
+            targetKind = NpcChaseTargetKind.Snapshot;
             return true;
         }
 
         position = transform.position;
-        targetKind = NpcPlayerTargetKind.None;
+        targetKind = NpcChaseTargetKind.None;
         return false;
     }
 
@@ -664,7 +667,7 @@ public class NpcView : MonoBehaviour
             capsule = GetComponent<CapsuleCollider>();
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         LazyInstantiate();
 
@@ -759,4 +762,11 @@ public class NpcView : MonoBehaviour
             previous = current;
         }
     }
+}
+
+public enum NpcChaseTargetKind
+{
+    None,
+    Actual,
+    Snapshot
 }

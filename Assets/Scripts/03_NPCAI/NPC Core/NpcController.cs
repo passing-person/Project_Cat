@@ -17,8 +17,6 @@ public class NpcController : MonoBehaviour, IRageReceiver
     [Tooltip("If true, ending a chase sequence in Idle reduces this NPC's rage through CoreFacade.RageManager.")]
     [SerializeField] private bool reduceRageWhenChaseSequenceEndsInIdle = true;
 
-    [Tooltip("Rage amount reduced when a chase sequence ends in Idle.")]
-    [SerializeField, Min(0f)] private float chaseToIdleRageReduction = 20f;
 
     [Header("Debug - State Machine")]
     [SerializeField] NpcRageState debugRageState;
@@ -311,7 +309,7 @@ public class NpcController : MonoBehaviour, IRageReceiver
 
     private void ApplyChaseToIdleRageReduction()
     {
-        if (!reduceRageWhenChaseSequenceEndsInIdle || chaseToIdleRageReduction <= 0f)
+        if (!reduceRageWhenChaseSequenceEndsInIdle)
             return;
 
         if (coreFacade == null)
@@ -323,8 +321,8 @@ public class NpcController : MonoBehaviour, IRageReceiver
             return;
         }
 
-        coreFacade.rageManager.ReduceRage(NpcId, chaseToIdleRageReduction);
-        Debug.Log($"[NPC] {NpcId}: chase ended in Idle, reduced rage by {chaseToIdleRageReduction:0.##}.");
+        coreFacade.ReportNpcLostPlayer(NpcId);
+        Debug.Log($"[NPC] {NpcId}: chase ended in Idle, rage reduced.");
     }
 
     public void OnPlayerCaught(PlayerController player)

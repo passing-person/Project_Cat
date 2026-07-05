@@ -61,7 +61,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2e05a747a6709c347be39ce67225f341,
         type: 3}
       propertyPath: m_Name
-      value: Model
+      value: Cat_rigged
       objectReference: {fileID: 0}
     - target: {fileID: 2694113770958563359, guid: 2e05a747a6709c347be39ce67225f341,
         type: 3}
@@ -151,7 +151,25 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 111100003}
   m_SourcePrefab: {fileID: 100100000, guid: 2e05a747a6709c347be39ce67225f341, type: 3}
---- !u!1 &111100001 stripped
+--- !u!137 &3171863732447290995 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 5652184452787973536, guid: 2e05a747a6709c347be39ce67225f341,
+    type: 3}
+  m_PrefabInstance: {fileID: 7094346519110650835}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &4055211285473282623 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6499591188483719660, guid: 2e05a747a6709c347be39ce67225f341,
+    type: 3}
+  m_PrefabInstance: {fileID: 7094346519110650835}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &5122638559561884620 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2694113770958563359, guid: 2e05a747a6709c347be39ce67225f341,
+    type: 3}
+  m_PrefabInstance: {fileID: 7094346519110650835}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7977360671217268354 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2e05a747a6709c347be39ce67225f341,
     type: 3}
@@ -163,7 +181,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 111100001}
+  m_GameObject: {fileID: 7977360671217268354}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7d4f291a6c34e5d9f8e2c1a0b6d3f45, type: 3}
@@ -175,11 +193,35 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 111100001}
+  m_GameObject: {fileID: 7977360671217268354}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8ed48182153ca264080e3a99d22c7214, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slots: []
+  slots:
+  - label: Cat.L_Eye.L
+    renderer: {fileID: 3171863732447290995}
+    subMeshIndex: 0
+    material: {fileID: 2100000, guid: e650c119207b97f42bc2bf99ce7e55f0, type: 2}
+    overrideShaderValues: 0
+    specular: 0
+    smoothness: 0
+    emission: 0
+  - label: Cat.L_Eye.R
+    renderer: {fileID: 5122638559561884620}
+    subMeshIndex: 0
+    material: {fileID: 2100000, guid: e650c119207b97f42bc2bf99ce7e55f0, type: 2}
+    overrideShaderValues: 0
+    specular: 0
+    smoothness: 0
+    emission: 0
+  - label: Cat.L
+    renderer: {fileID: 4055211285473282623}
+    subMeshIndex: 0
+    material: {fileID: 2100000, guid: e650c119207b97f42bc2bf99ce7e55f0, type: 2}
+    overrideShaderValues: 1
+    specular: 1
+    smoothness: 1
+    emission: 1
   applyOnAwake: 1

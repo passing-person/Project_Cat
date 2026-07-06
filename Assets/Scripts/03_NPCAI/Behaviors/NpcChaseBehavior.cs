@@ -23,13 +23,15 @@ public class NpcChaseBehavior : MonoBehaviour
     private NpcView view;
     private NpcAnimationMachine anim;
 
-    private bool PlayerInView => view.PlayerInView;
-    private bool PlayerInActualView => view.PlayerInActualView;
+    private bool PlayerInView => IsSecurity || view.PlayerInView;
+    private bool PlayerInActualView => IsSecurity || view.PlayerInActualView;
 
     private bool navigatingToSnapshot;
     private bool chaseTimerStarted;
 
     private int fruitlessSnapshotChaseAttempt;
+
+    private bool IsSecurity => controller.IsSecurity;
 
 
     private Vector3 currentSnapshotDestination;
@@ -156,6 +158,9 @@ public class NpcChaseBehavior : MonoBehaviour
 
     private IEnumerator ChaseRoutine()
     {
+        if (IsSecurity)
+            SwitchToPlayerChase();
+
         if (!PlayerInView)
         {
             // A rage-triggered chase should still begin with a snapshot if possible.
@@ -206,6 +211,18 @@ public class NpcChaseBehavior : MonoBehaviour
 
     private void SwitchToSnapshotChase(Vector3 snapshotPosition)
     {
+        LazyInstantiate();
+
+        if (IsSecurity)
+        {
+            chaseMode = ChaseMode.ToPlayer;
+            nav.StopNav();
+            nav.StopPatrol();
+            nav.ToggleChasePlayer(true);
+            anim.PlayLocomotion();
+            return;
+        } 
+
         bool destinationChanged = !hasCurrentSnapshotDestination ||
             (snapshotPosition - currentSnapshotDestination).sqrMagnitude > snapshotDestinationRefreshDistance * snapshotDestinationRefreshDistance;
 
@@ -234,6 +251,8 @@ public class NpcChaseBehavior : MonoBehaviour
 
     private void SwitchToPlayerChase()
     {
+        LazyInstantiate();
+
         if (chaseMode == ChaseMode.ToPlayer)
             return;
 
@@ -242,18 +261,16 @@ public class NpcChaseBehavior : MonoBehaviour
         fruitlessSnapshotChaseAttempt = 0;
         chaseMode = ChaseMode.ToPlayer;
 
-        if (nav != null)
-            nav.ToggleChasePlayer(true);
+        nav.ToggleChasePlayer(true);
 
-        if (anim != null)
-            anim.PlayLocomotion();
+        anim.PlayLocomotion();
 
         Debug.Log($"[NPC] {controller.NpcId}: actual player acquired, chasing player.");
     }
 
     private void ResolveFruitlessChaseCapacity(NpcChaseTargetKind prev, NpcChaseTargetKind current)
     {
-
+        if (IsSecurity) return;
         if (prev == current) return;
         if (current == NpcChaseTargetKind.Snapshot)
             fruitlessSnapshotChaseAttempt++;

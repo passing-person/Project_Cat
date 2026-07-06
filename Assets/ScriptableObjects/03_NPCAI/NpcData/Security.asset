@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   npcId: Security
   npcType: 3
-  moveSpeed: 1.3333334
-  chaseSpeed: 1.733333
-  annoyedThreshold: 40
-  angryThreshold: 70
+  moveSpeed: 1.733333
+  chaseSpeed: 2.666667
+  annoyedThreshold: 100
+  angryThreshold: 100
   enragedThreshold: 100
   canReceiveRage: 0

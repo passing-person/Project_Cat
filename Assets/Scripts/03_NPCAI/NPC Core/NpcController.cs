@@ -27,6 +27,7 @@ public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventRe
     private NpcView npcView;
     private NpcStateMachine npcStateMachine;
     private NpcPopoutController popoutController;
+    private HeadFollowLogic headFollowLogic;
 
     // behaviors
     private NpcIdleBehavior npcIdleBehavior;
@@ -102,6 +103,8 @@ public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventRe
     }
     private bool _isOverride;
 
+    public bool IsSecurity => NpcType == NpcType.Security;
+
     // behavior delegates
     private delegate void IdleBehavior();
     private delegate void ChaseBehavior();
@@ -168,6 +171,8 @@ public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventRe
     {
         LazyInitialize();
 
+        if (IsSecurity) return;
+
         if (npcOverrideBehavior == null)
         {
             Debug.LogWarning($"[NPC] {NpcId}: received world event but NpcOverrideBehavior is missing.");
@@ -209,6 +214,8 @@ public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventRe
     {
         LazyInitialize();
 
+        if (IsSecurity) return;
+
         _isOverride = true;
 
         // Override must be able to interrupt every other behavior immediately,
@@ -220,6 +227,8 @@ public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventRe
     public void FinishOverrideState()
     {
         LazyInitialize();
+
+        // for security, override state is never entered.
 
         _isOverride = false;
 
@@ -241,6 +250,8 @@ public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventRe
     private NpcState GetOverrideFallbackState()
     {
         RefreshNpcStateFlags();
+
+        if (IsSecurity) return NpcState.Chase;
 
         if (IsTired)
             return NpcState.Cooldown;
@@ -450,11 +461,11 @@ public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventRe
                 cooldownAction = npcCooldownBehavior.Cleaner;
                 break;
             case NpcType.Security:
-                idleAction = npcIdleBehavior.Security;
+                idleAction = npcChaseBehavior.Security;
                 chaseAction = npcChaseBehavior.Security;
                 searchAction = npcSearchBehavior.Security;
                 diveAction = npcDiveBehavior.Security;
-                overrideAction = npcOverrideBehavior.Security;
+                overrideAction = npcChaseBehavior.Security;
                 cooldownAction = npcCooldownBehavior.Security;
                 break;
             default:
@@ -489,6 +500,7 @@ public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventRe
         if (npcDiveBehavior == null) npcDiveBehavior = GetComponent<NpcDiveBehavior>();
         if (npcCooldownBehavior == null) npcCooldownBehavior = GetComponent<NpcCooldownBehavior>();
         if (npcStateMachine == null) npcStateMachine = GetComponent<NpcStateMachine>();
+        if (headFollowLogic == null) headFollowLogic = GetComponentInChildren<HeadFollowLogic>();
         if (popoutController == null) popoutController = GetComponent<NpcPopoutController>();
     }
 
@@ -520,13 +532,21 @@ public class NpcController : MonoBehaviour, IRageReceiver, IMischiefWorldEventRe
 
     private void OnDrawGizmosSelected()
     {
+        LazyInitialize();
+
         if (HeadTransform == null) return;
+
+        if (!headFollowLogic.TryGetFlatViewDirection
+            (out Vector3 flatForward)) return;
+
+        LazyInitialize();
+
         Gizmos.color = new Color(255, 0, 0);
-        Gizmos.DrawRay(HeadTransform.position, HeadTransform.forward * 3.5f);
+        Gizmos.DrawRay(HeadTransform.position, flatForward * 3.5f);
         Gizmos.color = new Color(255, 0, 0);
-        Gizmos.DrawRay(HeadTransform.position, Quaternion.Euler(0f, 70f, 0f) * HeadTransform.forward * 3.5f);
+        Gizmos.DrawRay(HeadTransform.position, Quaternion.Euler(0f, 70f, 0f) * flatForward * 3.5f);
         Gizmos.color = new Color(255, 0, 0);
-        Gizmos.DrawRay(HeadTransform.position, Quaternion.Euler(0f, -70f, 0f) * HeadTransform.forward * 3.5f);
+        Gizmos.DrawRay(HeadTransform.position, Quaternion.Euler(0f, -70f, 0f) * flatForward * 3.5f);
     }
 
 

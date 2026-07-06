@@ -9,6 +9,8 @@ public class NpcStateMachine : MonoBehaviour
 
     private NpcState? deferredState;
 
+    private bool IsSecurity => controller.IsSecurity;
+
     private void Awake()
     {
         LazyInstantiate();
@@ -31,6 +33,9 @@ public class NpcStateMachine : MonoBehaviour
     /// </summary>
     private NpcState EvaluateFlags(NpcStateSnapshot s)
     {
+        if (IsSecurity)
+            return EvaluateSecurityFlags(s);
+
         switch (s.currentState)
         {
             case NpcState.Idle:
@@ -115,12 +120,41 @@ public class NpcStateMachine : MonoBehaviour
         return s.currentState;
     }
 
+    private NpcState EvaluateSecurityFlags(NpcStateSnapshot s)
+    {
+        switch (s.currentState)
+        {
+            case NpcState.Chase:
+                if (s.currentIsTired) return NpcState.Cooldown;
+                if (s.currentPlayerInReach) return NpcState.Dive;
+                return NpcState.Chase;
+
+            case NpcState.Dive:
+                if (s.currentIsTired)
+                    return NpcState.Cooldown;
+                return NpcState.Dive;
+
+            case NpcState.Cooldown:
+                if (s.currentIsTired)
+                    return NpcState.Cooldown;
+
+                if (s.currentPlayerInReach && view != null && view.DiveRequestIsValid)
+                    return NpcState.Dive;
+
+                return NpcState.Chase;
+
+            default: return NpcState.Chase;
+        }
+    }
+
     /// <summary>
     /// Apply global priorities.
     /// Override is always highest.
     /// </summary>
     private NpcState ApplyPriority(NpcStateSnapshot s, NpcState desiredState)
     {
+        if (s.currentIsOverride) return NpcState.Chase;
+
         if (s.currentIsOverride)
             return NpcState.Override;
 

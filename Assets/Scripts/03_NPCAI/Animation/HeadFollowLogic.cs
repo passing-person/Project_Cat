@@ -130,6 +130,26 @@ public class HeadFollowLogic : MonoBehaviour
         animator.SetLookAtPosition(lookTarget.position);
     }
 
+    public bool TryGetFlatViewDirection(out Vector3 direction)
+    {
+        direction = Vector3.zero;
+
+        Transform reference = headReference != null ? headReference : transform;
+
+        Vector3 targetPosition = lookTarget != null
+            ? lookTarget.position
+            : desiredLookPosition;
+
+        direction = targetPosition - reference.position;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude <= 0.0001f)
+            return false;
+
+        direction.Normalize();
+        return true;
+    }
+
     private IEnumerator HeadFollowCoroutine()
     {
         WaitForSeconds wait = new WaitForSeconds(headDelayInterval);

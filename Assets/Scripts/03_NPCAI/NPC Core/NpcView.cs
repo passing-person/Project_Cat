@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.Serialization;
-using System;
+using UnityEngine.UIElements;
 
 
 
@@ -39,6 +40,9 @@ public class NpcView : MonoBehaviour
     [FormerlySerializedAs("diveDistanceThreshold")]
     [SerializeField, Min(0f)] private float closeRangeDiveDistanceThreshold = 0.75f;
 
+    [Header("View Direction Source")]
+    [SerializeField] private bool useHeadFollowDirectionForViewSector = true;
+
     [Header("Reach")]
     [SerializeField, Min(0f)] private float catchRadius = 0.75f;
 
@@ -51,9 +55,11 @@ public class NpcView : MonoBehaviour
     private Transform headTransform => head != null ? head.transform : transform;
 
     private NpcViewRange viewRange;
+    private HeadFollowLogic headFollowLogic;
     private GameObject player;
     private CapsuleCollider capsule;
     private NpcAnimationMachine animationMachine;
+    private NpcController controller;
 
     public event Action PlayerInViewFlagChange;
     public event Action PlayerActualViewFlagChange;
@@ -66,24 +72,25 @@ public class NpcView : MonoBehaviour
     /// True when the NPC has a usable target position: either actual sector visibility or an active snapshot.
     /// This is intentionally not the same as raw sector visibility.
     /// </summary>
-    public bool PlayerInView => _playerInView;
+    public bool PlayerInView => IsSecurity || _playerInView;
 
     /// <summary>
     /// True only while the player is inside the head-facing view sector and the larger view range.
     /// </summary>
-    public bool PlayerInActualView => _playerInActualView;
+    public bool PlayerInActualView => IsSecurity || _playerInActualView;
 
     public bool PlayerHidden
     {
         get
         {
+            if (IsSecurity) return false;
             LazyInstantiate();
             return player.GetComponent<PlayerController>().IsHidden;
         }
     }
-    public bool PlayerInViewRange => _playerInViewRange;
-    public bool HasPlayerPositionSnapshot => _hasPlayerPositionSnapshot;
-    public bool HasExitRangeSnapshot => _hasExitRangeSnapshot;
+    public bool PlayerInViewRange => IsSecurity || _playerInViewRange;
+    public bool HasPlayerPositionSnapshot => IsSecurity || _hasPlayerPositionSnapshot;
+    public bool HasExitRangeSnapshot => IsSecurity || _hasExitRangeSnapshot;
 
     public bool PlayerInReach => _playerInDiveRange;
     public bool PlayerInCatchRange => _playerInCatchRange;
@@ -152,6 +159,15 @@ public class NpcView : MonoBehaviour
         }
     }
 
+    private bool IsSecurity
+    {
+        get
+        {
+            LazyInstantiate();
+            return controller.IsSecurity;
+        }
+    }
+
     private void Awake()
     {
         LazyInstantiate();
@@ -163,7 +179,7 @@ public class NpcView : MonoBehaviour
         Refresh();
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         Refresh();
     }
@@ -223,6 +239,13 @@ public class NpcView : MonoBehaviour
 
     public bool TryGetKnownPlayerPosition(out Vector3 position, out NpcChaseTargetKind targetKind)
     {
+        if (IsSecurity)
+        {
+            position = player.transform.position;
+            targetKind = NpcChaseTargetKind.Actual;
+            return true;
+        }
+
         if (_playerInActualView && _hasActualPlayerPosition)
         {
             position = _actualPlayerPosition;
@@ -244,12 +267,24 @@ public class NpcView : MonoBehaviour
 
     public bool TryGetActivePlayerSnapshot(out Vector3 position)
     {
+        if (IsSecurity)
+        {
+            position = player.transform.position;
+            return true;
+        }
+
         position = _playerPositionSnapshot;
         return _hasPlayerPositionSnapshot;
     }
 
     public bool TryGetExitRangeSnapshot(out Vector3 position)
     {
+        if (IsSecurity)
+        {
+            position = player.transform.position;
+            return true;
+        }
+
         position = _exitRangeSnapshotPosition;
         return _hasExitRangeSnapshot;
     }
@@ -298,6 +333,13 @@ public class NpcView : MonoBehaviour
     /// </summary>
     public bool TryPrepareSearchTimeoutChaseTarget(out Vector3 position, out NpcChaseTargetKind targetKind)
     {
+        if (IsSecurity)
+        {
+            position = player.transform.position;
+            targetKind = NpcChaseTargetKind.Actual;
+            return true;
+        }
+
         if (_playerInActualView && _hasActualPlayerPosition)
         {
             position = _actualPlayerPosition;
@@ -368,6 +410,8 @@ public class NpcView : MonoBehaviour
 
     private bool IsPlayerInsideViewSector()
     {
+        if (IsSecurity) return true;
+
         if (player == null || viewParams == null)
             return false;
 
@@ -381,11 +425,23 @@ public class NpcView : MonoBehaviour
         if (SectorDeg >= 360f)
             return true;
 
-        Vector3 flatForward = headTransform.forward;
-        flatForward.y = 0f;
 
-        if (flatForward.sqrMagnitude <= 0.0001f)
-            flatForward = transform.forward;
+        if (useHeadFollowDirectionForViewSector &&
+            headFollowLogic != null &&
+            headFollowLogic.TryGetFlatViewDirection(out Vector3 flatForward))
+        {
+            // Use HeadFollow / IK gaze direction.
+        }
+        else
+        {
+            flatForward = headTransform.forward;
+            flatForward.y = 0f;
+
+            if (flatForward.sqrMagnitude <= 0.0001f)
+                flatForward = transform.forward;
+
+            flatForward.Normalize();
+        }
 
         return Vector3.Angle(flatForward, flatToPlayer) < SectorDeg * 0.5f;
     }
@@ -402,6 +458,12 @@ public class NpcView : MonoBehaviour
 
     private void SetActivePlayerSnapshot(Vector3 position)
     {
+        if (IsSecurity)
+        {
+            position = player.transform.position;
+            return;
+        }
+
         bool changed = !_hasPlayerPositionSnapshot ||
             (position - _playerPositionSnapshot).sqrMagnitude > 0.0001f;
 
@@ -508,6 +570,12 @@ public class NpcView : MonoBehaviour
 
     private void SetPlayerInView(bool value)
     {
+        if (IsSecurity)
+        {
+            _playerInView = true;
+            return;
+        }
+        
         if (_playerInView == value)
             return;
 
@@ -517,6 +585,12 @@ public class NpcView : MonoBehaviour
 
     private void SetPlayerInActualView(bool value)
     {
+        if (IsSecurity)
+        {
+            _playerInActualView = true;
+            return;
+        }
+
         if (_playerInActualView == value)
             return;
 
@@ -526,6 +600,12 @@ public class NpcView : MonoBehaviour
 
     private void SetPlayerInViewRange(bool value)
     {
+        if (IsSecurity)
+        {
+            _playerInViewRange = true;
+            return;
+        }
+
         if (_playerInViewRange == value)
             return;
 
@@ -665,6 +745,12 @@ public class NpcView : MonoBehaviour
 
         if (capsule == null)
             capsule = GetComponent<CapsuleCollider>();
+
+        if (controller == null)
+            controller = GetComponent<NpcController>();
+
+        if (headFollowLogic == null)
+            headFollowLogic = GetComponent<HeadFollowLogic>();
     }
 
     private void OnDrawGizmosSelected()

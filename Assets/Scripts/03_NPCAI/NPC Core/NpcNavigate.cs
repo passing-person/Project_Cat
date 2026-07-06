@@ -92,6 +92,17 @@ public class NpcNavigate : MonoBehaviour
         ToggleNav(target, true);
     }
 
+    public void StartNavToPointApprox(
+        Vector3 target,
+        bool isChasing,
+        float sampleRadius = 2f,
+        bool allowPartialPath = true)
+    {
+        StopNav();
+        ToggleSpeed(isChasing);
+        navCoro = StartCoroutine(NavToPointApprox(target, sampleRadius, allowPartialPath));
+    }
+
     public void StopNav()
     {
         if (navCoro != null)
@@ -279,6 +290,23 @@ public class NpcNavigate : MonoBehaviour
         DestinationReached?.Invoke();
     }
 
+    public static float GetPathDistance(Vector3 fromPosition, Vector3 toPosition, int areaMask = NavMesh.AllAreas)
+    {
+        NavMeshPath path = new();
+
+        if (NavMesh.CalculatePath(fromPosition, toPosition, areaMask, path) && path.status == NavMeshPathStatus.PathComplete)
+        {
+            float distance = 0f;
+            for (int i = 1; i < path.corners.Length; i++)
+            {
+                distance += Vector3.Distance(path.corners[i - 1], path.corners[i]);
+            }
+            return distance;
+        }
+
+        return -1f; // Path incomplete or invalid
+    }
+
     private void LazyInstantiate()
     {
         // Used in properties and Awake()
@@ -373,12 +401,112 @@ public class NpcNavigate : MonoBehaviour
 
         while (agent.enabled && agent.isOnNavMesh)
         {
+            bool isPathValid = agent.hasPath || agent.remainingDistance == 0;
             if (!agent.pathPending &&
-                agent.hasPath &&
+                isPathValid &&
                 agent.remainingDistance <= agent.stoppingDistance)
             {
                 break;
             }
+
+            yield return null;
+        }
+
+        if (agent.enabled && agent.isOnNavMesh)
+            agent.ResetPath();
+
+        navCoro = null;
+        DestinationReached?.Invoke();
+    }
+
+    private IEnumerator NavToPointApprox(
+    Vector3 target,
+    float sampleRadius,
+    bool allowPartialPath)
+    {
+        if (agent == null)
+            yield break;
+
+        if (!agent.enabled)
+            agent.enabled = true;
+
+        yield return null;
+
+        if (!agent.isOnNavMesh)
+        {
+            Debug.LogWarning($"[NPC] {Id}: Agent is not on NavMesh.");
+            navCoro = null;
+            yield break;
+        }
+
+        Vector3 requestedTarget = target;
+        Vector3 navTarget = target;
+
+        // Step 1: project requested point onto nearby NavMesh.
+        if (NavMesh.SamplePosition(requestedTarget, out NavMeshHit hit, sampleRadius, NavMesh.AllAreas))
+        {
+            navTarget = hit.position;
+        }
+
+        // Step 2: calculate path before committing.
+        NavMeshPath path = new NavMeshPath();
+        bool hasPath = NavMesh.CalculatePath(transform.position, navTarget, NavMesh.AllAreas, path);
+
+        if (!hasPath || path.status == NavMeshPathStatus.PathInvalid)
+        {
+            Debug.LogWarning(
+                $"[NPC] {Id}: no valid approximate path. " +
+                $"Requested={requestedTarget}, Sampled={navTarget}"
+            );
+
+            agent.ResetPath();
+            navCoro = null;
+            yield break;
+        }
+
+        // Step 3: if target is blocked but partial path exists, walk to last reachable corner.
+        if (path.status == NavMeshPathStatus.PathPartial)
+        {
+            if (!allowPartialPath || path.corners == null || path.corners.Length == 0)
+            {
+                Debug.LogWarning(
+                    $"[NPC] {Id}: partial path rejected. " +
+                    $"Requested={requestedTarget}, Sampled={navTarget}"
+                );
+
+                agent.ResetPath();
+                navCoro = null;
+                yield break;
+            }
+
+            navTarget = path.corners[path.corners.Length - 1];
+
+            Debug.Log(
+                $"[NPC] {Id}: using partial reachable point. " +
+                $"Requested={requestedTarget}, Reachable={navTarget}"
+            );
+        }
+
+        agent.isStopped = false;
+
+        bool accepted = agent.SetDestination(navTarget);
+
+        if (!accepted)
+        {
+            Debug.LogWarning($"[NPC] {Id}: SetDestination failed. Target={navTarget}");
+            navCoro = null;
+            yield break;
+        }
+
+        yield return null;
+
+        while (agent.enabled && agent.isOnNavMesh && agent.pathPending)
+            yield return null;
+
+        while (agent.enabled && agent.isOnNavMesh)
+        {
+            bool isValidPath = !(agent.hasPath || agent.remainingDistance <= agent.stoppingDistance);
+            if (!agent.pathPending && isValidPath) break;
 
             yield return null;
         }

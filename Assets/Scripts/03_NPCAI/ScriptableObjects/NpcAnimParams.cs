@@ -87,7 +87,7 @@ public class AnimParam
     public bool allowPopout;
 
     [Tooltip("Which head anchor should popout adopt. If none, popout is unavailable.")]
-    public NpcPopoutAnchorMode popoutAnchorMode = NpcPopoutAnchorMode.None;
+    public NpcAnchorMode popoutAnchorMode = NpcAnchorMode.None;
 
     [Header("Code Driven Horizontal Motion")]
     public bool useCodeDrivenHorizontalMotion;
@@ -123,7 +123,7 @@ public enum AnimState
     IdleSitting
 }
 
-public enum NpcPopoutAnchorMode
+public enum NpcAnchorMode
 {
     None,
     Standing,

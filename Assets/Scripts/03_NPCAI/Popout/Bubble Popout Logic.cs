@@ -23,7 +23,7 @@ public class BubblePopoutLogic : MonoBehaviour
 
     private Camera mainCamera;
     private Coroutine activeRoutine;
-    private NpcPopoutAnchorMode currentAnchorMode;
+    private NpcAnchorMode currentAnchorMode;
 
     private void Awake()
     {
@@ -40,9 +40,9 @@ public class BubblePopoutLogic : MonoBehaviour
         FaceCamera();
     }
 
-    public void Show(PopoutType type, float duration, NpcPopoutAnchorMode anchorMode)
+    public void Show(PopoutType type, float duration, NpcAnchorMode anchorMode)
     {
-        if (anchorMode == NpcPopoutAnchorMode.None)
+        if (anchorMode == NpcAnchorMode.None)
             return;
 
         if (activeRoutine != null)
@@ -59,17 +59,17 @@ public class BubblePopoutLogic : MonoBehaviour
         activeRoutine = StartCoroutine(ShowRoutine(type, duration));
     }
 
-    private Transform ResolveAnchor(NpcPopoutAnchorMode mode)
+    private Transform ResolveAnchor(NpcAnchorMode mode)
     {
         switch (mode)
         {
-            case NpcPopoutAnchorMode.Standing:
+            case NpcAnchorMode.Standing:
                 return standingPopoutAnchor;
 
-            case NpcPopoutAnchorMode.Sitting:
+            case NpcAnchorMode.Sitting:
                 return sittingPopoutAnchor;
 
-            case NpcPopoutAnchorMode.None:
+            case NpcAnchorMode.None:
             default:
                 return null;
         }

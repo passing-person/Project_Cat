@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: Security
   m_EditorClassIdentifier: 
   timerValues:
+  - timerType: 0
+    duration: 1e+10
+    isOneShot: 0
   - timerType: 2
     duration: 0.35
     isOneShot: 0

@@ -12,7 +12,7 @@ public class NpcPopoutController : MonoBehaviour
 
     public void ShowPopout(PopoutType type,
     float duration,
-    NpcPopoutAnchorMode anchorMode)
+    NpcAnchorMode anchorMode)
     {
         bubblePopout.Show(type, duration, anchorMode);
     }
@@ -31,9 +31,9 @@ public class NpcPopoutController : MonoBehaviour
 
         if (ResolvePopoutType(state, rage, rageReduced, out PopoutType type))
         {
-            NpcPopoutAnchorMode anchorMode = ResolveCurrentAnchorMode();
+            NpcAnchorMode anchorMode = ResolveCurrentAnchorMode();
 
-            if (anchorMode != NpcPopoutAnchorMode.None)
+            if (anchorMode != NpcAnchorMode.None)
             {
                 ShowPopout(type, defaultDuration, anchorMode);
                 Debug.Log($"[NPC Popout] {name}: Popout of type {type}, anchorMode {anchorMode}.");
@@ -76,7 +76,7 @@ public class NpcPopoutController : MonoBehaviour
         }
     }
 
-    private NpcPopoutAnchorMode ResolveCurrentAnchorMode()
+    private NpcAnchorMode ResolveCurrentAnchorMode()
     {
         if (animationMachine != null &&
             animationMachine.TryGetCurrentPopoutAnchorMode(out var mode))
@@ -84,6 +84,6 @@ public class NpcPopoutController : MonoBehaviour
             return mode;
         }
 
-        return NpcPopoutAnchorMode.Standing;
+        return NpcAnchorMode.Standing;
     }
 }

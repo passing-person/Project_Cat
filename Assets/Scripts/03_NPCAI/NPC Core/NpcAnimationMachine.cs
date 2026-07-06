@@ -82,6 +82,7 @@ public class NpcAnimationMachine : MonoBehaviour
     private NpcView view;
 
     public AnimState? CurrentAnimState => currentAnimState;
+    public NpcAnchorMode CurrentNpcAnchorMode => currentAnimParam.popoutAnchorMode;
     public float CloseRangeDiveDistanceThreshold => closeRangeDiveDistanceThreshold;
 
     private void Awake()
@@ -640,9 +641,9 @@ public class NpcAnimationMachine : MonoBehaviour
         );
     }
 
-    public bool TryGetCurrentPopoutAnchorMode(out NpcPopoutAnchorMode mode)
+    public bool TryGetCurrentPopoutAnchorMode(out NpcAnchorMode mode)
     {
-        mode = NpcPopoutAnchorMode.None;
+        mode = NpcAnchorMode.None;
 
         if (currentAnimParam == null)
             return false;
@@ -651,7 +652,7 @@ public class NpcAnimationMachine : MonoBehaviour
             return false;
 
         mode = currentAnimParam.popoutAnchorMode;
-        return mode != NpcPopoutAnchorMode.None;
+        return mode != NpcAnchorMode.None;
     }
 
     public void PlayLocomotion()
@@ -705,6 +706,12 @@ public class NpcAnimationMachine : MonoBehaviour
                 PlayChaseCooldown();
                 break;
         }
+    }
+
+    public void PlayFallback()
+    {
+        Debug.LogWarning($"[NPC Anim] {name}: cannot resolve animation clip, play fallback clip.");
+        PlayCaught(); // this uses t-pose clip.
     }
 
     public void PlayCaught()

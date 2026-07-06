@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class NpcOverrideBehavior : MonoBehaviour
 {
@@ -12,11 +13,11 @@ public class NpcOverrideBehavior : MonoBehaviour
 
     [Header("Reactor Movement")]
     [SerializeField] private bool useChaseSpeedForOverrideMove = false;
-    [SerializeField, Min(0.1f)] private float reactorMoveTimeout = 8f;
 
     private NpcController controller;
     private NpcNavigate nav;
     private NpcAnimationMachine anim;
+    private CoreFacade facade;
 
     private readonly List<OverrideJob> pendingJobs = new();
     private Coroutine processRoutine;
@@ -188,6 +189,12 @@ public class NpcOverrideBehavior : MonoBehaviour
             case MischiefWorldEventType.LightToggle:
                 yield return ExecuteGenericLightReaction(context);
                 break;
+
+            case MischiefWorldEventType.GenericMess:
+            case MischiefWorldEventType.PrinterMess:
+            case MischiefWorldEventType.WaterDispenserMess:
+                yield return ExecuteGenericMessReaction(context);
+                break;
         }
     }
 
@@ -221,11 +228,25 @@ public class NpcOverrideBehavior : MonoBehaviour
             nav.StopNav();
         }
 
-        if (anim != null)
-            anim.PlayOverrideMove();
+        // placeholder for possible stunned animation.
+        // no animation is played for now.
+        // play suitable anim for current anchor mode
+        if (anim.CurrentNpcAnchorMode == NpcAnchorMode.Sitting)
+            anim.PlayIdleSitting();
+        else if (anim.CurrentNpcAnchorMode == NpcAnchorMode.Standing)
+            anim.PlayLocomotion(); // Idle standing clip
+        else anim.PlayFallback();
 
         if (lightStunDuration > 0f)
+        {
+            Debug.Log($"[NPC Override] {NpcId}: stunned for {lightStunDuration} second(s).");
             yield return new WaitForSeconds(lightStunDuration);
+        }
+    }
+
+    private IEnumerator ExecuteGenericMessReaction(MischiefWorldEventContext context)
+    {
+        yield return null;
     }
 
     private IEnumerator ExecuteReactorReaction(MischiefWorldEventContext context)
@@ -248,38 +269,50 @@ public class NpcOverrideBehavior : MonoBehaviour
         bool arrived = false;
         void OnArrived() => arrived = true;
 
-        if (nav != null)
+            
+        if (nav == null) arrived = true;
+
+        nav.DestinationReached += OnArrived;
+
+        if (context.EventType == MischiefWorldEventType.GenericMess ||
+            context.EventType == MischiefWorldEventType.PrinterMess ||
+            context.EventType == MischiefWorldEventType.WaterDispenserMess)
         {
-            nav.DestinationReached += OnArrived;
+            NavigateToMess(context);
+        }
+        else if (context.EventType == MischiefWorldEventType.LightToggle)
+        {
             nav.StartNavToPoint(context.Position, useChaseSpeedForOverrideMove);
         }
-        else
-        {
-            arrived = true;
-        }
 
-        float elapsed = 0f;
-        while (!arrived && elapsed < reactorMoveTimeout)
+        while (!arrived)
         {
-            elapsed += Time.deltaTime;
             yield return null;
         }
 
-        if (nav != null)
-        {
-            nav.DestinationReached -= OnArrived;
-            nav.StopNav();
-        }
-
-        if (!arrived)
-        {
-            Debug.LogWarning(
-                $"[NPC Override] {NpcId}: reactor move to {context.TargetId} timed out after {reactorMoveTimeout:0.00}s. " +
-                "Completing the world event anyway so Core does not stay locked."
-            );
-        }
+        nav.DestinationReached -= OnArrived;
+        nav.StopNav();
 
         CompleteWorldEventForReactor(context);
+    }
+
+    private void NavigateToMess(MischiefWorldEventContext context)
+    {
+        if (NpcType != NpcType.Cleaner) return;
+
+        if (TryGetWorldEventGameObject(context.TargetId, out var targetGO))
+        {
+            var script = targetGO.GetComponent<AdaptiveBlockLogic>();
+            if (script == null)
+                Debug.Log($"[NPC Override] {NpcId}: missing script \"AdaptiveBlockLogic\" on the target.");
+            if (script.TryGetClosestFallbackPoint
+                    (gameObject.transform.position, out var closest))
+            {
+                nav.StartNavToPointApprox(closest, useChaseSpeedForOverrideMove);
+            }
+            else
+                Debug.Log($"[NPC Override] {NpcId}: transforms not assigned in script \"AdaptiveBlockLogic\" on the target.");
+        }
     }
 
     private void CompleteWorldEventForReactor(MischiefWorldEventContext context)
@@ -304,6 +337,8 @@ public class NpcOverrideBehavior : MonoBehaviour
                 CompleteMischiefWorldEvent(context.TargetId);
                 break;
         }
+
+        Debug.Log($"[NPC Override] {NpcId}: Reactor {context.ReactorNpcId} has concluded its reaction.");
     }
 
     private void CompleteMischiefWorldEvent(string targetId)
@@ -367,6 +402,17 @@ public class NpcOverrideBehavior : MonoBehaviour
         });
     }
 
+    private bool TryGetWorldEventGameObject(string targetId, out GameObject target)
+    {
+        if(facade.TryGetMischiefWorldEventTarget(targetId, out var script))
+        {
+            target = (script as MonoBehaviour).gameObject;
+            return true;
+        }
+        target = null;
+        return false;
+    }
+
     private void LazyInstantiate()
     {
         if (controller == null)
@@ -377,6 +423,9 @@ public class NpcOverrideBehavior : MonoBehaviour
 
         if (anim == null)
             anim = GetComponent<NpcAnimationMachine>();
+
+        if (facade == null)
+            facade = FindFirstObjectByType<CoreFacade>();
     }
 
     private enum OverrideReactionRole
@@ -428,4 +477,38 @@ public class NpcOverrideBehavior : MonoBehaviour
             return true;
         }
     }
+
+    [ContextMenu("Debug test World Event")]
+    private void DebugtestWorldEvent()
+    {
+        GameObject go = new();
+        go.name = "Debug World Event Object";
+        go.transform.position = DebugPosition;
+        go.AddComponent<AdaptiveBlockLogic>();
+        MischiefWorldEventContext context = new(actorId,
+            targetId,
+            eventType,
+            DebugPosition,
+            resolveMode,
+            preferredNpcId,
+            preferredNpcType,
+            disableTargetAfterResponse,
+            shouldReact,
+            DebugReactorNpcId);
+        //facade.ReportMischiefWorldEvent(context);
+        OnMischiefWorldEvent(context);
+    }
+
+    [Header("Debug params")]
+    [SerializeField] string actorId = "Dummy Actor";
+    [SerializeField] string targetId = "Dummy Target";
+    [SerializeField] MischiefWorldEventType eventType;
+    private Vector3 DebugPosition => debugTargetPoint.position;
+    [SerializeField] Transform debugTargetPoint;
+    [SerializeField] MischiefWorldEventResolveMode resolveMode;
+    [SerializeField] string preferredNpcId;
+    [SerializeField] NpcType preferredNpcType;
+    [SerializeField] bool disableTargetAfterResponse = false;
+    [SerializeField] bool shouldReact = false;
+    private string DebugReactorNpcId => NpcId;
 }

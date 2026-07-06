@@ -3103,7 +3103,7 @@ MonoBehaviour:
   npcData: {fileID: 11400000, guid: 2b7c01c5a89167e40a96424026bf0466, type: 2}
   head: {fileID: 1896398136575012621}
   reduceRageWhenChaseSequenceEndsInIdle: 1
-  debugRageState: 0
+  debugRageState: 3
   StateToSwitch: 1
   CurrentRageState: 0
   PlayerInView: 0
@@ -3129,6 +3129,7 @@ MonoBehaviour:
   ensureSpaceRectDimension: {x: 0.5, y: 1.6}
   useAnimationMachineCloseRangeDiveDistanceThreshold: 1
   closeRangeDiveDistanceThreshold: 2.5
+  useHeadFollowDirectionForViewSector: 1
   catchRadius: 1
   requireViewRangeForDive: 1
   requireViewRangeForCatch: 0
@@ -3246,7 +3247,7 @@ MonoBehaviour:
   actorId: Dummy Actor
   targetId: Dummy Target
   eventType: 0
-  position: {x: 0, y: 0, z: 0}
+  debugTargetPoint: {fileID: 0}
   resolveMode: 0
   preferredNpcId: 
   preferredNpcType: 0

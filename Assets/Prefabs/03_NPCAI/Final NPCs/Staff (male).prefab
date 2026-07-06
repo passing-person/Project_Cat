@@ -375,7 +375,7 @@ Animator:
   m_GameObject: {fileID: 760924965400027450}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 43de6c8199bb1174a839810ebe7b7f41, type: 3}
-  m_Controller: {fileID: 9100000, guid: 0a11953d196ab1d4ea901397d25b1748, type: 2}
+  m_Controller: {fileID: 9100000, guid: c3e7563fed6604e4bb47accca6e82ebd, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -562,7 +562,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 886542780492264240}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
@@ -686,6 +686,7 @@ MonoBehaviour:
   ensureSpaceRectDimension: {x: 0.5, y: 1.6}
   useAnimationMachineCloseRangeDiveDistanceThreshold: 1
   closeRangeDiveDistanceThreshold: 2.5
+  useHeadFollowDirectionForViewSector: 1
   catchRadius: 1
   requireViewRangeForDive: 1
   requireViewRangeForCatch: 0

@@ -1269,7 +1269,13 @@ Animator:
   m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_WarningMessage: 
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'mixamorig:Hips'\n\tTransform 'mixamorig:LeftFoot'\n\tTransform
+    'mixamorig:LeftHandThumb2'\n\tTransform 'mixamorig:LeftHandIndex1'\n\tTransform
+    'mixamorig:LeftHandPinky2'\n\tTransform 'mixamorig:Spine1'\n\tTransform 'mixamorig:LeftToeBase'\n\tTransform
+    'mixamorig:LeftHandThumb3'\n\tTransform 'mixamorig:RightArm'\n\tTransform 'mixamorig:LeftLeg'\n\tand
+    more ...\n\tFrom animation clip 'security idle standing'"
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -2719,6 +2725,7 @@ GameObject:
   - component: {fileID: 4971582520108825873}
   - component: {fileID: 7147774113394820855}
   - component: {fileID: 3724648821873964812}
+  - component: {fileID: 4295153640656379455}
   m_Layer: 0
   m_Name: Security
   m_TagString: Untagged
@@ -2858,6 +2865,7 @@ MonoBehaviour:
   ensureSpaceRectDimension: {x: 0.5, y: 1.6}
   useAnimationMachineCloseRangeDiveDistanceThreshold: 1
   closeRangeDiveDistanceThreshold: 2
+  useHeadFollowDirectionForViewSector: 1
   catchRadius: 1.5
   requireViewRangeForDive: 1
   requireViewRangeForCatch: 0
@@ -3050,6 +3058,34 @@ MonoBehaviour:
   bubblePopout: {fileID: 4571561216732575446}
   animationMachine: {fileID: 7147774113394820855}
   defaultDuration: 2
+--- !u!114 &4295153640656379455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5118122244331779871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 676d864344816bf478127f15d6b4edbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityOnly: 1
+  breakOnlyWhileChasing: 1
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  scanDirectDestination: 1
+  scanCurrentPathCorners: 1
+  scanAheadDistance: 3
+  capsuleRadius: 0.45
+  capsuleHeight: 1.8
+  scanInterval: 0.12
+  destroyUnmarkedObstacleColliders: 0
+  repeatBreakCooldown: 0.35
+  repathAfterBreak: 1
+  logBreaks: 1
+  drawDebugGizmos: 1
 --- !u!1 &5382907495632190286
 GameObject:
   m_ObjectHideFlags: 0

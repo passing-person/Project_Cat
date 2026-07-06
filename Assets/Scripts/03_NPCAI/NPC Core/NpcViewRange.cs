@@ -1,5 +1,9 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(CapsuleCollider))]
 public class NpcViewRange : MonoBehaviour
@@ -7,6 +11,8 @@ public class NpcViewRange : MonoBehaviour
     public event Action PlayerInViewRangeChange;
     [HideInInspector] public bool playerInViewRange = false;
     [SerializeField] private bool showGizmos = true;
+
+    private bool IsSecurity => GetComponentInParent<NpcController>().NpcType == NpcType.Security;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -17,6 +23,13 @@ public class NpcViewRange : MonoBehaviour
 
             playerInViewRange = true;
             PlayerInViewRangeChange?.Invoke();
+        }
+
+        if (IsSecurity)
+        {
+            var obs = other.gameObject.GetComponent<NavMeshObstacle>();
+            if (obs != null)
+                obs.enabled = false;
         }
     }
 

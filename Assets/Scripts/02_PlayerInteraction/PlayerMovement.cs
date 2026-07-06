@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     public float movementDeceleration = 22f;
 
     [Header("Idle Turn Animation")]
+    public bool enableIdleTurnAnimation = true;
     public float idleTurnTriggerAngle = 32f;
     public float idleTurnCooldown = 0.35f;
 
@@ -182,6 +183,12 @@ public class PlayerMovement : MonoBehaviour
 
         if (animationController == null)
         {
+            return;
+        }
+
+        if (!enableIdleTurnAnimation)
+        {
+            idleYawAccumulator = 0f;
             return;
         }
 

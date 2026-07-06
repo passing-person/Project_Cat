@@ -1621,8 +1621,8 @@ MonoBehaviour:
   npcData: {fileID: 11400000, guid: 1e551c74894226b4c9172c7111006b07, type: 2}
   head: {fileID: 2086590971126351022}
   reduceRageWhenChaseSequenceEndsInIdle: 1
-  debugRageState: 0
-  StateToSwitch: 0
+  debugRageState: 3
+  StateToSwitch: 2
   CurrentRageState: 0
   PlayerInView: 0
   PlayerInReach: 0
@@ -1762,13 +1762,13 @@ MonoBehaviour:
   useChaseSpeedForOverrideMove: 0
   actorId: Dummy Actor
   targetId: Dummy Target
-  eventType: 0
+  eventType: 2
   debugTargetPoint: {fileID: 0}
-  resolveMode: 0
+  resolveMode: 1
   preferredNpcId: 
   preferredNpcType: 0
   disableTargetAfterResponse: 0
-  shouldReact: 0
+  shouldReact: 1
 --- !u!114 &5000470263479613083
 MonoBehaviour:
   m_ObjectHideFlags: 0

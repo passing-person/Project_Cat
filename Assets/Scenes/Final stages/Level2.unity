@@ -11284,7 +11284,7 @@ PrefabInstance:
     - target: {fileID: 182125980047512214, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -3.09
       objectReference: {fileID: 0}
     - target: {fileID: 182125980047512214, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
@@ -11294,7 +11294,7 @@ PrefabInstance:
     - target: {fileID: 182125980047512214, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -2.31
       objectReference: {fileID: 0}
     - target: {fileID: 182125980047512214, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
@@ -11336,6 +11336,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Staff (male) (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 8724847557545652109, guid: 3bb2171abbb89584db76ed52ccad233c,
+        type: 3}
+      propertyPath: assignedSeat
+      value: 
+      objectReference: {fileID: 1432537961}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -29858,7 +29863,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -82250,7 +82255,7 @@ PrefabInstance:
     - target: {fileID: 182125980047512214, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -1.81
       objectReference: {fileID: 0}
     - target: {fileID: 182125980047512214, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
@@ -82260,7 +82265,7 @@ PrefabInstance:
     - target: {fileID: 182125980047512214, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 2.04
       objectReference: {fileID: 0}
     - target: {fileID: 182125980047512214, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
@@ -82302,6 +82307,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Staff (male) (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 8724847557545652109, guid: 3bb2171abbb89584db76ed52ccad233c,
+        type: 3}
+      propertyPath: assignedSeat
+      value: 
+      objectReference: {fileID: 1957837964}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -96443,6 +96453,18 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!114 &1327519045 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 191085909081250726, guid: ddc4b0a42ce7ba546a0213853a8e15dc,
+    type: 3}
+  m_PrefabInstance: {fileID: 367809339}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 605ad3f31c3c8c745b73cf558a23b2eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1327585937
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -104979,7 +105001,7 @@ PrefabInstance:
     - target: {fileID: 182125980047512214, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 1.825
       objectReference: {fileID: 0}
     - target: {fileID: 182125980047512214, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
@@ -105021,6 +105043,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Staff (male) (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 8724847557545652109, guid: 3bb2171abbb89584db76ed52ccad233c,
+        type: 3}
+      propertyPath: assignedSeat
+      value: 
+      objectReference: {fileID: 1327519045}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -105032,6 +105059,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 88800053}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1432537961 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7277620024810951967, guid: a26608cfec001ad488be2112c6cb95a2,
+    type: 3}
+  m_PrefabInstance: {fileID: 88800053}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 605ad3f31c3c8c745b73cf558a23b2eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!43 &1433806529
 Mesh:
   m_ObjectHideFlags: 0
@@ -114222,6 +114261,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Dummy
+      objectReference: {fileID: 0}
+    - target: {fileID: 7186805834010524992, guid: cbbc04b7bd329e1418231dc7f8f84b63,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7670226680310599475, guid: cbbc04b7bd329e1418231dc7f8f84b63,
         type: 3}
@@ -144156,6 +144200,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1056822146}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1957837964 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 191085909081250726, guid: ddc4b0a42ce7ba546a0213853a8e15dc,
+    type: 3}
+  m_PrefabInstance: {fileID: 1056822146}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 605ad3f31c3c8c745b73cf558a23b2eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!43 &1958133303
 Mesh:
   m_ObjectHideFlags: 0

@@ -5,6 +5,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 public static class MainScenePlayableBuilder
 {
@@ -21,6 +23,7 @@ public static class MainScenePlayableBuilder
     private const string MicrophoneDataPath = CoreAssetFolder + "/MicrophoneTargetData.asset";
     private const string PlayerPrefabPath = "Assets/Prefabs/02_Player/PlayerCat.prefab";
     private const string SupervisorPrefabPath = "Assets/Prefabs/03_NPCAI/Final NPCs/Supervisor.prefab";
+    private const string MainCanvasPrefabPath = "Assets/Prefabs/05_UI/MainCanvas.prefab";
 
     [MenuItem("Tools/Project Cat/MainScene/Build Playable MainScene")]
     public static void BuildPlayableMainScene()
@@ -148,8 +151,10 @@ public static class MainScenePlayableBuilder
         GameObject systems = CreateEmpty("Systems", parent, Vector3.zero);
 
         UIManager uiManager = systems.AddComponent<UIManager>();
+        uiManager.UseMinimalOverlayMode();
         GameInputGate inputGate = systems.AddComponent<GameInputGate>();
-        PauseMenuController pauseMenu = systems.AddComponent<PauseMenuController>();
+        DesignUiRefs designUi = CreateDesignedUi(systems.transform);
+        DesignedUICoreConnector designedUiConnector = designUi.connector != null ? designUi.connector : systems.AddComponent<DesignedUICoreConnector>();
         AudioManager audioManager = systems.AddComponent<AudioManager>();
         SimpleFeedbackAudio feedbackAudio = systems.AddComponent<SimpleFeedbackAudio>();
         NavMeshAgentPlacementFixer navMeshFixer = systems.AddComponent<NavMeshAgentPlacementFixer>();
@@ -168,38 +173,38 @@ public static class MainScenePlayableBuilder
         MainSceneStarter starter = systems.AddComponent<MainSceneStarter>();
 
         gameManager.stageManager = stageManager;
-        gameManager.uiBridgeBehaviour = uiManager;
+        gameManager.uiBridgeBehaviour = designedUiConnector;
 
         stageManager.gameManager = gameManager;
         stageManager.scoreManager = scoreManager;
         stageManager.objectiveManager = objectiveManager;
         stageManager.failManager = failManager;
-        stageManager.uiBridgeBehaviour = uiManager;
+        stageManager.uiBridgeBehaviour = designedUiConnector;
         stageManager.defaultStageData = stageData;
 
-        scoreManager.uiBridgeBehaviour = uiManager;
+        scoreManager.uiBridgeBehaviour = designedUiConnector;
         scoreManager.autoTick = true;
 
         rageManager.scoreManager = scoreManager;
-        rageManager.uiBridgeBehaviour = uiManager;
+        rageManager.uiBridgeBehaviour = designedUiConnector;
 
         objectiveManager.scoreManager = scoreManager;
         objectiveManager.stageManager = stageManager;
-        objectiveManager.uiBridgeBehaviour = uiManager;
+        objectiveManager.uiBridgeBehaviour = designedUiConnector;
 
         failManager.stageManager = stageManager;
         failManager.objectiveManager = objectiveManager;
         failManager.caughtRule = stageData.caughtRule;
 
         hidingManager.scoreManager = scoreManager;
-        hidingManager.uiBridgeBehaviour = uiManager;
+        hidingManager.uiBridgeBehaviour = designedUiConnector;
         hidingManager.autoTick = true;
         hidingManager.ConfigureFromStageData(stageData);
 
         mischiefManager.rageManager = rageManager;
         mischiefManager.scoreManager = scoreManager;
         mischiefManager.objectiveManager = objectiveManager;
-        mischiefManager.uiBridgeBehaviour = uiManager;
+        mischiefManager.uiBridgeBehaviour = designedUiConnector;
         mischiefManager.autoTickTargetCooldowns = true;
 
         coreFacade.gameManager = gameManager;
@@ -210,7 +215,7 @@ public static class MainScenePlayableBuilder
         coreFacade.objectiveManager = objectiveManager;
         coreFacade.failManager = failManager;
         coreFacade.hidingManager = hidingManager;
-        coreFacade.uiBridgeBehaviour = uiManager;
+        coreFacade.uiBridgeBehaviour = designedUiConnector;
         coreFacade.cuteActionRadius = 5f;
         coreFacade.cuteActionRageReduction = 20f;
         coreFacade.defaultSecurityMultiplier = stageData.securityMultiplierOverride;
@@ -226,7 +231,7 @@ public static class MainScenePlayableBuilder
         validator.objectiveManager = objectiveManager;
         validator.failManager = failManager;
         validator.hidingManager = hidingManager;
-        validator.uiBridgeBehaviour = uiManager;
+        validator.uiBridgeBehaviour = designedUiConnector;
         validator.logValidationOnStart = true;
 
         SetPrivateField(audioManager, "sfxSource", sfxSource);
@@ -234,13 +239,261 @@ public static class MainScenePlayableBuilder
         audioManager.SetSfxLibrary(sfxLibrary);
         SetPrivateField(uiManager, "coreFacade", coreFacade);
         SetPrivateField(uiManager, "feedbackAudio", feedbackAudio);
+        SetPrivateField(designedUiConnector, "coreFacade", coreFacade);
+        SetPrivateField(designedUiConnector, "hudManager", designUi.hudManager);
+        SetPrivateField(designedUiConnector, "skillCooldownUI", designUi.skillCooldownUI);
+        SetPrivateField(designedUiConnector, "completeUI", designUi.completeUI);
+        SetPrivateField(designedUiConnector, "pauseMenu", designUi.pauseMenu);
+        SetPrivateField(designedUiConnector, "worldRageBarManager", designUi.worldRageBarManager);
+        SetPrivateField(designedUiConnector, "fallbackFeedbackUI", uiManager);
+        if (designUi.worldRageBarManager != null) designUi.worldRageBarManager.BindCore(coreFacade);
+        if (designUi.hudManager != null) designUi.hudManager.BindCore(coreFacade);
+        if (designUi.completeUI != null) designUi.completeUI.BindCore(coreFacade);
         SetPrivateField(starter, "coreFacade", coreFacade);
         SetPrivateField(starter, "uiManager", uiManager);
         SetPrivateField(starter, "stageData", stageData);
         _ = inputGate;
-        _ = pauseMenu;
+        _ = designedUiConnector;
 
         return systems;
+    }
+
+
+    private sealed class DesignUiRefs
+    {
+        public HUDManager hudManager;
+        public SkillCooldownUI skillCooldownUI;
+        public CompleteUI completeUI;
+        public PauseMenu pauseMenu;
+        public WorldRageBarManager worldRageBarManager;
+        public DesignedUICoreConnector connector;
+    }
+
+    private static DesignUiRefs CreateDesignedUi(Transform parent)
+    {
+        EnsureEventSystem();
+
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(MainCanvasPrefabPath);
+        if (prefab != null)
+        {
+            RemoveOldGeneratedUiRoots();
+
+            GameObject canvasObject = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+            Undo.RegisterCreatedObjectUndo(canvasObject, "Create MainCanvas UI");
+            canvasObject.name = "MainCanvas";
+            canvasObject.transform.SetParent(parent, false);
+            NormalizeCanvasSorting(canvasObject);
+            MainCanvasUiRepair.Repair(canvasObject);
+            return CollectDesignedUiRefs(canvasObject);
+        }
+
+        Debug.LogWarning("MainCanvas.prefab was not found. Falling back to generated minimal designed UI.");
+        return CreateGeneratedDesignedUi(parent);
+    }
+
+    private static DesignUiRefs CollectDesignedUiRefs(GameObject root)
+    {
+        DesignUiRefs refs = new DesignUiRefs();
+        refs.hudManager = root.GetComponentInChildren<HUDManager>(true);
+        refs.skillCooldownUI = root.GetComponentInChildren<SkillCooldownUI>(true);
+        refs.completeUI = root.GetComponentInChildren<CompleteUI>(true);
+        refs.pauseMenu = root.GetComponentInChildren<PauseMenu>(true);
+        refs.worldRageBarManager = root.GetComponentInChildren<WorldRageBarManager>(true);
+        if (refs.worldRageBarManager == null)
+        {
+            refs.worldRageBarManager = root.AddComponent<WorldRageBarManager>();
+        }
+        refs.connector = root.GetComponentInChildren<DesignedUICoreConnector>(true);
+
+        if (refs.connector == null)
+        {
+            refs.connector = root.AddComponent<DesignedUICoreConnector>();
+        }
+
+        return refs;
+    }
+
+    private static void NormalizeCanvasSorting(GameObject root)
+    {
+        if (root != null)
+        {
+            root.SetActive(true);
+            root.transform.localScale = Vector3.one;
+            RectTransform rootRect = root.GetComponent<RectTransform>();
+            if (rootRect != null)
+            {
+                rootRect.localScale = Vector3.one;
+            }
+        }
+
+        Canvas[] canvases = root.GetComponentsInChildren<Canvas>(true);
+        for (int i = 0; i < canvases.Length; i++)
+        {
+            canvases[i].gameObject.SetActive(true);
+            canvases[i].enabled = true;
+            canvases[i].sortingOrder = Mathf.Max(canvases[i].sortingOrder, 4500 + i);
+        }
+    }
+
+    private static void RemoveOldGeneratedUiRoots()
+    {
+        string[] names = { "PauseMenuCanvas", "DesignedUICanvas", "Generated PauseMenu", "Legacy PauseMenu" };
+        for (int i = 0; i < names.Length; i++)
+        {
+            GameObject obj = GameObject.Find(names[i]);
+            if (obj != null)
+            {
+                Undo.DestroyObjectImmediate(obj);
+            }
+        }
+    }
+
+    private static DesignUiRefs CreateGeneratedDesignedUi(Transform parent)
+    {
+        EnsureEventSystem();
+
+        GameObject canvasObject = CreateEmpty("DesignedUICanvas", parent, Vector3.zero);
+        Canvas canvas = canvasObject.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 4500;
+        CanvasScaler scaler = canvasObject.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        canvasObject.AddComponent<GraphicRaycaster>();
+
+        DesignUiRefs refs = new DesignUiRefs();
+        refs.connector = canvasObject.AddComponent<DesignedUICoreConnector>();
+        refs.hudManager = canvasObject.AddComponent<HUDManager>();
+        refs.completeUI = canvasObject.AddComponent<CompleteUI>();
+        refs.pauseMenu = canvasObject.AddComponent<PauseMenu>();
+        refs.worldRageBarManager = canvasObject.AddComponent<WorldRageBarManager>();
+
+        TMP_Text scoreText = CreateTMPLabel(canvasObject.transform, "ScoreText", new Vector2(40f, -40f), new Vector2(260f, 46f), "0", 32, TextAlignmentOptions.Left);
+        TMP_Text multiplierText = CreateTMPLabel(canvasObject.transform, "MultiplierText", new Vector2(40f, -86f), new Vector2(260f, 36f), "1.0x", 24, TextAlignmentOptions.Left);
+        TMP_Text targetText = CreateTMPLabel(canvasObject.transform, "TargetScoreText", new Vector2(40f, -126f), new Vector2(360f, 36f), "目标：5000", 24, TextAlignmentOptions.Left);
+        SetTopLeft(scoreText.rectTransform);
+        SetTopLeft(multiplierText.rectTransform);
+        SetTopLeft(targetText.rectTransform);
+
+        refs.hudManager.scoreText = scoreText;
+        refs.hudManager.multiplierText = multiplierText;
+        refs.hudManager.targetScoreText = targetText;
+
+        GameObject skillRoot = CreateUiPanel(canvasObject.transform, "SkillCooldownPanel", new Vector2(-96f, 92f), new Vector2(92f, 92f), new Color(0f, 0f, 0f, 0.35f));
+        RectTransform skillRect = skillRoot.GetComponent<RectTransform>();
+        skillRect.anchorMin = new Vector2(1f, 0f);
+        skillRect.anchorMax = new Vector2(1f, 0f);
+        refs.skillCooldownUI = skillRoot.AddComponent<SkillCooldownUI>();
+        Image mask = skillRoot.GetComponent<Image>();
+        mask.color = new Color(0f, 0f, 0f, 0.55f);
+        mask.type = Image.Type.Filled;
+        mask.fillMethod = Image.FillMethod.Radial360;
+        mask.fillOrigin = 2;
+        mask.fillAmount = 0f;
+        TMP_Text cooldownText = CreateTMPLabel(skillRoot.transform, "CuteCooldownText", Vector2.zero, new Vector2(90f, 90f), "", 28, TextAlignmentOptions.Center);
+        CenterStretch(cooldownText.rectTransform);
+        refs.skillCooldownUI.cooldownMask = mask;
+        refs.skillCooldownUI.cooldownText = cooldownText;
+
+        GameObject pausePanel = CreateUiPanel(canvasObject.transform, "PausePanel", Vector2.zero, new Vector2(520f, 420f), new Color(0f, 0f, 0f, 0.78f));
+        Center(pausePanel.GetComponent<RectTransform>());
+        CreateTMPLabel(pausePanel.transform, "PauseTitle", new Vector2(0f, 130f), new Vector2(420f, 60f), "PAUSED", 42, TextAlignmentOptions.Center);
+        CreateUiButton(pausePanel.transform, "ResumeButton", "Resume", new Vector2(0f, 45f), refs.pauseMenu.ResumeGame);
+        CreateUiButton(pausePanel.transform, "RestartButton", "Restart", new Vector2(0f, -25f), refs.pauseMenu.RestartScene);
+        CreateUiButton(pausePanel.transform, "MenuButton", "Title", new Vector2(0f, -95f), refs.pauseMenu.GoToMainMenu);
+        refs.pauseMenu.pausePanel = pausePanel;
+        pausePanel.SetActive(false);
+
+        GameObject completePanel = CreateUiPanel(canvasObject.transform, "CompletePanel", Vector2.zero, new Vector2(620f, 360f), new Color(0f, 0f, 0f, 0.82f));
+        Center(completePanel.GetComponent<RectTransform>());
+        TMP_Text resultTitle = CreateTMPLabel(completePanel.transform, "ResultTitle", new Vector2(0f, 105f), new Vector2(520f, 60f), "CLEAR", 44, TextAlignmentOptions.Center);
+        TMP_Text resultScore = CreateTMPLabel(completePanel.transform, "ResultScore", new Vector2(0f, 40f), new Vector2(520f, 44f), "0", 34, TextAlignmentOptions.Center);
+        TMP_Text resultDetail = CreateTMPLabel(completePanel.transform, "ResultDetail", new Vector2(0f, -18f), new Vector2(520f, 42f), "Stage Complete", 24, TextAlignmentOptions.Center);
+        CreateUiButton(completePanel.transform, "RetryButton", "Retry", new Vector2(-145f, -105f), refs.completeUI.RetryCurrentScene);
+        CreateUiButton(completePanel.transform, "LevelSelectButton", "Levels", new Vector2(145f, -105f), refs.completeUI.BackToLevelSelect);
+        refs.completeUI.completePanel = completePanel;
+        refs.completeUI.titleText = resultTitle;
+        refs.completeUI.scoreText = resultScore;
+        refs.completeUI.detailText = resultDetail;
+        completePanel.SetActive(false);
+
+        return refs;
+    }
+
+    private static GameObject CreateUiPanel(Transform parent, string name, Vector2 anchoredPosition, Vector2 size, Color color)
+    {
+        GameObject panel = new GameObject(name);
+        Undo.RegisterCreatedObjectUndo(panel, "Create UI Panel");
+        panel.transform.SetParent(parent, false);
+        RectTransform rect = panel.AddComponent<RectTransform>();
+        rect.sizeDelta = size;
+        rect.anchoredPosition = anchoredPosition;
+        Image image = panel.AddComponent<Image>();
+        image.color = color;
+        return panel;
+    }
+
+    private static TMP_Text CreateTMPLabel(Transform parent, string name, Vector2 anchoredPosition, Vector2 size, string text, int fontSize, TextAlignmentOptions alignment)
+    {
+        GameObject labelObject = new GameObject(name);
+        Undo.RegisterCreatedObjectUndo(labelObject, "Create TMP Label");
+        labelObject.transform.SetParent(parent, false);
+        RectTransform rect = labelObject.AddComponent<RectTransform>();
+        rect.sizeDelta = size;
+        rect.anchoredPosition = anchoredPosition;
+        TextMeshProUGUI label = labelObject.AddComponent<TextMeshProUGUI>();
+        label.text = text;
+        label.fontSize = fontSize;
+        label.alignment = alignment;
+        label.color = Color.white;
+        return label;
+    }
+
+    private static Button CreateUiButton(Transform parent, string name, string label, Vector2 anchoredPosition, UnityEngine.Events.UnityAction onClick)
+    {
+        GameObject buttonObject = CreateUiPanel(parent, name, anchoredPosition, new Vector2(220f, 52f), new Color(1f, 1f, 1f, 0.9f));
+        Button button = buttonObject.AddComponent<Button>();
+        button.onClick.AddListener(onClick);
+        TMP_Text buttonLabel = CreateTMPLabel(buttonObject.transform, name + "Text", Vector2.zero, new Vector2(220f, 52f), label, 24, TextAlignmentOptions.Center);
+        buttonLabel.color = Color.black;
+        CenterStretch(buttonLabel.rectTransform);
+        return button;
+    }
+
+    private static void SetTopLeft(RectTransform rect)
+    {
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(0f, 1f);
+        rect.pivot = new Vector2(0f, 1f);
+    }
+
+    private static void Center(RectTransform rect)
+    {
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+    }
+
+    private static void CenterStretch(RectTransform rect)
+    {
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+        rect.anchoredPosition = Vector2.zero;
+    }
+
+    private static void EnsureEventSystem()
+    {
+        if (Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>() != null)
+        {
+            return;
+        }
+
+        GameObject eventSystem = new GameObject("EventSystem");
+        Undo.RegisterCreatedObjectUndo(eventSystem, "Create EventSystem");
+        eventSystem.AddComponent<UnityEngine.EventSystems.EventSystem>();
+        eventSystem.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
     }
 
     private static GameObject CreatePlayer(Transform parent)
@@ -568,7 +821,7 @@ public static class MainScenePlayableBuilder
         stageData.stageId = "MVP_Office";
         stageData.nextStageId = "";
         stageData.objectiveType = ObjectiveType.Custom;
-        stageData.targetScore = 300;
+        stageData.targetScore = 5000;
         stageData.survivalTime = 0f;
         stageData.caughtRule = CaughtRule.ClearIfEnoughScore;
         stageData.baseScoreRate = 10f;

@@ -10,7 +10,12 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
 
     [Header("Runtime UI")]
     [SerializeField] private bool autoFindReferences = true;
-    [SerializeField] private bool useImmediateModeOverlay = true;
+    [SerializeField] private bool useImmediateModeOverlay = false;
+    [SerializeField] private bool showMinimalFeedbackOverlay = false;
+    [SerializeField] private bool showLegacyHudPanels = false;
+    [SerializeField] private bool showLegacyControls = false;
+    [SerializeField] private bool showLegacyEventLog = false;
+    [SerializeField] private bool showLegacyResultPanel = false;
     [SerializeField] private string watchedNpcId = "Supervisor";
     [SerializeField] private float pollInterval = 0.05f;
     [SerializeField] private float feedbackMessageDuration = 1.35f;
@@ -414,21 +419,34 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
 
     private void OnGUI()
     {
-        if (!useImmediateModeOverlay)
-        {
-            return;
-        }
+        // All visible UI is owned by MainCanvas.
+        // This legacy immediate-mode UIManager remains only as a Core feedback bridge.
+        return;
+    }
 
-        EnsureGuiResources();
-        DrawHiddenOverlay();
-        DrawFlashOverlay();
-        DrawTopLeftStatus();
-        DrawTopRightRage();
-        DrawWorldRageBars();
-        DrawBottomControls();
-        DrawPromptAndFeedback();
-        DrawEventLog();
-        DrawResult();
+    public void UseMinimalOverlayMode()
+    {
+        DisableImmediateModeOverlay();
+    }
+
+    public void DisableImmediateModeOverlay()
+    {
+        useImmediateModeOverlay = false;
+        showMinimalFeedbackOverlay = false;
+        showLegacyHudPanels = false;
+        showLegacyControls = false;
+        showLegacyEventLog = false;
+        showLegacyResultPanel = false;
+
+        // NPC rage bars are now owned by WorldRageBarManager under MainCanvas.
+        showWorldRageBars = false;
+    }
+
+
+    public void SetWorldRageBarsVisible(bool visible)
+    {
+        // World rage bars are handled by WorldRageBarManager under MainCanvas.
+        showWorldRageBars = false;
     }
 
     private void DrawTopLeftStatus()

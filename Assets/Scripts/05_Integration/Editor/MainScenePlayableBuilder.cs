@@ -244,7 +244,9 @@ public static class MainScenePlayableBuilder
         SetPrivateField(designedUiConnector, "skillCooldownUI", designUi.skillCooldownUI);
         SetPrivateField(designedUiConnector, "completeUI", designUi.completeUI);
         SetPrivateField(designedUiConnector, "pauseMenu", designUi.pauseMenu);
+        SetPrivateField(designedUiConnector, "worldRageBarManager", designUi.worldRageBarManager);
         SetPrivateField(designedUiConnector, "fallbackFeedbackUI", uiManager);
+        if (designUi.worldRageBarManager != null) designUi.worldRageBarManager.BindCore(coreFacade);
         if (designUi.hudManager != null) designUi.hudManager.BindCore(coreFacade);
         if (designUi.completeUI != null) designUi.completeUI.BindCore(coreFacade);
         SetPrivateField(starter, "coreFacade", coreFacade);
@@ -263,6 +265,7 @@ public static class MainScenePlayableBuilder
         public SkillCooldownUI skillCooldownUI;
         public CompleteUI completeUI;
         public PauseMenu pauseMenu;
+        public WorldRageBarManager worldRageBarManager;
         public DesignedUICoreConnector connector;
     }
 
@@ -295,6 +298,11 @@ public static class MainScenePlayableBuilder
         refs.skillCooldownUI = root.GetComponentInChildren<SkillCooldownUI>(true);
         refs.completeUI = root.GetComponentInChildren<CompleteUI>(true);
         refs.pauseMenu = root.GetComponentInChildren<PauseMenu>(true);
+        refs.worldRageBarManager = root.GetComponentInChildren<WorldRageBarManager>(true);
+        if (refs.worldRageBarManager == null)
+        {
+            refs.worldRageBarManager = root.AddComponent<WorldRageBarManager>();
+        }
         refs.connector = root.GetComponentInChildren<DesignedUICoreConnector>(true);
 
         if (refs.connector == null)
@@ -358,6 +366,7 @@ public static class MainScenePlayableBuilder
         refs.hudManager = canvasObject.AddComponent<HUDManager>();
         refs.completeUI = canvasObject.AddComponent<CompleteUI>();
         refs.pauseMenu = canvasObject.AddComponent<PauseMenu>();
+        refs.worldRageBarManager = canvasObject.AddComponent<WorldRageBarManager>();
 
         TMP_Text scoreText = CreateTMPLabel(canvasObject.transform, "ScoreText", new Vector2(40f, -40f), new Vector2(260f, 46f), "0", 32, TextAlignmentOptions.Left);
         TMP_Text multiplierText = CreateTMPLabel(canvasObject.transform, "MultiplierText", new Vector2(40f, -86f), new Vector2(260f, 36f), "1.0x", 24, TextAlignmentOptions.Left);

@@ -169,7 +169,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 25, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5518953209614490277
@@ -200,7 +200,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u9F20\u6807\u5DE6\u952E"
+  m_text: "\u5DE6\u952E"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 72fb3eeddcb5d5245b9074bcf6cfebc5, type: 2}
   m_sharedMaterial: {fileID: 8243648578021434703, guid: 72fb3eeddcb5d5245b9074bcf6cfebc5,
@@ -210,8 +210,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281677112
-  m_fontColor: {r: 0.22012573, g: 0.20697357, b: 0.20697357, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -456,6 +456,10 @@ MonoBehaviour:
   scoreText: {fileID: 6520957165309417556}
   multiplierText: {fileID: 6685880709801498828}
   targetScoreText: {fileID: 8782031403434248250}
+  coreFacade: {fileID: 0}
+  autoFindCore: 1
+  pollCore: 1
+  pollInterval: 0.05
 --- !u!1 &1663852923086650184
 GameObject:
   m_ObjectHideFlags: 0
@@ -573,6 +577,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pausePanel: {fileID: 5847548574001970134}
+  levelSelectSceneName: Levels
+  mainMenuSceneName: TitleScene
 --- !u!1 &1746134322823215203
 GameObject:
   m_ObjectHideFlags: 0
@@ -1051,8 +1057,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4282331389
-  m_fontColor: {r: 0.99215686, g: 0.1882353, b: 0.24787384, a: 1}
+    rgba: 4284232640
+  m_fontColor: {r: 0.754717, g: 0.2017324, b: 0.3612623, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1276,7 +1282,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1614,7 +1620,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 16.3}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1873722271359311527
@@ -1655,8 +1661,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281677112
-  m_fontColor: {r: 0.22012573, g: 0.20697357, b: 0.20697357, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1986,7 +1992,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2272,7 +2278,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2708,6 +2714,9 @@ MonoBehaviour:
   cooldownMask: {fileID: 2119459787447565258}
   cooldownText: {fileID: 6164516056979609577}
   cooldownTime: 20
+  playerCuteAction: {fileID: 0}
+  autoFindPlayerCuteAction: 1
+  trackPlayerCuteAction: 1
 --- !u!1 &7271802871221355772
 GameObject:
   m_ObjectHideFlags: 0
@@ -2825,6 +2834,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   completePanel: {fileID: 8557516628612037205}
   scoreText: {fileID: 3146257160981446923}
+  titleText: {fileID: 0}
+  detailText: {fileID: 0}
+  coreFacade: {fileID: 0}
+  autoFindCore: 1
+  autoShowFromCore: 1
+  levelSelectSceneName: Levels
 --- !u!1 &7711192249827294866
 GameObject:
   m_ObjectHideFlags: 0
@@ -3621,8 +3636,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281677112
-  m_fontColor: {r: 0.22012573, g: 0.20697357, b: 0.20697357, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

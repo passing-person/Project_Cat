@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerAnimationController : MonoBehaviour
@@ -132,6 +133,43 @@ public class PlayerAnimationController : MonoBehaviour
             return;
 
         animator.SetTrigger(TurnRightHash);
+    }
+
+    public IEnumerator WaitForStateToFinish(string stateName)
+    {
+        if (animator == null || string.IsNullOrWhiteSpace(stateName))
+            yield break;
+
+        int stateHash = Animator.StringToHash(stateName);
+
+        while (!IsStateActive(stateHash))
+            yield return null;
+
+        while (true)
+        {
+            AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
+            bool currentMatches = currentState.shortNameHash == stateHash;
+            bool nextMatches = animator.IsInTransition(0) && animator.GetNextAnimatorStateInfo(0).shortNameHash == stateHash;
+
+            if (!currentMatches && !nextMatches)
+                yield break;
+
+            if (currentMatches && !animator.IsInTransition(0) && currentState.normalizedTime >= 1f)
+                yield break;
+
+            yield return null;
+        }
+    }
+
+    private bool IsStateActive(int stateHash)
+    {
+        if (animator == null)
+            return false;
+
+        if (animator.GetCurrentAnimatorStateInfo(0).shortNameHash == stateHash)
+            return true;
+
+        return animator.IsInTransition(0) && animator.GetNextAnimatorStateInfo(0).shortNameHash == stateHash;
     }
 
     private Transform FindAnimatedRoot()

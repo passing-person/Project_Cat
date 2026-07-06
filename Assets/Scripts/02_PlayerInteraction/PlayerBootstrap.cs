@@ -33,6 +33,7 @@ public class PlayerBootstrap : MonoBehaviour
         SetPrivateField(GetComponent<PlayerCuteAction>(), "coreFacade", FindObjectOfType<CoreFacade>());
         SetPrivateField(GetComponent<PlayerCuteAction>(), "rageManager", FindObjectOfType<RageManager>());
         SetPrivateField(GetComponent<PlayerCuteAction>(), "uiManager", FindObjectOfType<UIManager>());
+        SetPrivateField(GetComponent<PlayerCuteAction>(), "playerController", GetComponent<PlayerController>());
         SetPrivateField(GetComponent<PlayerHide>(), "coreFacade", FindObjectOfType<CoreFacade>());
         SetPrivateField(GetComponent<PlayerHide>(), "hidingManager", FindObjectOfType<HidingManager>());
         SetPrivateField(GetComponent<PlayerHide>(), "uiManager", FindObjectOfType<UIManager>());
@@ -48,6 +49,7 @@ public class PlayerBootstrap : MonoBehaviour
         SetPrivateField(GetComponent<PlayerMischiefAction>(), "playerInteraction", GetComponent<PlayerInteraction>());
         SetPrivateField(GetComponent<PlayerMischiefAction>(), "animationController", GetComponent<PlayerAnimationController>());
         SetPrivateField(GetComponent<PlayerMischiefAction>(), "sfxController", GetComponent<PlayerSfxController>());
+        SetPrivateField(GetComponent<PlayerMischiefAction>(), "trashCubeSpawner", GetComponent<TrashCubeSpawner>());
         SetPrivateField(GetComponent<PlayerCuteAction>(), "animationController", GetComponent<PlayerAnimationController>());
         SetPrivateField(GetComponent<PlayerCuteAction>(), "sfxController", GetComponent<PlayerSfxController>());
         SetPrivateField(GetComponent<PlayerHide>(), "playerController", GetComponent<PlayerController>());

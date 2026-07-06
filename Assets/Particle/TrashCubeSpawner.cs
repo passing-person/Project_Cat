@@ -10,7 +10,8 @@ public class TrashCubeSpawner : MonoBehaviour
     public Transform emitPoint;
 
     [Header("Emission")]
-    public float emissionDuration = 2.6f;
+    public float emissionDuration = 0.1f;
+    [SerializeField] private bool requireEmissionArm = true;
     public float minSpawnInterval = 0.035f;
     public float maxSpawnInterval = 0.09f;
 
@@ -35,11 +36,18 @@ public class TrashCubeSpawner : MonoBehaviour
 
     private Coroutine spawnRoutine;
     private float emitEndTime;
+    private bool emissionArmed;
+    private float armedEmissionDuration;
 
     // Called by the cat action animation event.
     public void AE_SpawnTrashCubes()
     {
-        SpawnTrashCubes();
+        if (requireEmissionArm && !emissionArmed)
+            return;
+
+        float duration = emissionArmed ? armedEmissionDuration : emissionDuration;
+        emissionArmed = false;
+        SpawnTrashCubes(duration);
     }
 
     public void AE_StopTrashCubes()
@@ -49,16 +57,28 @@ public class TrashCubeSpawner : MonoBehaviour
 
     public void SpawnTrashCubes()
     {
+        SpawnTrashCubes(emissionDuration);
+    }
+
+    public void ArmNextEmission(float duration)
+    {
+        emissionArmed = true;
+        armedEmissionDuration = Mathf.Max(0f, duration);
+    }
+
+    private void SpawnTrashCubes(float duration)
+    {
         if (trashCubePrefab == null || emitPoint == null)
             return;
 
-        emitEndTime = Time.time + Mathf.Max(0f, emissionDuration);
+        float safeDuration = Mathf.Max(0f, duration);
+        emitEndTime = Time.time + safeDuration;
 
-        if (emissionDuration <= 0f)
+        if (safeDuration <= 0f)
             return;
 
         if (spawnRoutine != null)
-            return;
+            StopCoroutine(spawnRoutine);
 
         spawnRoutine = StartCoroutine(SpawnTrashCubesOverTime());
     }

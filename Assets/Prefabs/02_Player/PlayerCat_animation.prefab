@@ -219,7 +219,10 @@ MonoBehaviour:
   mischiefManager: {fileID: 0}
   animationController: {fileID: 0}
   sfxController: {fileID: 0}
+  trashCubeSpawner: {fileID: 0}
   uiManager: {fileID: 0}
+  mischiefStateName: Mischief
+  mischiefParticleDuration: 0.1
   logMischiefDebug: 1
 --- !u!114 &8380148043297911773
 MonoBehaviour:
@@ -233,6 +236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7091e10a62b269e4898a73422d30283f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerController: {fileID: 0}
   coreFacade: {fileID: 0}
   rageManager: {fileID: 0}
   uiManager: {fileID: 0}
@@ -240,6 +244,7 @@ MonoBehaviour:
   sfxController: {fileID: 0}
   radius: 5
   rageReduction: 20
+  cuteStateName: Cute
   cooldown: 20
   cooldownUiReportInterval: 1
 --- !u!114 &7118655816239863935
@@ -284,6 +289,7 @@ MonoBehaviour:
   sprintKey: 304
   movementAcceleration: 16
   movementDeceleration: 22
+  enableIdleTurnAnimation: 1
   idleTurnTriggerAngle: 32
   idleTurnCooldown: 0.35
   jumpForce: 4.2
@@ -308,7 +314,8 @@ MonoBehaviour:
   trashCubePrefab: {fileID: 3425176783288438273, guid: 2cbb3c129a2ed7741afe0b2f51b10557,
     type: 3}
   emitPoint: {fileID: 457454053380591212}
-  emissionDuration: 2.6
+  emissionDuration: 0.1
+  requireEmissionArm: 1
   minSpawnInterval: 0.035
   maxSpawnInterval: 0.09
   minScale: 0.015

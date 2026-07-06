@@ -309,6 +309,12 @@ public class CoreFacade : MonoBehaviour
             return;
         }
 
+        if (rageManager != null && rageManager.TryGetRuntimeNpcId(receiver, out string runtimeNpcId))
+        {
+            UnregisterRageReceiver(runtimeNpcId);
+            return;
+        }
+
         UnregisterRageReceiver(receiver.NpcId);
     }
 
@@ -341,6 +347,17 @@ public class CoreFacade : MonoBehaviour
     public List<string> GetRegisteredNpcIds()
     {
         return rageManager != null ? rageManager.GetRegisteredNpcIds() : new List<string>();
+    }
+
+    public bool TryGetRuntimeNpcId(IRageReceiver receiver, out string runtimeNpcId)
+    {
+        runtimeNpcId = string.Empty;
+        return rageManager != null && rageManager.TryGetRuntimeNpcId(receiver, out runtimeNpcId);
+    }
+
+    public string GetRuntimeNpcId(IRageReceiver receiver)
+    {
+        return rageManager != null ? rageManager.GetRuntimeNpcId(receiver) : string.Empty;
     }
 
     public bool TryGetNpcWorldPosition(string npcId, out Vector3 position)
@@ -488,7 +505,66 @@ public class CoreFacade : MonoBehaviour
     public bool TryGetMischiefWorldEventTarget(string targetId, out IMischiefWorldEventTarget target)
     {
         target = null;
-        return !string.IsNullOrWhiteSpace(targetId) && worldEventTargets.TryGetValue(targetId, out target) && target != null;
+        if (string.IsNullOrWhiteSpace(targetId))
+        {
+            return false;
+        }
+
+        if (worldEventTargets.TryGetValue(targetId, out target) && target != null)
+        {
+            return true;
+        }
+
+        RefreshMischiefWorldEventTargetRegistry();
+        return worldEventTargets.TryGetValue(targetId, out target) && target != null;
+    }
+
+    public bool TryGetMischiefWorldEventTargetGameObject(string targetId, out GameObject targetObject)
+    {
+        targetObject = null;
+
+        if (!TryGetMischiefWorldEventTarget(targetId, out IMischiefWorldEventTarget target) || target == null)
+        {
+            return false;
+        }
+
+        return TryGetGameObjectFromWorldEventTarget(target, out targetObject);
+    }
+
+    public GameObject GetMischiefWorldEventTargetGameObject(string targetId)
+    {
+        return TryGetMischiefWorldEventTargetGameObject(targetId, out GameObject targetObject) ? targetObject : null;
+    }
+
+    public void RefreshMischiefWorldEventTargetRegistry()
+    {
+        MonoBehaviour[] behaviours = FindObjectsOfType<MonoBehaviour>(true);
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            if (behaviours[i] is IMischiefWorldEventTarget target)
+            {
+                RegisterMischiefWorldEventTarget(target);
+            }
+        }
+    }
+
+    private bool TryGetGameObjectFromWorldEventTarget(IMischiefWorldEventTarget target, out GameObject targetObject)
+    {
+        targetObject = null;
+
+        if (target is Component component)
+        {
+            targetObject = component.gameObject;
+            return targetObject != null;
+        }
+
+        if (target is MonoBehaviour behaviour)
+        {
+            targetObject = behaviour.gameObject;
+            return targetObject != null;
+        }
+
+        return false;
     }
 
     public MischiefWorldEventResult ReportMischiefEventFromMischief(MischiefContext context)

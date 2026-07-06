@@ -13,6 +13,8 @@ public class RageManager : MonoBehaviour
     private readonly Dictionary<string, float> rageValues = new Dictionary<string, float>();
     private readonly Dictionary<string, NpcRageState> rageStates = new Dictionary<string, NpcRageState>();
     private readonly List<IRageReceiver> affectedCache = new List<IRageReceiver>();
+    private readonly Dictionary<IRageReceiver, string> runtimeNpcIdsByReceiver = new Dictionary<IRageReceiver, string>();
+    private readonly Dictionary<string, int> runtimeNpcIdCounters = new Dictionary<string, int>();
 
     private ICoreUIBridge uiBridge;
 
@@ -66,19 +68,20 @@ public class RageManager : MonoBehaviour
             return;
         }
 
-        receivers[npcId] = receiver;
+        string runtimeNpcId = GetOrCreateRuntimeNpcId(npcId, receiver);
+        receivers[runtimeNpcId] = receiver;
 
-        if (!rageValues.ContainsKey(npcId))
+        if (!rageValues.ContainsKey(runtimeNpcId))
         {
-            rageValues[npcId] = 0f;
+            rageValues[runtimeNpcId] = 0f;
         }
 
-        if (!rageStates.ContainsKey(npcId))
+        if (!rageStates.ContainsKey(runtimeNpcId))
         {
-            rageStates[npcId] = NpcRageState.Calm;
+            rageStates[runtimeNpcId] = NpcRageState.Calm;
         }
 
-        RefreshRageUI(npcId);
+        RefreshRageUI(runtimeNpcId);
         RecalculateScoreMultiplier();
     }
 
@@ -89,15 +92,22 @@ public class RageManager : MonoBehaviour
             return;
         }
 
-        receivers.Remove(npcId);
-        rageValues.Remove(npcId);
-        rageStates.Remove(npcId);
+        string runtimeNpcId = ResolveNpcId(npcId);
+        if (receivers.TryGetValue(runtimeNpcId, out IRageReceiver receiver) && receiver != null)
+        {
+            runtimeNpcIdsByReceiver.Remove(receiver);
+        }
+
+        receivers.Remove(runtimeNpcId);
+        rageValues.Remove(runtimeNpcId);
+        rageStates.Remove(runtimeNpcId);
         RecalculateScoreMultiplier();
     }
 
     public float GetRage(string npcId)
     {
-        if (string.IsNullOrWhiteSpace(npcId) || !rageValues.TryGetValue(npcId, out float value))
+        string runtimeNpcId = ResolveNpcId(npcId);
+        if (string.IsNullOrWhiteSpace(runtimeNpcId) || !rageValues.TryGetValue(runtimeNpcId, out float value))
         {
             return 0f;
         }
@@ -107,7 +117,8 @@ public class RageManager : MonoBehaviour
 
     public NpcRageState GetRageState(string npcId)
     {
-        if (string.IsNullOrWhiteSpace(npcId) || !rageStates.TryGetValue(npcId, out NpcRageState state))
+        string runtimeNpcId = ResolveNpcId(npcId);
+        if (string.IsNullOrWhiteSpace(runtimeNpcId) || !rageStates.TryGetValue(runtimeNpcId, out NpcRageState state))
         {
             return NpcRageState.Calm;
         }
@@ -124,7 +135,8 @@ public class RageManager : MonoBehaviour
     {
         position = Vector3.zero;
 
-        if (string.IsNullOrWhiteSpace(npcId) || !receivers.TryGetValue(npcId, out IRageReceiver receiver) || receiver == null)
+        string runtimeNpcId = ResolveNpcId(npcId);
+        if (string.IsNullOrWhiteSpace(runtimeNpcId) || !receivers.TryGetValue(runtimeNpcId, out IRageReceiver receiver) || receiver == null)
         {
             return false;
         }
@@ -133,17 +145,48 @@ public class RageManager : MonoBehaviour
         return true;
     }
 
+    public bool TryGetRuntimeNpcId(IRageReceiver receiver, out string runtimeNpcId)
+    {
+        runtimeNpcId = string.Empty;
+        if (receiver == null)
+        {
+            return false;
+        }
+
+        if (runtimeNpcIdsByReceiver.TryGetValue(receiver, out runtimeNpcId) && !string.IsNullOrWhiteSpace(runtimeNpcId))
+        {
+            return true;
+        }
+
+        foreach (KeyValuePair<string, IRageReceiver> pair in receivers)
+        {
+            if (ReferenceEquals(pair.Value, receiver))
+            {
+                runtimeNpcId = pair.Key;
+                runtimeNpcIdsByReceiver[receiver] = runtimeNpcId;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public string GetRuntimeNpcId(IRageReceiver receiver)
+    {
+        return TryGetRuntimeNpcId(receiver, out string runtimeNpcId) ? runtimeNpcId : string.Empty;
+    }
 
     public bool TryGetReceiver(string npcId, out IRageReceiver receiver)
     {
         receiver = null;
 
-        if (string.IsNullOrWhiteSpace(npcId))
+        string runtimeNpcId = ResolveNpcId(npcId);
+        if (string.IsNullOrWhiteSpace(runtimeNpcId))
         {
             return false;
         }
 
-        return receivers.TryGetValue(npcId, out receiver) && receiver != null;
+        return receivers.TryGetValue(runtimeNpcId, out receiver) && receiver != null;
     }
 
     public bool TryFindNearestNpc(Vector3 position, out string npcId, out IRageReceiver receiver, bool excludeSecurity = true)
@@ -208,6 +251,67 @@ public class RageManager : MonoBehaviour
         }
 
         return receiver != null;
+    }
+
+    private string GetOrCreateRuntimeNpcId(string baseNpcId, IRageReceiver receiver)
+    {
+        if (runtimeNpcIdsByReceiver.TryGetValue(receiver, out string existingRuntimeId) && !string.IsNullOrWhiteSpace(existingRuntimeId))
+        {
+            return existingRuntimeId;
+        }
+
+        string safeBaseId = string.IsNullOrWhiteSpace(baseNpcId) ? "NPC" : baseNpcId.Trim();
+        if (!receivers.TryGetValue(safeBaseId, out IRageReceiver existingReceiver) || ReferenceEquals(existingReceiver, receiver))
+        {
+            runtimeNpcIdsByReceiver[receiver] = safeBaseId;
+            return safeBaseId;
+        }
+
+        int nextIndex = runtimeNpcIdCounters.TryGetValue(safeBaseId, out int currentIndex) ? currentIndex + 1 : 2;
+        string candidate = safeBaseId + "_" + nextIndex;
+        while (receivers.ContainsKey(candidate))
+        {
+            nextIndex++;
+            candidate = safeBaseId + "_" + nextIndex;
+        }
+
+        runtimeNpcIdCounters[safeBaseId] = nextIndex;
+        runtimeNpcIdsByReceiver[receiver] = candidate;
+        return candidate;
+    }
+
+    private string ResolveNpcId(string npcId)
+    {
+        if (string.IsNullOrWhiteSpace(npcId))
+        {
+            return string.Empty;
+        }
+
+        if (receivers.ContainsKey(npcId) || rageValues.ContainsKey(npcId))
+        {
+            return npcId;
+        }
+
+        foreach (KeyValuePair<string, IRageReceiver> pair in receivers)
+        {
+            IRageReceiver receiver = pair.Value;
+            if (receiver != null && receiver.NpcId == npcId)
+            {
+                return pair.Key;
+            }
+        }
+
+        return npcId;
+    }
+
+    private string GetRuntimeNpcIdOrFallback(IRageReceiver receiver)
+    {
+        if (TryGetRuntimeNpcId(receiver, out string runtimeNpcId))
+        {
+            return runtimeNpcId;
+        }
+
+        return receiver != null ? ResolveNpcId(receiver.NpcId) : string.Empty;
     }
 
     public float GetEnragedThreshold(string npcId)
@@ -294,7 +398,8 @@ public class RageManager : MonoBehaviour
 
         for (int i = 0; i < affected.Count; i++)
         {
-            results.Add(AddRage(affected[i].NpcId, context.BaseRageAmount));
+            string runtimeNpcId = GetRuntimeNpcIdOrFallback(affected[i]);
+            results.Add(AddRage(runtimeNpcId, context.BaseRageAmount));
         }
 
         if (results.Count > 0)
@@ -308,6 +413,7 @@ public class RageManager : MonoBehaviour
 
     public RageResult AddRage(string npcId, float amount)
     {
+        npcId = ResolveNpcId(npcId);
         float previousRage = GetRage(npcId);
         NpcRageState previousState = GetRageState(npcId);
         float currentRage = Mathf.Clamp(previousRage + amount, 0f, 100f);
@@ -333,6 +439,7 @@ public class RageManager : MonoBehaviour
 
     public RageResult ReduceRage(string npcId, float amount)
     {
+        npcId = ResolveNpcId(npcId);
         float previousRage = GetRage(npcId);
         NpcRageState previousState = GetRageState(npcId);
         float currentRage = Mathf.Clamp(previousRage - Mathf.Max(0f, amount), 0f, 100f);
@@ -351,6 +458,7 @@ public class RageManager : MonoBehaviour
 
     public void SetRage(string npcId, float value)
     {
+        npcId = ResolveNpcId(npcId);
         float previousRage = GetRage(npcId);
         NpcRageState previousState = GetRageState(npcId);
         float currentRage = Mathf.Clamp(value, 0f, 100f);

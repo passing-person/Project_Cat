@@ -137,7 +137,6 @@ public class PlayerMischiefAction : MonoBehaviour
             $"LMB success: mischief → {target.InteractionId}, rage +{context.BaseRageAmount}"));
         uiManager?.ShowMischiefApplied(target.InteractionId, context.BaseRageAmount);
         ReportWorldEvent(target, context);
-        PlayTargetEffect(target);
         animationController?.PlayMischief();
         sfxController?.PlayMischief();
     }
@@ -176,21 +175,6 @@ public class PlayerMischiefAction : MonoBehaviour
         }
 
         return targetBehaviour.GetComponent<MischiefWorldEventReporter>();
-    }
-
-    private void PlayTargetEffect(IMischiefTarget target)
-    {
-        MonoBehaviour targetBehaviour = target as MonoBehaviour;
-        if (targetBehaviour == null)
-        {
-            return;
-        }
-
-        MischiefEffectPlayer effectPlayer = targetBehaviour.GetComponent<MischiefEffectPlayer>();
-        if (effectPlayer != null)
-        {
-            effectPlayer.Play();
-        }
     }
 
     private bool CanApplyMischief(string targetId)

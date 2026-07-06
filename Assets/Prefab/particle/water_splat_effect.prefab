@@ -128,3 +128,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6127ba98fef0246bc763404eb95c60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  listenTarget: {fileID: 0}
+  manualOnly: 0
+  fadeInDuration: 0.5
+  holdDuration: 10
+  fadeOutDuration: 1
+  splatRenderer: {fileID: 1114196981108834921}
+  hideOnStart: 1

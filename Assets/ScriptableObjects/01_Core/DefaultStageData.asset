@@ -15,7 +15,7 @@ MonoBehaviour:
   stageId: MVP_Office
   nextStageId: 
   objectiveType: 4
-  targetScore: 300
+  targetScore: 5000
   survivalTime: 0
   caughtRule: 2
   baseScoreRate: 10

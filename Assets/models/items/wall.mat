@@ -127,7 +127,7 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BrightColor: {r: 0.7058824, g: 0.6666667, b: 0.8196079, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DarkShadeColor: {r: 0.32704395, g: 0.16763571, b: 0.23303396, a: 1}
+    - _DarkShadeColor: {r: 0.21568629, g: 0.15294118, b: 0.3921569, a: 1}
     - _DarkZoneColor: {r: 0.3254902, g: 0.16862746, b: 0.23137257, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MidColor: {r: 0.6, g: 0.44705886, b: 0.50980395, a: 1}

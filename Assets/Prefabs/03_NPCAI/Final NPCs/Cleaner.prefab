@@ -136,7 +136,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 526099987290802232}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
@@ -252,7 +252,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewParams: {fileID: 11400000, guid: 31c12b8481fd66948aafb50a50600c1d, type: 2}
-  head: {fileID: 1075850068821436925}
+  head: {fileID: 0}
   snapshotWhenPlayerLeavesViewSector: 1
   allowSearchTimeoutSnapshotInsideViewRange: 1
   targetingRectDimension: {x: 0.5, y: 1.6}
@@ -260,6 +260,7 @@ MonoBehaviour:
   ensureSpaceRectDimension: {x: 0.5, y: 1.6}
   useAnimationMachineCloseRangeDiveDistanceThreshold: 1
   closeRangeDiveDistanceThreshold: 2.5
+  useHeadFollowDirectionForViewSector: 1
   catchRadius: 1
   requireViewRangeForDive: 1
   requireViewRangeForCatch: 0
@@ -371,18 +372,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c548233af7ad20b4fb79bccba4d15695, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OverrideSchedule: []
+  OverrideSchedule:
+  - OverrideType: 2
+    reactionRole: 1
+    targetId: 
+    priority: 1
+  - OverrideType: 2
+    reactionRole: 2
+    targetId: 
+    priority: 10
+  - OverrideType: 3
+    reactionRole: 2
+    targetId: 
+    priority: 100
+  - OverrideType: 4
+    reactionRole: 2
+    targetId: 
+    priority: 100
   lightStunDuration: 1.25
   useChaseSpeedForOverrideMove: 1
   actorId: Dummy Actor
   targetId: Dummy Target
-  eventType: 0
+  eventType: 3
   debugTargetPoint: {fileID: 0}
   resolveMode: 0
   preferredNpcId: 
   preferredNpcType: 0
   disableTargetAfterResponse: 0
-  shouldReact: 0
+  shouldReact: 1
 --- !u!114 &2056900030208568090
 MonoBehaviour:
   m_ObjectHideFlags: 0

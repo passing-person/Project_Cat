@@ -22,6 +22,10 @@ public class PlayerCuteAction : MonoBehaviour
     private float cooldownUiTimer;
     private bool wasOnCooldown;
 
+    public float CooldownRemaining => Mathf.Max(0f, cooldownTimer);
+    public float CooldownDuration => Mathf.Max(0.1f, cooldown);
+    public bool IsCoolingDown => cooldownTimer > 0f;
+
     private void Update()
     {
         if (cooldownTimer > 0f)

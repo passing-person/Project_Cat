@@ -454,7 +454,7 @@ MonoBehaviour:
   moveSpeed: 2.4
   sprintMultiplier: 1.55
   sprintKey: 304
-  jumpForce: 4.2
+  jumpForce: 6
   groundCheckRadius: 0.22
   groundRayLength: 0.18
   groundLayer:

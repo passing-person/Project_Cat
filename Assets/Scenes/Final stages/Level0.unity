@@ -1117,30 +1117,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04d355f3432ba584fa724fbd3e38ee23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &31549971
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 31549956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 039294dd352519e47a921ad42fa5eb7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerController: {fileID: 31549966}
-  uiManager: {fileID: 1698629751}
-  interactionOrigin: {fileID: 31549984}
-  detectionRadius: 1.2
-  interactionRange: 0.5
-  logInteractionDebug: 1
---- !u!4 &31549984 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6473064039931927648, guid: 2162d65336e8f204f97518c950bd891a,
-    type: 3}
-  m_PrefabInstance: {fileID: 197834571}
-  m_PrefabAsset: {fileID: 0}
 --- !u!43 &38204363
 Mesh:
   m_ObjectHideFlags: 0
@@ -4251,11 +4227,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5827777631391397180, guid: 2162d65336e8f204f97518c950bd891a,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 31549971}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2162d65336e8f204f97518c950bd891a, type: 3}
 --- !u!1001 &203182897
 PrefabInstance:
@@ -9880,26 +9852,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 991435969}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &491084429
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 491084427}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cc54debaa6c4b2408918cce7ae4ec12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: 01284f6c7f2bb83498651816344e9047, type: 2}
-  canInteract: 1
-  interactionId: MischiefTarget
-  mischiefType: 0
-  instantScoreBonus: 0
-  baseRageAmount: 5
-  rageRadius: 5
-  primaryNpcId: 
 --- !u!43 &494404204
 Mesh:
   m_ObjectHideFlags: 0
@@ -21336,11 +21288,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7837164955247182376, guid: 52c7734ee6c1a4a4a9874f2c3197ae14,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 491084429}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 52c7734ee6c1a4a4a9874f2c3197ae14, type: 3}
 --- !u!43 &992279679
 Mesh:

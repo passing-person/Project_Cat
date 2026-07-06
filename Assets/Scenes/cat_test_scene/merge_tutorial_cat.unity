@@ -10360,12 +10360,12 @@ PrefabInstance:
     - target: {fileID: 6473064039931927648, guid: 2162d65336e8f204f97518c950bd891a,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.685
       objectReference: {fileID: 0}
     - target: {fileID: 6473064039931927648, guid: 2162d65336e8f204f97518c950bd891a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.639
       objectReference: {fileID: 0}
     - target: {fileID: 6473064039931927648, guid: 2162d65336e8f204f97518c950bd891a,
         type: 3}
@@ -10406,6 +10406,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7870867317998497156, guid: 2162d65336e8f204f97518c950bd891a,
+        type: 3}
+      propertyPath: m_Center.x
+      value: -0.022887826
+      objectReference: {fileID: 0}
+    - target: {fileID: 7870867317998497156, guid: 2162d65336e8f204f97518c950bd891a,
+        type: 3}
+      propertyPath: m_Center.y
+      value: 0.33651358
+      objectReference: {fileID: 0}
+    - target: {fileID: 7870867317998497156, guid: 2162d65336e8f204f97518c950bd891a,
+        type: 3}
+      propertyPath: m_Center.z
+      value: 0.25090125
       objectReference: {fileID: 0}
     - target: {fileID: 8380148043297911773, guid: 2162d65336e8f204f97518c950bd891a,
         type: 3}
@@ -25914,9 +25929,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 605ad3f31c3c8c745b73cf558a23b2eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  seatMode: 0
+  randomizeOnEnable: 1
   bottomPoint: {fileID: 577930297}
   facingPoint: {fileID: 577930297}
+  seatAnchors: []
   showGizmos: 1
+  showOnlySelectedSeat: 0
 --- !u!1 &976572643 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8391380245164153101, guid: 8a6c2aac71b2f864ab814bd51f97df52,

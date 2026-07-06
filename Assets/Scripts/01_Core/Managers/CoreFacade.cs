@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -38,6 +39,7 @@ public class CoreFacade : MonoBehaviour
     public int CurrentScore => scoreManager != null ? scoreManager.CurrentScore : 0;
     public float CurrentScoreFloat => scoreManager != null ? scoreManager.CurrentScoreFloat : 0f;
     public float CurrentMultiplier => scoreManager != null ? scoreManager.CurrentMultiplier : 1f;
+    public event Action<MischiefContext> MischiefApplied;
     public int TargetScore => scoreManager != null ? scoreManager.targetScore : 0;
     public bool HasEnoughScore => scoreManager != null && scoreManager.HasReachedTargetScore();
     public float RemainingHideTime => hidingManager != null ? hidingManager.RemainingHideTime : 0f;
@@ -207,7 +209,13 @@ public class CoreFacade : MonoBehaviour
             return false;
         }
 
-        return mischiefManager.ApplyMischief(context);
+        bool applied = mischiefManager.ApplyMischief(context);
+        if (applied)
+        {
+            MischiefApplied?.Invoke(context);
+        }
+
+        return applied;
     }
 
     public bool CanApplyMischief(string targetId)

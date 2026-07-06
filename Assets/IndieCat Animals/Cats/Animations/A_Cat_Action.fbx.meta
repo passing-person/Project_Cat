@@ -96,15 +96,8 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0
-        functionName: AE_SpawnTrashCubes
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
       - time: 0.17901236
-        functionName: Function:AE_SpawnTrashCubes
+        functionName: AE_SpawnTrashCubes
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

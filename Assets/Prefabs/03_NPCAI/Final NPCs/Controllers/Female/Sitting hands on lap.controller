@@ -48,7 +48,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -203655887218126122, guid: 4a21c02a4252a29489a68dca8240ff5a,
+  m_Motion: {fileID: -203655887218126122, guid: 074e9f09bbe96c04ebcd00eb58c09485,
     type: 3}
   m_Tag: 
   m_SpeedParameter: 
@@ -234,7 +234,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Generic Controller
+  m_Name: Sitting hands on lap
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: Speed

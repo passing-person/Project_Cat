@@ -281,17 +281,17 @@ PrefabInstance:
     - target: {fileID: 6900279571559961183, guid: 2a6f6d13ecaa8544884e939b2828267a,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.06
       objectReference: {fileID: 0}
     - target: {fileID: 6900279571559961183, guid: 2a6f6d13ecaa8544884e939b2828267a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.5
+      value: 0.422
       objectReference: {fileID: 0}
     - target: {fileID: 6900279571559961183, guid: 2a6f6d13ecaa8544884e939b2828267a,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.023
       objectReference: {fileID: 0}
     - target: {fileID: 6900279571559961183, guid: 2a6f6d13ecaa8544884e939b2828267a,
         type: 3}
@@ -530,6 +530,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 605ad3f31c3c8c745b73cf558a23b2eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  seatMode: 0
+  randomizeOnEnable: 1
   bottomPoint: {fileID: 7422249816373942042}
   facingPoint: {fileID: 7422249816373942042}
+  seatAnchors: []
   showGizmos: 1
+  showOnlySelectedSeat: 0

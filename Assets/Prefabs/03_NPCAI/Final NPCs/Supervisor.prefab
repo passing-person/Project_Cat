@@ -1647,6 +1647,7 @@ MonoBehaviour:
   ensureSpaceRectDimension: {x: 0.5, y: 1.6}
   useAnimationMachineCloseRangeDiveDistanceThreshold: 1
   closeRangeDiveDistanceThreshold: 2.5
+  useHeadFollowDirectionForViewSector: 1
   catchRadius: 1
   requireViewRangeForDive: 1
   requireViewRangeForCatch: 0
@@ -1762,7 +1763,7 @@ MonoBehaviour:
   actorId: Dummy Actor
   targetId: Dummy Target
   eventType: 0
-  position: {x: 0, y: 0, z: 0}
+  debugTargetPoint: {fileID: 0}
   resolveMode: 0
   preferredNpcId: 
   preferredNpcType: 0
@@ -2447,7 +2448,7 @@ MonoBehaviour:
   animMachine: {fileID: 8717371892258348518}
   headDelayInterval: 0.2
   targetSmoothSpeed: 8
-  playerLookHeightOffset: 1.35
+  playerLookHeightOffset: 1
   activeLookWeight: 1
   scanLookWeight: 0.45
   weightBlendSpeed: 6

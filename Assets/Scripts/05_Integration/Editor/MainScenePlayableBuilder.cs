@@ -148,6 +148,8 @@ public static class MainScenePlayableBuilder
         GameObject systems = CreateEmpty("Systems", parent, Vector3.zero);
 
         UIManager uiManager = systems.AddComponent<UIManager>();
+        GameInputGate inputGate = systems.AddComponent<GameInputGate>();
+        PauseMenuController pauseMenu = systems.AddComponent<PauseMenuController>();
         AudioManager audioManager = systems.AddComponent<AudioManager>();
         SimpleFeedbackAudio feedbackAudio = systems.AddComponent<SimpleFeedbackAudio>();
         NavMeshAgentPlacementFixer navMeshFixer = systems.AddComponent<NavMeshAgentPlacementFixer>();
@@ -235,6 +237,8 @@ public static class MainScenePlayableBuilder
         SetPrivateField(starter, "coreFacade", coreFacade);
         SetPrivateField(starter, "uiManager", uiManager);
         SetPrivateField(starter, "stageData", stageData);
+        _ = inputGate;
+        _ = pauseMenu;
 
         return systems;
     }

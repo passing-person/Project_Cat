@@ -90,6 +90,11 @@ public class ThirdPersonCameraController : MonoBehaviour
     {
         HandleCursor();
 
+        if (GameInputGate.IsGameplayInputBlocked)
+        {
+            return;
+        }
+
         if (target == null)
         {
             return;
@@ -278,10 +283,11 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     private void HandleCursor()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (GameInputGate.IsGameplayInputBlocked)
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            return;
         }
 
         if (Input.GetMouseButtonDown(0) && Cursor.lockState != CursorLockMode.Locked)

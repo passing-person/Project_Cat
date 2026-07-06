@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class PlayerMischiefAction : MonoBehaviour
@@ -10,20 +9,10 @@ public class PlayerMischiefAction : MonoBehaviour
     [SerializeField] private MischiefManager mischiefManager;
     [SerializeField] private PlayerAnimationController animationController;
     [SerializeField] private PlayerSfxController sfxController;
-    [SerializeField] private TrashCubeSpawner trashCubeSpawner;
     [SerializeField] private UIManager uiManager;
-
-    [Header("Animation Lock")]
-    [SerializeField] private string mischiefStateName = "Mischief";
-
-    [Header("Particles")]
-    [SerializeField] private float mischiefParticleDuration = 0.1f;
 
     [Header("Debug")]
     public bool logMischiefDebug = true;
-
-    private bool mischiefAnimationLockActive;
-    private Coroutine mischiefLockRoutine;
 
     private void Awake()
     {
@@ -33,12 +22,16 @@ public class PlayerMischiefAction : MonoBehaviour
         if (mischiefManager == null) mischiefManager = FindObjectOfType<MischiefManager>();
         if (animationController == null) animationController = GetComponent<PlayerAnimationController>();
         if (sfxController == null) sfxController = GetComponent<PlayerSfxController>();
-        if (trashCubeSpawner == null) trashCubeSpawner = GetComponent<TrashCubeSpawner>();
         if (uiManager == null) uiManager = FindObjectOfType<UIManager>();
     }
 
     private void Update()
     {
+        if (GameInputGate.IsGameplayInputBlocked)
+        {
+            return;
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             TryPerformMischief();
@@ -47,6 +40,11 @@ public class PlayerMischiefAction : MonoBehaviour
 
     public void TryPerformMischief()
     {
+        if (GameInputGate.IsGameplayInputBlocked)
+        {
+            return;
+        }
+
         if (playerInteraction == null)
         {
             LogDebug(BilingualDebug.Line(
@@ -64,8 +62,7 @@ public class PlayerMischiefAction : MonoBehaviour
             return;
         }
 
-        if (playerController != null && !playerController.IsControllable &&
-            (!mischiefAnimationLockActive || !playerController.IsBaseControllable))
+        if (playerController != null && !playerController.IsControllable)
         {
             LogDebug(BilingualDebug.Line(
                 "左键失败：玩家不可控制",
@@ -108,10 +105,10 @@ public class PlayerMischiefAction : MonoBehaviour
             return;
         }
 
-        MischiefWorldEventReporter worldEventReporter = GetWorldEventReporter(target);
-        if (worldEventReporter != null && !worldEventReporter.CanStartWorldEvent())
+        IMischiefWorldEventTarget worldEventTarget = GetWorldEventTarget(target);
+        if (worldEventTarget != null && !worldEventTarget.CanStartWorldEvent())
         {
-            string reason = worldEventReporter.GetUnavailableReason();
+            string reason = worldEventTarget.GetUnavailableReason();
             if (string.IsNullOrWhiteSpace(reason))
             {
                 reason = "World event is not ready";
@@ -150,67 +147,34 @@ public class PlayerMischiefAction : MonoBehaviour
             $"LMB success: mischief → {target.InteractionId}, rage +{context.BaseRageAmount}"));
         uiManager?.ShowMischiefApplied(target.InteractionId, context.BaseRageAmount);
         ReportWorldEvent(target, context);
-        trashCubeSpawner?.ArmNextEmission(mischiefParticleDuration);
         animationController?.PlayMischief();
         sfxController?.PlayMischief();
-        RestartMischiefControlLock();
-    }
-
-    private void RestartMischiefControlLock()
-    {
-        if (!mischiefAnimationLockActive)
-        {
-            mischiefAnimationLockActive = true;
-            playerController?.AddTemporaryControlLock();
-        }
-
-        if (mischiefLockRoutine != null)
-            StopCoroutine(mischiefLockRoutine);
-
-        mischiefLockRoutine = StartCoroutine(ReleaseMischiefControlAfterAnimation());
-    }
-
-    private IEnumerator ReleaseMischiefControlAfterAnimation()
-    {
-        yield return null;
-
-        if (animationController != null)
-            yield return animationController.WaitForStateToFinish(mischiefStateName);
-
-        playerController?.RemoveTemporaryControlLock();
-        mischiefAnimationLockActive = false;
-        mischiefLockRoutine = null;
-    }
-
-    private void OnDisable()
-    {
-        if (mischiefLockRoutine != null)
-        {
-            StopCoroutine(mischiefLockRoutine);
-            mischiefLockRoutine = null;
-        }
-
-        if (mischiefAnimationLockActive)
-        {
-            playerController?.RemoveTemporaryControlLock();
-            mischiefAnimationLockActive = false;
-        }
     }
 
 
     private void ReportWorldEvent(IMischiefTarget target, MischiefContext context)
     {
         MischiefWorldEventResult result = MischiefWorldEventResult.Ignored(context.TargetId, MischiefWorldEventType.None, context.Position, string.Empty);
-        bool hasReporter = false;
+        bool reported = false;
 
         MischiefWorldEventReporter reporter = GetWorldEventReporter(target);
         if (reporter != null)
         {
-            hasReporter = true;
+            reported = true;
             result = reporter.Report(context);
         }
 
-        if (!hasReporter && coreFacade != null)
+        if (!reported && coreFacade != null)
+        {
+            IMischiefWorldEventTarget worldEventTarget = GetWorldEventTarget(target);
+            if (worldEventTarget != null)
+            {
+                result = ReportGenericWorldEventTarget(worldEventTarget, context);
+                reported = true;
+            }
+        }
+
+        if (!reported && coreFacade != null)
         {
             result = coreFacade.ReportMischiefEventFromMischief(context);
         }
@@ -222,6 +186,36 @@ public class PlayerMischiefAction : MonoBehaviour
         }
     }
 
+    private MischiefWorldEventResult ReportGenericWorldEventTarget(IMischiefWorldEventTarget worldEventTarget, MischiefContext context)
+    {
+        string targetId = !string.IsNullOrWhiteSpace(worldEventTarget.WorldEventTargetId)
+            ? worldEventTarget.WorldEventTargetId
+            : context.TargetId;
+
+        MischiefWorldEventType eventType = worldEventTarget.WorldEventType;
+        if (eventType == MischiefWorldEventType.Auto)
+        {
+            eventType = MischiefWorldEventContext.InferEventType(targetId, context.MischiefType);
+        }
+
+        if (eventType == MischiefWorldEventType.None)
+        {
+            return MischiefWorldEventResult.Ignored(targetId, eventType, context.Position, "No world event route for this target.");
+        }
+
+        MischiefWorldEventContext eventContext = new MischiefWorldEventContext(
+            context.ActorId,
+            targetId,
+            eventType,
+            context.Position,
+            MischiefWorldEventContext.GetDefaultResolveMode(eventType),
+            string.Empty,
+            NpcType.Special,
+            MischiefWorldEventContext.ShouldDisableTargetAfterResponse(eventType));
+
+        return coreFacade.ReportMischiefWorldEvent(eventContext);
+    }
+
     private MischiefWorldEventReporter GetWorldEventReporter(IMischiefTarget target)
     {
         MonoBehaviour targetBehaviour = target as MonoBehaviour;
@@ -231,6 +225,26 @@ public class PlayerMischiefAction : MonoBehaviour
         }
 
         return targetBehaviour.GetComponent<MischiefWorldEventReporter>();
+    }
+
+    private IMischiefWorldEventTarget GetWorldEventTarget(IMischiefTarget target)
+    {
+        MonoBehaviour targetBehaviour = target as MonoBehaviour;
+        if (targetBehaviour == null)
+        {
+            return null;
+        }
+
+        MonoBehaviour[] behaviours = targetBehaviour.GetComponents<MonoBehaviour>();
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            if (behaviours[i] is IMischiefWorldEventTarget worldEventTarget)
+            {
+                return worldEventTarget;
+            }
+        }
+
+        return null;
     }
 
     private bool CanApplyMischief(string targetId)

@@ -31,7 +31,7 @@ public class PlayerHide : MonoBehaviour
     {
         SyncForcedExitFromCore();
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (!GameInputGate.IsGameplayInputBlocked && Input.GetKeyDown(KeyCode.F))
         {
             TryHideOrExit();
         }
@@ -39,6 +39,11 @@ public class PlayerHide : MonoBehaviour
 
     public void TryHideOrExit()
     {
+        if (GameInputGate.IsGameplayInputBlocked)
+        {
+            return;
+        }
+
         if (playerController != null && playerController.IsHidden)
         {
             ExitHide();

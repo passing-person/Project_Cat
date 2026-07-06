@@ -33,6 +33,11 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
+        if (GameInputGate.IsGameplayInputBlocked)
+        {
+            return;
+        }
+
         ScanForInteractable();
         ValidateCurrentTarget();
 
@@ -162,6 +167,11 @@ public class PlayerInteraction : MonoBehaviour
 
     public bool TryInteract()
     {
+        if (GameInputGate.IsGameplayInputBlocked)
+        {
+            return false;
+        }
+
         if (playerController != null && playerController.IsHidden)
         {
             LogDebug(BilingualDebug.Line(

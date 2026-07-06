@@ -4,16 +4,13 @@ using UnityEngine.SceneManagement;
 
 public class LevelSelectManager : MonoBehaviour
 {
-    //Five level buttons in total
     public Button[] levelButtons;
-
-    //Color change
     public Color unlockedColor = Color.white;
     public Color lockedColor = Color.gray;
+    [SerializeField] private string levelScenePrefix = "Level";
 
-    void Start()
+    private void Start()
     {
-        //Enter this game for the 1st time
         if (!PlayerPrefs.HasKey("UnlockedLevel"))
         {
             PlayerPrefs.SetInt("UnlockedLevel", 0);
@@ -23,29 +20,32 @@ public class LevelSelectManager : MonoBehaviour
         UpdateButtons();
     }
 
-    void UpdateButtons()
+    private void UpdateButtons()
     {
         int unlockedLevel = PlayerPrefs.GetInt("UnlockedLevel");
 
         for (int i = 0; i < levelButtons.Length; i++)
         {
-            Image img = levelButtons[i].GetComponent<Image>();
-
-            if (i <= unlockedLevel)
+            if (levelButtons[i] == null)
             {
-                levelButtons[i].interactable = true;
-                img.color = unlockedColor;
+                continue;
             }
-            else
+
+            Image image = levelButtons[i].GetComponent<Image>();
+            bool unlocked = i <= unlockedLevel;
+            levelButtons[i].interactable = unlocked;
+
+            if (image != null)
             {
-                levelButtons[i].interactable = false;
-                img.color = lockedColor;
+                image.color = unlocked ? unlockedColor : lockedColor;
             }
         }
     }
 
     public void LoadLevel(int levelIndex)
     {
-        SceneManager.LoadScene("Level" + levelIndex);
+        Time.timeScale = 1f;
+        GameInputGate.SetMenuOpen(false);
+        SceneManager.LoadScene(levelScenePrefix + levelIndex);
     }
 }

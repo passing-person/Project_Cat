@@ -10,7 +10,12 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
 
     [Header("Runtime UI")]
     [SerializeField] private bool autoFindReferences = true;
-    [SerializeField] private bool useImmediateModeOverlay = true;
+    [SerializeField] private bool useImmediateModeOverlay = false;
+    [SerializeField] private bool showMinimalFeedbackOverlay = false;
+    [SerializeField] private bool showLegacyHudPanels = false;
+    [SerializeField] private bool showLegacyControls = false;
+    [SerializeField] private bool showLegacyEventLog = false;
+    [SerializeField] private bool showLegacyResultPanel = false;
     [SerializeField] private string watchedNpcId = "Supervisor";
     [SerializeField] private float pollInterval = 0.05f;
     [SerializeField] private float feedbackMessageDuration = 1.35f;
@@ -414,21 +419,40 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
 
     private void OnGUI()
     {
-        if (!useImmediateModeOverlay)
+        // Legacy immediate-mode HUD/pause UI stays disabled.
+        // Keep only NPC world rage bars because the designed MainCanvas does not own world-space NPC rage display.
+        if (!showWorldRageBars)
         {
             return;
         }
 
         EnsureGuiResources();
-        DrawHiddenOverlay();
-        DrawFlashOverlay();
-        DrawTopLeftStatus();
-        DrawTopRightRage();
         DrawWorldRageBars();
-        DrawBottomControls();
-        DrawPromptAndFeedback();
-        DrawEventLog();
-        DrawResult();
+    }
+
+    public void UseMinimalOverlayMode()
+    {
+        DisableImmediateModeOverlay();
+    }
+
+    public void DisableImmediateModeOverlay()
+    {
+        useImmediateModeOverlay = false;
+        showMinimalFeedbackOverlay = false;
+        showLegacyHudPanels = false;
+        showLegacyControls = false;
+        showLegacyEventLog = false;
+        showLegacyResultPanel = false;
+
+        // Do not disable NPC world rage bars here.
+        // MainCanvas replaces only screen-space HUD/pause UI; NPC rage bars remain a gameplay readability layer.
+        showWorldRageBars = true;
+    }
+
+
+    public void SetWorldRageBarsVisible(bool visible)
+    {
+        showWorldRageBars = visible;
     }
 
     private void DrawTopLeftStatus()

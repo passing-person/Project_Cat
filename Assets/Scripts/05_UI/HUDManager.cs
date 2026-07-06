@@ -8,13 +8,68 @@ public class HUDManager : MonoBehaviour
     public TMP_Text multiplierText;
     public TMP_Text targetScoreText;
 
+    [Header("Core Binding")]
+    [SerializeField] private CoreFacade coreFacade;
+    [SerializeField] private bool autoFindCore = true;
+    [SerializeField] private bool pollCore = true;
+    [SerializeField] private float pollInterval = 0.05f;
+
     private int currentScore;
-    private int currentTargetScore;
+    private int currentTargetScore = 5000;
     private float currentMultiplier = 1f;
+    private float pollTimer;
 
     private void Start()
     {
+        ResolveCore();
+        RefreshFromCore();
         RefreshUI();
+    }
+
+    private void Update()
+    {
+        if (!pollCore)
+        {
+            return;
+        }
+
+        pollTimer -= Time.unscaledDeltaTime;
+        if (pollTimer > 0f)
+        {
+            return;
+        }
+
+        pollTimer = Mathf.Max(0.02f, pollInterval);
+        ResolveCore();
+        RefreshFromCore();
+    }
+
+    public void BindCore(CoreFacade facade)
+    {
+        coreFacade = facade;
+        RefreshFromCore();
+    }
+
+    private void ResolveCore()
+    {
+        if (!autoFindCore || coreFacade != null)
+        {
+            return;
+        }
+
+        coreFacade = FindObjectOfType<CoreFacade>();
+    }
+
+    private void RefreshFromCore()
+    {
+        if (coreFacade == null)
+        {
+            RefreshUI();
+            return;
+        }
+
+        SetScore(coreFacade.CurrentScore, coreFacade.TargetScore);
+        SetMultiplier(coreFacade.CurrentMultiplier);
     }
 
     private void RefreshUI()
@@ -31,40 +86,26 @@ public class HUDManager : MonoBehaviour
 
         if (targetScoreText != null)
         {
-            targetScoreText.text = "Ä¿±ê£º" + currentTargetScore;
+            targetScoreText.text = "ç›®æ ‡ï¼š" + currentTargetScore;
         }
     }
 
-    /// <summary>
-    /// ¸üÐÂ·ÖÊýºÍÄ¿±ê·ÖÊý
-    /// ¸ø UICoreBridge µ÷ÓÃ
-    /// </summary>
     public void SetScore(int score, int targetScore)
     {
-        currentScore = score;
-        currentTargetScore = targetScore;
-
+        currentScore = Mathf.Max(0, score);
+        currentTargetScore = targetScore > 0 ? targetScore : currentTargetScore;
         RefreshUI();
     }
 
-    /// <summary>
-    /// ¸üÐÂ±¶ÂÊ
-    /// ¸ø UICoreBridge µ÷ÓÃ
-    /// </summary>
     public void SetMultiplier(float multiplier)
     {
-        currentMultiplier = multiplier;
-
+        currentMultiplier = Mathf.Max(0f, multiplier);
         RefreshUI();
     }
 
-    /// <summary>
-    /// µ¥¶À¸üÐÂÄ¿±ê·ÖÊý
-    /// </summary>
     public void SetTargetScore(int targetScore)
     {
-        currentTargetScore = targetScore;
-
+        currentTargetScore = Mathf.Max(0, targetScore);
         RefreshUI();
     }
 }

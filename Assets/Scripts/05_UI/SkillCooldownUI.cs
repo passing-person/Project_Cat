@@ -11,28 +11,35 @@ public class SkillCooldownUI : MonoBehaviour
     [Header("Cooldown")]
     public float cooldownTime = 20f;
 
-    private float timer = 0f;
-    private bool isCooling = false;
+    [Header("Core Binding")]
+    [SerializeField] private PlayerCuteAction playerCuteAction;
+    [SerializeField] private bool autoFindPlayerCuteAction = true;
+    [SerializeField] private bool trackPlayerCuteAction = true;
 
-    void Start()
+    private float timer;
+    private bool isCooling;
+
+    private void Start()
     {
-        cooldownMask.fillAmount = 0;
-        cooldownText.text = "";
+        ResolvePlayerCuteAction();
+        FinishCooldown();
     }
 
-    void Update()
+    private void Update()
     {
-        // 按Q开始冷却（以后这里可以改成真正释放技能后调用）
-        if (Input.GetKeyDown(KeyCode.Q) && !isCooling)
+        ResolvePlayerCuteAction();
+
+        if (trackPlayerCuteAction && playerCuteAction != null)
         {
-            StartCooldown();
+            SetCooldown(playerCuteAction.CooldownRemaining, playerCuteAction.CooldownDuration);
+            return;
         }
 
         if (isCooling)
         {
-            timer -= Time.deltaTime;
+            timer -= Time.unscaledDeltaTime;
 
-            if (timer <= 0)
+            if (timer <= 0f)
             {
                 FinishCooldown();
             }
@@ -43,34 +50,84 @@ public class SkillCooldownUI : MonoBehaviour
         }
     }
 
-    void StartCooldown()
+    public void BindPlayerCuteAction(PlayerCuteAction cuteAction)
     {
-        isCooling = true;
-        timer = cooldownTime;
-
-        cooldownMask.enabled = true;
-        cooldownText.enabled = true;
+        playerCuteAction = cuteAction;
+        if (playerCuteAction != null)
+        {
+            SetCooldown(playerCuteAction.CooldownRemaining, playerCuteAction.CooldownDuration);
+        }
     }
 
-    void FinishCooldown()
+    public void SetCooldown(float remainingSeconds, float totalSeconds)
+    {
+        cooldownTime = Mathf.Max(0.1f, totalSeconds);
+        timer = Mathf.Max(0f, remainingSeconds);
+        isCooling = timer > 0f;
+
+        if (isCooling)
+        {
+            if (cooldownMask != null)
+            {
+                cooldownMask.enabled = true;
+            }
+
+            if (cooldownText != null)
+            {
+                cooldownText.enabled = true;
+            }
+
+            UpdateCooldownUI();
+        }
+        else
+        {
+            FinishCooldown();
+        }
+    }
+
+    public void StartCooldown()
+    {
+        SetCooldown(cooldownTime, cooldownTime);
+    }
+
+    private void FinishCooldown()
     {
         isCooling = false;
+        timer = 0f;
 
-        cooldownMask.fillAmount = 0;
+        if (cooldownMask != null)
+        {
+            cooldownMask.fillAmount = 0f;
+            cooldownMask.enabled = false;
+        }
 
-        cooldownMask.enabled = false;
-
-        cooldownText.text = "";
-
-        cooldownText.enabled = false;
+        if (cooldownText != null)
+        {
+            cooldownText.text = "";
+            cooldownText.enabled = false;
+        }
     }
 
-    void UpdateCooldownUI()
+    private void UpdateCooldownUI()
     {
-        // 显示整数秒
-        cooldownText.text = Mathf.Ceil(timer).ToString();
+        if (cooldownText != null)
+        {
+            cooldownText.text = Mathf.CeilToInt(timer).ToString();
+        }
 
-        // FillAmount
-        cooldownMask.fillAmount = timer / cooldownTime;
+        if (cooldownMask != null)
+        {
+            cooldownMask.fillAmount = Mathf.Clamp01(timer / Mathf.Max(0.1f, cooldownTime));
+        }
+    }
+
+    private void ResolvePlayerCuteAction()
+    {
+        if (!autoFindPlayerCuteAction || playerCuteAction != null)
+        {
+            return;
+        }
+
+        playerCuteAction = FindObjectOfType<PlayerCuteAction>();
     }
 }

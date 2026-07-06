@@ -419,15 +419,9 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
 
     private void OnGUI()
     {
-        // Legacy immediate-mode HUD/pause UI stays disabled.
-        // Keep only NPC world rage bars because the designed MainCanvas does not own world-space NPC rage display.
-        if (!showWorldRageBars)
-        {
-            return;
-        }
-
-        EnsureGuiResources();
-        DrawWorldRageBars();
+        // All visible UI is owned by MainCanvas.
+        // This legacy immediate-mode UIManager remains only as a Core feedback bridge.
+        return;
     }
 
     public void UseMinimalOverlayMode()
@@ -444,15 +438,15 @@ public class UIManager : MonoBehaviour, ICoreUIBridge
         showLegacyEventLog = false;
         showLegacyResultPanel = false;
 
-        // Do not disable NPC world rage bars here.
-        // MainCanvas replaces only screen-space HUD/pause UI; NPC rage bars remain a gameplay readability layer.
-        showWorldRageBars = true;
+        // NPC rage bars are now owned by WorldRageBarManager under MainCanvas.
+        showWorldRageBars = false;
     }
 
 
     public void SetWorldRageBarsVisible(bool visible)
     {
-        showWorldRageBars = visible;
+        // World rage bars are handled by WorldRageBarManager under MainCanvas.
+        showWorldRageBars = false;
     }
 
     private void DrawTopLeftStatus()

@@ -11,6 +11,7 @@ public class DesignedUICoreConnector : MonoBehaviour, ICoreUIBridge
     [SerializeField] private SkillCooldownUI skillCooldownUI;
     [SerializeField] private CompleteUI completeUI;
     [SerializeField] private PauseMenu pauseMenu;
+    [SerializeField] private WorldRageBarManager worldRageBarManager;
 
     [Header("Optional Prompt UI")]
     [SerializeField] private GameObject promptPanel;
@@ -283,6 +284,8 @@ public class DesignedUICoreConnector : MonoBehaviour, ICoreUIBridge
         if (skillCooldownUI == null) skillCooldownUI = GetComponentInChildren<SkillCooldownUI>(true) ?? FindObjectOfType<SkillCooldownUI>(true);
         if (completeUI == null) completeUI = GetComponentInChildren<CompleteUI>(true) ?? FindObjectOfType<CompleteUI>(true);
         if (pauseMenu == null) pauseMenu = GetComponentInChildren<PauseMenu>(true) ?? FindObjectOfType<PauseMenu>(true);
+        if (worldRageBarManager == null) worldRageBarManager = GetComponentInChildren<WorldRageBarManager>(true);
+        if (worldRageBarManager == null) worldRageBarManager = gameObject.AddComponent<WorldRageBarManager>();
         if (fallbackFeedbackUI == null) fallbackFeedbackUI = FindObjectOfType<UIManager>();
     }
 
@@ -296,6 +299,12 @@ public class DesignedUICoreConnector : MonoBehaviour, ICoreUIBridge
         if (completeUI != null)
         {
             completeUI.BindCore(coreFacade);
+        }
+
+        if (worldRageBarManager != null)
+        {
+            worldRageBarManager.BindCore(coreFacade);
+            worldRageBarManager.SetVisible(true);
         }
 
         if (fallbackFeedbackUI != null)

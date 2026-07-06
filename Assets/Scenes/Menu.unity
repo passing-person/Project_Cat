@@ -213,7 +213,7 @@ RectTransform:
   m_GameObject: {fileID: 106667262}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 239275682}
@@ -584,6 +584,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2edea1f2016704418b6348b994fb656, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  firstLevelSceneName: Levels
 --- !u!1 &956753076
 GameObject:
   m_ObjectHideFlags: 0
@@ -983,6 +984,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2edea1f2016704418b6348b994fb656, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  firstLevelSceneName: Levels
 --- !u!1 &1361387727
 GameObject:
   m_ObjectHideFlags: 0

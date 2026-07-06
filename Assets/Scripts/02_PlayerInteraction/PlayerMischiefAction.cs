@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class PlayerMischiefAction : MonoBehaviour
@@ -10,20 +9,10 @@ public class PlayerMischiefAction : MonoBehaviour
     [SerializeField] private MischiefManager mischiefManager;
     [SerializeField] private PlayerAnimationController animationController;
     [SerializeField] private PlayerSfxController sfxController;
-    [SerializeField] private TrashCubeSpawner trashCubeSpawner;
     [SerializeField] private UIManager uiManager;
-
-    [Header("Animation Lock")]
-    [SerializeField] private string mischiefStateName = "Mischief";
-
-    [Header("Particles")]
-    [SerializeField] private float mischiefParticleDuration = 0.1f;
 
     [Header("Debug")]
     public bool logMischiefDebug = true;
-
-    private bool mischiefAnimationLockActive;
-    private Coroutine mischiefLockRoutine;
 
     private void Awake()
     {
@@ -33,7 +22,6 @@ public class PlayerMischiefAction : MonoBehaviour
         if (mischiefManager == null) mischiefManager = FindObjectOfType<MischiefManager>();
         if (animationController == null) animationController = GetComponent<PlayerAnimationController>();
         if (sfxController == null) sfxController = GetComponent<PlayerSfxController>();
-        if (trashCubeSpawner == null) trashCubeSpawner = GetComponent<TrashCubeSpawner>();
         if (uiManager == null) uiManager = FindObjectOfType<UIManager>();
     }
 
@@ -64,8 +52,7 @@ public class PlayerMischiefAction : MonoBehaviour
             return;
         }
 
-        if (playerController != null && !playerController.IsControllable &&
-            (!mischiefAnimationLockActive || !playerController.IsBaseControllable))
+        if (playerController != null && !playerController.IsControllable)
         {
             LogDebug(BilingualDebug.Line(
                 "左键失败：玩家不可控制",
@@ -150,49 +137,8 @@ public class PlayerMischiefAction : MonoBehaviour
             $"LMB success: mischief → {target.InteractionId}, rage +{context.BaseRageAmount}"));
         uiManager?.ShowMischiefApplied(target.InteractionId, context.BaseRageAmount);
         ReportWorldEvent(target, context);
-        trashCubeSpawner?.ArmNextEmission(mischiefParticleDuration);
         animationController?.PlayMischief();
         sfxController?.PlayMischief();
-        RestartMischiefControlLock();
-    }
-
-    private void RestartMischiefControlLock()
-    {
-        if (!mischiefAnimationLockActive)
-        {
-            mischiefAnimationLockActive = true;
-            playerController?.AddTemporaryControlLock();
-        }
-
-        if (mischiefLockRoutine != null)
-            StopCoroutine(mischiefLockRoutine);
-
-        mischiefLockRoutine = StartCoroutine(ReleaseMischiefControlAfterAnimation());
-    }
-
-    private IEnumerator ReleaseMischiefControlAfterAnimation()
-    {
-        if (animationController != null)
-            yield return animationController.WaitForStateToFinish(mischiefStateName);
-
-        playerController?.RemoveTemporaryControlLock();
-        mischiefAnimationLockActive = false;
-        mischiefLockRoutine = null;
-    }
-
-    private void OnDisable()
-    {
-        if (mischiefLockRoutine != null)
-        {
-            StopCoroutine(mischiefLockRoutine);
-            mischiefLockRoutine = null;
-        }
-
-        if (mischiefAnimationLockActive)
-        {
-            playerController?.RemoveTemporaryControlLock();
-            mischiefAnimationLockActive = false;
-        }
     }
 
 

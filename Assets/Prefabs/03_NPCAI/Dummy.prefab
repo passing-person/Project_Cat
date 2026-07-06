@@ -19,6 +19,9 @@ GameObject:
   - component: {fileID: 4894956142958054225}
   - component: {fileID: 1620700158995799479}
   - component: {fileID: 37990434758033499}
+  - component: {fileID: 7670226680310599475}
+  - component: {fileID: 452710524971486487}
+  - component: {fileID: 1296254800258492228}
   m_Layer: 0
   m_Name: Dummy
   m_TagString: Untagged
@@ -262,3 +265,57 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &7670226680310599475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7186805834010524992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63db4dfce3c878f49b332b46a1f88d3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stageManager: {fileID: 0}
+  objectiveManager: {fileID: 0}
+  caughtRule: 0
+  hasFailed: 0
+--- !u!114 &452710524971486487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7186805834010524992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bf35e42930942548ab9ccee2ea91399, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameManager: {fileID: 0}
+  scoreManager: {fileID: 0}
+  objectiveManager: {fileID: 0}
+  failManager: {fileID: 0}
+  uiBridgeBehaviour: {fileID: 0}
+  defaultStageData: {fileID: 0}
+  currentStageData: {fileID: 0}
+  currentStageId: 
+  stageCleared: 0
+  stageFailed: 0
+  lastFailReason: 
+--- !u!114 &1296254800258492228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7186805834010524992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d594c8bbf21966449bab19bd813d34b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stageManager: {fileID: 0}
+  uiBridgeBehaviour: {fileID: 0}
+  currentState: 0

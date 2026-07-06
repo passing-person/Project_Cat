@@ -21,8 +21,12 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask groundLayer = ~0;
 
     private Rigidbody rb;
+    private Collider[] ownColliders;
     private Vector3 moveInput;
     private bool isSprinting;
+    private float lastGroundedTime = -999f;
+
+    private const float GroundContactGraceTime = 0.12f;
 
     public bool IsMoving => moveInput.sqrMagnitude > 0.01f;
     public bool IsSprinting => isSprinting;
@@ -37,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
 
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
+        ownColliders = GetComponentsInChildren<Collider>();
     }
 
     private void Update()
@@ -116,19 +121,81 @@ public class PlayerMovement : MonoBehaviour
         }
 
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        lastGroundedTime = -999f;
         animationController?.PlayJump();
         sfxController?.PlayJump();
     }
 
     private bool IsGrounded()
     {
-        Vector3 origin = groundCheck != null ? groundCheck.position : transform.position + Vector3.up * 0.05f;
-        if (Physics.CheckSphere(origin, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore))
+        if (Time.time - lastGroundedTime <= GroundContactGraceTime)
         {
             return true;
         }
 
-        return Physics.Raycast(origin, Vector3.down, groundRayLength + 0.08f, groundLayer, QueryTriggerInteraction.Ignore);
+        Vector3 origin = groundCheck != null ? groundCheck.position : transform.position + Vector3.up * 0.05f;
+        Collider[] groundHits = Physics.OverlapSphere(origin, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
+        foreach (Collider hit in groundHits)
+        {
+            if (!IsOwnCollider(hit))
+            {
+                lastGroundedTime = Time.time;
+                return true;
+            }
+        }
+
+        float rayDistance = groundRayLength + groundCheckRadius + 0.08f;
+        RaycastHit[] rayHits = Physics.RaycastAll(origin + Vector3.up * groundCheckRadius, Vector3.down, rayDistance, groundLayer, QueryTriggerInteraction.Ignore);
+        foreach (RaycastHit rayHit in rayHits)
+        {
+            if (!IsOwnCollider(rayHit.collider))
+            {
+                lastGroundedTime = Time.time;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (IsOwnCollider(collision.collider))
+        {
+            return;
+        }
+
+        if ((groundLayer.value & (1 << collision.gameObject.layer)) == 0)
+        {
+            return;
+        }
+
+        foreach (ContactPoint contact in collision.contacts)
+        {
+            if (contact.normal.y > 0.45f)
+            {
+                lastGroundedTime = Time.time;
+                return;
+            }
+        }
+    }
+
+    private bool IsOwnCollider(Collider target)
+    {
+        if (target == null || ownColliders == null)
+        {
+            return false;
+        }
+
+        foreach (Collider ownCollider in ownColliders)
+        {
+            if (ownCollider == target)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void UpdateAnimation(bool moving, bool grounded)
@@ -139,8 +206,14 @@ public class PlayerMovement : MonoBehaviour
         }
 
         float animationSpeed = moving ? CurrentMoveSpeed : 0f;
-        float localX = moving ? Vector3.Dot(transform.right, moveInput) * animationSpeed : 0f;
-        float localY = moving ? Vector3.Dot(transform.forward, moveInput) * animationSpeed : 0f;
+        float localX = 0f;
+        float localY = 0f;
+        if (moving)
+        {
+            float forwardAmount = Vector3.Dot(transform.forward, moveInput);
+            float signedForward = Mathf.Abs(forwardAmount) > 0.1f ? Mathf.Sign(forwardAmount) : 1f;
+            localY = signedForward * animationSpeed;
+        }
 
         animationController.SetMoveSpeed(animationSpeed);
         animationController.SetMoveDirection(localX, localY);

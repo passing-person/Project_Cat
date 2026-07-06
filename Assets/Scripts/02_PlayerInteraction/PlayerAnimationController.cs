@@ -24,6 +24,17 @@ public class PlayerAnimationController : MonoBehaviour
     [SerializeField] private Transform animatedRoot;
 
     private Vector3 initialAnimatedRootLocalPosition;
+    private bool hasMoveSpeedParam;
+    private bool hasMoveXParam;
+    private bool hasMoveYParam;
+    private bool hasIsGroundedParam;
+    private bool hasJumpParam;
+    private bool hasMischiefParam;
+    private bool hasCuteParam;
+    private bool hasHideParam;
+    private bool hasCaughtParam;
+    private bool hasTurnLeftParam;
+    private bool hasTurnRightParam;
 
     private void Awake()
     {
@@ -44,6 +55,8 @@ public class PlayerAnimationController : MonoBehaviour
 
         if (animatedRoot != null)
             initialAnimatedRootLocalPosition = animatedRoot.localPosition;
+
+        CacheAnimatorParameters();
     }
 
     private void LateUpdate()
@@ -56,7 +69,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     public void SetMoveSpeed(float speed)
     {
-        if (animator == null)
+        if (animator == null || !hasMoveSpeedParam)
             return;
 
         animator.SetFloat(MoveSpeedHash, speed);
@@ -67,13 +80,16 @@ public class PlayerAnimationController : MonoBehaviour
         if (animator == null)
             return;
 
-        animator.SetFloat(MoveXHash, x, 0.08f, Time.deltaTime);
-        animator.SetFloat(MoveYHash, y, 0.08f, Time.deltaTime);
+        if (hasMoveXParam)
+            animator.SetFloat(MoveXHash, x, 0.08f, Time.deltaTime);
+
+        if (hasMoveYParam)
+            animator.SetFloat(MoveYHash, y, 0.08f, Time.deltaTime);
     }
 
     public void SetGrounded(bool grounded)
     {
-        if (animator == null)
+        if (animator == null || !hasIsGroundedParam)
             return;
 
         animator.SetBool(IsGroundedHash, grounded);
@@ -81,7 +97,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     public void PlayJump()
     {
-        if (animator == null)
+        if (animator == null || !hasJumpParam)
             return;
 
         animator.SetTrigger(JumpHash);
@@ -89,7 +105,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     public void PlayMischief()
     {
-        if (animator == null)
+        if (animator == null || !hasMischiefParam)
             return;
 
         animator.SetTrigger(MischiefHash);
@@ -97,7 +113,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     public void PlayCute()
     {
-        if (animator == null)
+        if (animator == null || !hasCuteParam)
             return;
 
         animator.SetTrigger(CuteHash);
@@ -105,7 +121,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     public void PlayHide(bool isHidden)
     {
-        if (animator == null)
+        if (animator == null || !hasHideParam)
             return;
 
         animator.SetBool(HideHash, isHidden);
@@ -113,7 +129,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     public void PlayCaught()
     {
-        if (animator == null)
+        if (animator == null || !hasCaughtParam)
             return;
 
         animator.SetTrigger(CaughtHash);
@@ -121,7 +137,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     public void PlayTurnLeft()
     {
-        if (animator == null)
+        if (animator == null || !hasTurnLeftParam)
             return;
 
         animator.SetTrigger(TurnLeftHash);
@@ -129,10 +145,39 @@ public class PlayerAnimationController : MonoBehaviour
 
     public void PlayTurnRight()
     {
-        if (animator == null)
+        if (animator == null || !hasTurnRightParam)
             return;
 
         animator.SetTrigger(TurnRightHash);
+    }
+
+    private void CacheAnimatorParameters()
+    {
+        if (animator == null)
+            return;
+
+        hasMoveSpeedParam = HasParameter(MoveSpeedHash);
+        hasMoveXParam = HasParameter(MoveXHash);
+        hasMoveYParam = HasParameter(MoveYHash);
+        hasIsGroundedParam = HasParameter(IsGroundedHash);
+        hasJumpParam = HasParameter(JumpHash);
+        hasMischiefParam = HasParameter(MischiefHash);
+        hasCuteParam = HasParameter(CuteHash);
+        hasHideParam = HasParameter(HideHash);
+        hasCaughtParam = HasParameter(CaughtHash);
+        hasTurnLeftParam = HasParameter(TurnLeftHash);
+        hasTurnRightParam = HasParameter(TurnRightHash);
+    }
+
+    private bool HasParameter(int nameHash)
+    {
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.nameHash == nameHash)
+                return true;
+        }
+
+        return false;
     }
 
     public IEnumerator WaitForStateToFinish(string stateName)

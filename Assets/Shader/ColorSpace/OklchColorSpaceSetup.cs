@@ -21,10 +21,10 @@ public class OklchColorSpaceSetup : MonoBehaviour
     Texture2D m_RgbToOklabLut;
     Texture2D m_OklabToRgbLut;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void Bootstrap()
     {
-        EnsureInstance();
+        BindGlobalsStatic(force: true);
     }
 
     void OnEnable()
@@ -232,6 +232,13 @@ public class OklchColorSpaceSetup : MonoBehaviour
 
         string resourceName = Path.GetFileNameWithoutExtension(bytesPath);
         var bytesAsset = Resources.Load<TextAsset>($"ColorSpace/{resourceName}");
-        return bytesAsset != null ? bytesAsset.bytes : null;
+        if (bytesAsset != null && bytesAsset.bytes != null && bytesAsset.bytes.Length > 0)
+            return bytesAsset.bytes;
+
+        string streamingPath = Path.Combine(Application.streamingAssetsPath, "ColorSpace", resourceName + ".bytes");
+        if (File.Exists(streamingPath))
+            return File.ReadAllBytes(streamingPath);
+
+        return null;
     }
 }

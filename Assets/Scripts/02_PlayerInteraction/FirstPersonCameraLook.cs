@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(100)]
 public class FirstPersonCameraLook : MonoBehaviour
 {
     [Header("References")]
@@ -16,6 +17,8 @@ public class FirstPersonCameraLook : MonoBehaviour
     [SerializeField] private bool lockCursorOnStart = true;
 
     private float pitch;
+    private float yaw;
+    private Rigidbody rb;
 
     private void Awake()
     {
@@ -31,6 +34,11 @@ public class FirstPersonCameraLook : MonoBehaviour
                 cameraTransform = Camera.main.transform;
         }
 
+        rb = GetComponent<Rigidbody>();
+        yaw = transform.eulerAngles.y;
+
+        DisableConflictingCameraControllers();
+
         if (lockCursorOnStart)
             LockCursor();
     }
@@ -42,7 +50,24 @@ public class FirstPersonCameraLook : MonoBehaviour
         if (!CanLook())
             return;
 
-        UpdateMouseLook();
+        float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+
+        if (invertY)
+            mouseY = -mouseY;
+
+        yaw += mouseX;
+
+        pitch -= mouseY;
+        pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+    }
+
+    private void LateUpdate()
+    {
+        if (!CanLook())
+            return;
+
+        ApplyLookRotation();
     }
 
     private bool CanLook()
@@ -74,19 +99,28 @@ public class FirstPersonCameraLook : MonoBehaviour
         Cursor.visible = false;
     }
 
-    private void UpdateMouseLook()
+    private void ApplyLookRotation()
     {
-        float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+        Quaternion bodyRotation = Quaternion.Euler(0f, yaw, 0f);
+        transform.rotation = bodyRotation;
 
-        if (invertY)
-            mouseY = -mouseY;
-
-        transform.Rotate(Vector3.up * mouseX, Space.World);
-
-        pitch -= mouseY;
-        pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+        if (rb != null)
+            rb.rotation = bodyRotation;
 
         cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+    }
+
+    private void DisableConflictingCameraControllers()
+    {
+        MonoBehaviour[] behaviours = GetComponents<MonoBehaviour>();
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            MonoBehaviour behaviour = behaviours[i];
+            if (behaviour == null || behaviour == this)
+                continue;
+
+            if (behaviour.GetType().Name == "SimpleCameraController")
+                behaviour.enabled = false;
+        }
     }
 }

@@ -106,6 +106,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8364301218209180078}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 89def8f2368664c42b644337cdfd0a6f,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 710000031}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 89def8f2368664c42b644337cdfd0a6f,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 710000032}
   m_SourcePrefab: {fileID: 100100000, guid: 89def8f2368664c42b644337cdfd0a6f, type: 3}
 --- !u!1 &3310815038808763329 stripped
 GameObject:
@@ -129,6 +137,40 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0.1, z: 0.05}
   m_TimeToStationary: 0.5
+--- !u!114 &710000031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3310815038808763329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70917856bcb34804e9da0206de79f565, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  zoneLocalCenter: {x: 0, y: 0, z: 0}
+  zoneSize: {x: 1.4, y: 1.4, z: 1.4}
+--- !u!114 &710000032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3310815038808763329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cc54debaa6c4b2408918cce7ae4ec12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: 684e128c3c1299547b09fd3a27863d08, type: 2}
+  canInteract: 1
+  interactionId: MischiefTarget
+  mischiefType: 0
+  instantScoreBonus: 0
+  baseRageAmount: 5
+  rageRadius: 5
+  primaryNpcId: 
 --- !u!1 &9067166172263027796 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6694041149102326468, guid: 89def8f2368664c42b644337cdfd0a6f,

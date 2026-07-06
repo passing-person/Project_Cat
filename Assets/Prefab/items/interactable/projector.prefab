@@ -72,7 +72,55 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6333907725958658167}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8288651f6a818ee468842c2a99b688d5,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 710000061}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8288651f6a818ee468842c2a99b688d5,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 710000062}
   m_SourcePrefab: {fileID: 100100000, guid: 8288651f6a818ee468842c2a99b688d5, type: 3}
+--- !u!1 &710000063 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 8288651f6a818ee468842c2a99b688d5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1680601750211236640}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &710000061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 710000063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70917856bcb34804e9da0206de79f565, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  zoneLocalCenter: {x: 0, y: 0, z: 0}
+  zoneSize: {x: 1.4, y: 1.4, z: 1.4}
+--- !u!114 &710000062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 710000063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cc54debaa6c4b2408918cce7ae4ec12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: 7f3e6717a22641f48804a99f75b51b0a, type: 2}
+  canInteract: 1
+  interactionId: MischiefTarget
+  mischiefType: 0
+  instantScoreBonus: 0
+  baseRageAmount: 5
+  rageRadius: 5
+  primaryNpcId: 
 --- !u!1 &8150253527348052026 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7370481662633251610, guid: 8288651f6a818ee468842c2a99b688d5,

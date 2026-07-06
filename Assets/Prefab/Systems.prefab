@@ -71,11 +71,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2254641199151756008}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2098204864085132523}
   - {fileID: 4969807255845214359}
   - {fileID: 4100064753680309794}
   - {fileID: 5841528606685567571}
@@ -146,6 +147,119 @@ MonoBehaviour:
   defaultSecurityMultiplier: 13
   autoResolveReferences: 0
   autoWireReferences: 0
+--- !u!1 &2769135768198748175
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2098204864085132523}
+  - component: {fileID: 5547574472102287591}
+  - component: {fileID: 7047831041212596723}
+  - component: {fileID: 1957357350939145217}
+  - component: {fileID: 8576408259586338709}
+  m_Layer: 0
+  m_Name: MockUIBridge
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2098204864085132523
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2769135768198748175}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 486003186954706881}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5547574472102287591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2769135768198748175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8534ac890957cf948912bfe134b2ebb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coreFacade: {fileID: 722513475706035171}
+  feedbackAudio: {fileID: 1957357350939145217}
+  cameraController: {fileID: 0}
+  autoFindReferences: 1
+  useImmediateModeOverlay: 1
+  showMinimalFeedbackOverlay: 0
+  showLegacyHudPanels: 0
+  showLegacyControls: 0
+  showLegacyEventLog: 0
+  showLegacyResultPanel: 0
+  watchedNpcId: Supervisor
+  pollInterval: 0.05
+  feedbackMessageDuration: 1.35
+  showWorldRageBars: 1
+  worldRageBarOffset: {x: 0, y: 2.1, z: 0}
+--- !u!114 &7047831041212596723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2769135768198748175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78a2162c28b9cbb4287ac9227905567c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sfxSource: {fileID: 0}
+  bgmSource: {fileID: 0}
+  sfxLibrary: {fileID: 0}
+  logMissingClips: 1
+  createTemporarySourceForSpatialSfx: 1
+--- !u!114 &1957357350939145217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2769135768198748175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 489ddc38c6296d94f8855ad1bca2931e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioManager: {fileID: 7047831041212596723}
+--- !u!114 &8576408259586338709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2769135768198748175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18f859f0bc5e8e4aa2f721634a110b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hudManager: {fileID: 0}
+  completeUI: {fileID: 0}
+  promptPanel: {fileID: 0}
+  promptText: {fileID: 0}
+  warningPanel: {fileID: 0}
+  warningText: {fileID: 0}
+  timerText: {fileID: 0}
+  objectiveText: {fileID: 0}
+  coreFacade: {fileID: 0}
 --- !u!1 &3946780813301630729
 GameObject:
   m_ObjectHideFlags: 0
@@ -401,7 +515,7 @@ MonoBehaviour:
   failManager: {fileID: 1917786639581991251}
   uiBridgeBehaviour: {fileID: 0}
   defaultStageData: {fileID: 11400000, guid: f7f634fa9e9a1f34aa240ed2fadece72, type: 2}
-  currentStageData: {fileID: 0}
+  currentStageData: {fileID: 11400000, guid: 3b61fe2be83478d49b1811909f76c5cb, type: 2}
   currentStageId: 
   stageCleared: 0
   stageFailed: 0

@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 58632603}
   - component: {fileID: 58632605}
   - component: {fileID: 58632606}
-  - component: {fileID: 58632607}
+  - component: {fileID: 58632609}
   m_Layer: 0
   m_Name: Wall (24)
   m_TagString: Untagged
@@ -246,33 +246,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &58632607
-Rigidbody:
+--- !u!114 &58632609
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 58632601}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &76987462
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -443,7 +438,7 @@ GameObject:
   - component: {fileID: 91082208}
   - component: {fileID: 91082210}
   - component: {fileID: 91082211}
-  - component: {fileID: 91082212}
+  - component: {fileID: 91082214}
   m_Layer: 0
   m_Name: Wall (15)
   m_TagString: Untagged
@@ -554,33 +549,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &91082212
-Rigidbody:
+--- !u!114 &91082214
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 91082206}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &101815177
 GameObject:
   m_ObjectHideFlags: 0
@@ -594,7 +584,7 @@ GameObject:
   - component: {fileID: 101815179}
   - component: {fileID: 101815181}
   - component: {fileID: 101815182}
-  - component: {fileID: 101815183}
+  - component: {fileID: 101815185}
   m_Layer: 0
   m_Name: Wall (30)
   m_TagString: Untagged
@@ -705,33 +695,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &101815183
-Rigidbody:
+--- !u!114 &101815185
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 101815177}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &128392318
 GameObject:
   m_ObjectHideFlags: 0
@@ -745,7 +730,7 @@ GameObject:
   - component: {fileID: 128392321}
   - component: {fileID: 128392320}
   - component: {fileID: 128392323}
-  - component: {fileID: 128392324}
+  - component: {fileID: 128392326}
   m_Layer: 0
   m_Name: Wall (34)
   m_TagString: Untagged
@@ -856,33 +841,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &128392324
-Rigidbody:
+--- !u!114 &128392326
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 128392318}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &154309844
 GameObject:
   m_ObjectHideFlags: 0
@@ -896,7 +876,7 @@ GameObject:
   - component: {fileID: 154309846}
   - component: {fileID: 154309848}
   - component: {fileID: 154309849}
-  - component: {fileID: 154309850}
+  - component: {fileID: 154309852}
   m_Layer: 0
   m_Name: Wall (18)
   m_TagString: Untagged
@@ -1007,33 +987,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &154309850
-Rigidbody:
+--- !u!114 &154309852
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 154309844}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &185802410
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1112,14 +1087,23 @@ PrefabInstance:
       propertyPath: m_Constraints
       value: 112
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6314307450330484114, guid: deea916bee424354c9620fdbc24048ee, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 6554751704416298808, guid: deea916bee424354c9620fdbc24048ee,
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7070350074459249628, guid: deea916bee424354c9620fdbc24048ee,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 541323596}
-    m_AddedComponents: []
+      addedObject: {fileID: 871133703}
+    - targetCorrespondingSourceObject: {fileID: 7070350074459249628, guid: deea916bee424354c9620fdbc24048ee,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 871133702}
+    - targetCorrespondingSourceObject: {fileID: 7070350074459249628, guid: deea916bee424354c9620fdbc24048ee,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 871133701}
   m_SourcePrefab: {fileID: 100100000, guid: deea916bee424354c9620fdbc24048ee, type: 3}
 --- !u!1 &273385752
 GameObject:
@@ -1169,7 +1153,7 @@ GameObject:
   - component: {fileID: 277308001}
   - component: {fileID: 277308003}
   - component: {fileID: 277308004}
-  - component: {fileID: 277308005}
+  - component: {fileID: 277308007}
   m_Layer: 0
   m_Name: Wall (14)
   m_TagString: Untagged
@@ -1280,33 +1264,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &277308005
-Rigidbody:
+--- !u!114 &277308007
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 277307999}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &283579446
 GameObject:
   m_ObjectHideFlags: 0
@@ -1320,7 +1299,7 @@ GameObject:
   - component: {fileID: 283579448}
   - component: {fileID: 283579450}
   - component: {fileID: 283579451}
-  - component: {fileID: 283579452}
+  - component: {fileID: 283579454}
   m_Layer: 0
   m_Name: Wall (13)
   m_TagString: Untagged
@@ -1431,33 +1410,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &283579452
-Rigidbody:
+--- !u!114 &283579454
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 283579446}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &308428625
 GameObject:
   m_ObjectHideFlags: 0
@@ -1471,7 +1445,7 @@ GameObject:
   - component: {fileID: 308428627}
   - component: {fileID: 308428629}
   - component: {fileID: 308428630}
-  - component: {fileID: 308428631}
+  - component: {fileID: 308428633}
   m_Layer: 0
   m_Name: Wall (26)
   m_TagString: Untagged
@@ -1582,33 +1556,34 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &308428631
-Rigidbody:
+--- !u!114 &308428633
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 308428625}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!1 &352935272 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7070350074459249628, guid: deea916bee424354c9620fdbc24048ee,
+    type: 3}
+  m_PrefabInstance: {fileID: 185802410}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &353468928
 GameObject:
   m_ObjectHideFlags: 0
@@ -1653,7 +1628,7 @@ GameObject:
   - component: {fileID: 367632663}
   - component: {fileID: 367632665}
   - component: {fileID: 367632666}
-  - component: {fileID: 367632667}
+  - component: {fileID: 367632669}
   m_Layer: 0
   m_Name: Wall (11)
   m_TagString: Untagged
@@ -1764,33 +1739,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &367632667
-Rigidbody:
+--- !u!114 &367632669
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 367632661}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &381241653
 GameObject:
   m_ObjectHideFlags: 0
@@ -1804,7 +1774,7 @@ GameObject:
   - component: {fileID: 381241655}
   - component: {fileID: 381241657}
   - component: {fileID: 381241658}
-  - component: {fileID: 381241659}
+  - component: {fileID: 381241661}
   m_Layer: 0
   m_Name: Wall (9)
   m_TagString: Untagged
@@ -1915,33 +1885,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &381241659
-Rigidbody:
+--- !u!114 &381241661
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 381241653}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &385811613
 GameObject:
   m_ObjectHideFlags: 0
@@ -2033,109 +1998,6 @@ Transform:
   - {fileID: 1063963604}
   m_Father: {fileID: 1050120326}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &417420910
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 417420912}
-  - component: {fileID: 417420911}
-  - component: {fileID: 417420914}
-  - component: {fileID: 417420913}
-  m_Layer: 0
-  m_Name: MockUIBridge
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &417420911
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 417420910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03032f93aec771248ac4f1e98a0d97a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lastScore: 0
-  lastTargetScore: 0
-  lastMultiplier: 0
-  lastRageNpcId: 
-  lastRage: 0
-  lastRageState: 0
-  lastTimer: 0
-  lastObjectiveText: 
-  lastPrompt: 
-  lastFailureReason: 
-  stageClearShown: 0
-  stageFailedShown: 0
-  gameOverShown: 0
---- !u!4 &417420912
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 417420910}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1988460664}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &417420913
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 417420910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78a2162c28b9cbb4287ac9227905567c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sfxSource: {fileID: 0}
-  bgmSource: {fileID: 0}
-  sfxLibrary: {fileID: 0}
-  logMissingClips: 1
-  createTemporarySourceForSpatialSfx: 1
---- !u!114 &417420914
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 417420910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8534ac890957cf948912bfe134b2ebb0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  coreFacade: {fileID: 0}
-  feedbackAudio: {fileID: 0}
-  cameraController: {fileID: 0}
-  autoFindReferences: 1
-  useImmediateModeOverlay: 1
-  showMinimalFeedbackOverlay: 0
-  showLegacyHudPanels: 0
-  showLegacyControls: 0
-  showLegacyEventLog: 0
-  showLegacyResultPanel: 0
-  watchedNpcId: Supervisor
-  pollInterval: 0.05
-  feedbackMessageDuration: 1.35
-  showWorldRageBars: 1
-  worldRageBarOffset: {x: 0, y: 2.1, z: 0}
 --- !u!1001 &417570732
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2287,7 +2149,7 @@ GameObject:
   - component: {fileID: 417688097}
   - component: {fileID: 417688099}
   - component: {fileID: 417688100}
-  - component: {fileID: 417688101}
+  - component: {fileID: 417688103}
   m_Layer: 0
   m_Name: Wall (27)
   m_TagString: Untagged
@@ -2398,33 +2260,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &417688101
-Rigidbody:
+--- !u!114 &417688103
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 417688095}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &425664005
 GameObject:
   m_ObjectHideFlags: 0
@@ -2438,7 +2295,7 @@ GameObject:
   - component: {fileID: 425664007}
   - component: {fileID: 425664009}
   - component: {fileID: 425664010}
-  - component: {fileID: 425664011}
+  - component: {fileID: 425664013}
   m_Layer: 0
   m_Name: Wall (29)
   m_TagString: Untagged
@@ -2549,33 +2406,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &425664011
-Rigidbody:
+--- !u!114 &425664013
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 425664005}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &426584547
 GameObject:
   m_ObjectHideFlags: 0
@@ -2589,7 +2441,7 @@ GameObject:
   - component: {fileID: 426584549}
   - component: {fileID: 426584551}
   - component: {fileID: 426584552}
-  - component: {fileID: 426584553}
+  - component: {fileID: 426584555}
   m_Layer: 0
   m_Name: Wall (28)
   m_TagString: Untagged
@@ -2700,33 +2552,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &426584553
-Rigidbody:
+--- !u!114 &426584555
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 426584547}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &481774659
 GameObject:
   m_ObjectHideFlags: 0
@@ -2773,7 +2620,7 @@ GameObject:
   - component: {fileID: 540035985}
   - component: {fileID: 540035984}
   - component: {fileID: 540035987}
-  - component: {fileID: 540035988}
+  - component: {fileID: 540035990}
   m_Layer: 0
   m_Name: Wall (32)
   m_TagString: Untagged
@@ -2884,170 +2731,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &540035988
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540035982}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!1 &541323595
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 541323596}
-  - component: {fileID: 541323599}
-  - component: {fileID: 541323598}
-  - component: {fileID: 541323597}
-  m_Layer: 0
-  m_Name: Camera
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &541323596
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 541323595}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.09416593, y: -0, z: -0, w: 0.99555653}
-  m_LocalPosition: {x: 0, y: 0.33199996, z: -0.77299976}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 871133687}
-  m_LocalEulerAnglesHint: {x: 10.807, y: 0, z: 0}
---- !u!114 &541323597
+--- !u!114 &540035990
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 541323595}
+  m_GameObject: {fileID: 540035982}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
-  m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 2
-  m_CameraType: 0
-  m_Cameras: []
-  m_RendererIndex: -1
-  m_VolumeLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  m_VolumeTrigger: {fileID: 0}
-  m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
-  m_Antialiasing: 0
-  m_AntialiasingQuality: 2
-  m_StopNaN: 0
-  m_Dithering: 0
-  m_ClearDepth: 1
-  m_AllowXRRendering: 1
-  m_AllowHDROutput: 1
-  m_UseScreenCoordOverride: 0
-  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
-  m_RequiresDepthTexture: 0
-  m_RequiresColorTexture: 0
-  m_Version: 2
-  m_TaaSettings:
-    m_Quality: 3
-    m_FrameInfluence: 0.1
-    m_JitterScale: 1
-    m_MipBias: 0
-    m_VarianceClampScale: 0.9
-    m_ContrastAdaptiveSharpening: 0
---- !u!81 &541323598
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 541323595}
-  m_Enabled: 1
---- !u!20 &541323599
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 541323595}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_Iso: 200
-  m_ShutterSpeed: 0.005
-  m_Aperture: 16
-  m_FocusDistance: 10
-  m_FocalLength: 50
-  m_BladeCount: 5
-  m_Curvature: {x: 2, y: 11}
-  m_BarrelClipping: 0.25
-  m_Anamorphism: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 60
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &560467844
 GameObject:
   m_ObjectHideFlags: 0
@@ -3058,6 +2763,7 @@ GameObject:
   m_Component:
   - component: {fileID: 560467845}
   - component: {fileID: 560467846}
+  - component: {fileID: 560467847}
   m_Layer: 0
   m_Name: WorldGeo
   m_TagString: Untagged
@@ -3115,6 +2821,37 @@ MonoBehaviour:
   m_VoxelSize: 0.033333335
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: b9e0737b6cecf2e48a64e43af378b905, type: 2}
+  m_BuildHeightMesh: 0
+--- !u!114 &560467847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 560467844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 1479372276
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.033333335
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 35b3229ebbe8d624f80a06e5e9cbfc56, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1 &599724228
 GameObject:
@@ -3238,7 +2975,7 @@ GameObject:
   - component: {fileID: 637036566}
   - component: {fileID: 637036568}
   - component: {fileID: 637036569}
-  - component: {fileID: 637036570}
+  - component: {fileID: 637036572}
   m_Layer: 0
   m_Name: Wall (21)
   m_TagString: Untagged
@@ -3349,33 +3086,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &637036570
-Rigidbody:
+--- !u!114 &637036572
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 637036564}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &667121689
 GameObject:
   m_ObjectHideFlags: 0
@@ -3389,7 +3121,7 @@ GameObject:
   - component: {fileID: 667121691}
   - component: {fileID: 667121693}
   - component: {fileID: 667121694}
-  - component: {fileID: 667121695}
+  - component: {fileID: 667121697}
   m_Layer: 0
   m_Name: Wall (19)
   m_TagString: Untagged
@@ -3500,33 +3232,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &667121695
-Rigidbody:
+--- !u!114 &667121697
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 667121689}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &673026820
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3679,6 +3406,124 @@ Transform:
   m_Children: []
   m_Father: {fileID: 273385753}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &740510876
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1803399818315777330, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8016124485891023649, guid: a8f6a7832d9b4214ca35eb73bde91979,
+        type: 3}
+      propertyPath: m_Name
+      value: MainCanvas
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a8f6a7832d9b4214ca35eb73bde91979, type: 3}
 --- !u!1 &776140368
 GameObject:
   m_ObjectHideFlags: 0
@@ -3943,7 +3788,7 @@ GameObject:
   - component: {fileID: 821599869}
   - component: {fileID: 821599871}
   - component: {fileID: 821599872}
-  - component: {fileID: 821599873}
+  - component: {fileID: 821599875}
   m_Layer: 0
   m_Name: Wall (23)
   m_TagString: Untagged
@@ -4054,33 +3899,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &821599873
-Rigidbody:
+--- !u!114 &821599875
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 821599867}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &843182257
 GameObject:
   m_ObjectHideFlags: 0
@@ -4094,7 +3934,7 @@ GameObject:
   - component: {fileID: 843182260}
   - component: {fileID: 843182259}
   - component: {fileID: 843182262}
-  - component: {fileID: 843182263}
+  - component: {fileID: 843182265}
   m_Layer: 0
   m_Name: Wall (33)
   m_TagString: Untagged
@@ -4205,33 +4045,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &843182263
-Rigidbody:
+--- !u!114 &843182265
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 843182257}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &862168962
 GameObject:
   m_ObjectHideFlags: 0
@@ -4245,7 +4080,7 @@ GameObject:
   - component: {fileID: 862168964}
   - component: {fileID: 862168966}
   - component: {fileID: 862168967}
-  - component: {fileID: 862168968}
+  - component: {fileID: 862168970}
   m_Layer: 0
   m_Name: Wall (22)
   m_TagString: Untagged
@@ -4356,39 +4191,163 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &862168968
-Rigidbody:
+--- !u!114 &862168970
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 862168962}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!4 &871133687 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6554751704416298808, guid: deea916bee424354c9620fdbc24048ee,
-    type: 3}
-  m_PrefabInstance: {fileID: 185802410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &871133701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352935272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+--- !u!114 &871133702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352935272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4699314ad5cd64347ac80dddfb7f877c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  playerController: {fileID: 0}
+  targetOffset: {x: 0, y: 0.75, z: 0}
+  distance: 3.2
+  minDistance: 1.2
+  maxDistance: 5
+  followSharpness: 18
+  rotationSharpness: 20
+  normalFov: 60
+  useFixedHideAnchorView: 1
+  hiddenEyeOffset: {x: 0, y: 0.55, z: 0.08}
+  hiddenDistance: 0.05
+  hiddenFov: 42
+  hiddenYawLimit: 38
+  hiddenMinPitch: -12
+  hiddenMaxPitch: 22
+  mouseSensitivityX: 3.2
+  mouseSensitivityY: 2.4
+  minPitch: -35
+  maxPitch: 70
+  invertY: 0
+  rotateTargetYaw: 1
+  useCameraCollision: 1
+  collisionRadius: 0.2
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  lockCursorOnStart: 1
+--- !u!20 &871133703
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352935272}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
 --- !u!1 &889368353
 GameObject:
   m_ObjectHideFlags: 0
@@ -4402,7 +4361,7 @@ GameObject:
   - component: {fileID: 889368356}
   - component: {fileID: 889368355}
   - component: {fileID: 889368358}
-  - component: {fileID: 889368359}
+  - component: {fileID: 889368361}
   m_Layer: 0
   m_Name: Wall (31)
   m_TagString: Untagged
@@ -4513,33 +4472,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &889368359
-Rigidbody:
+--- !u!114 &889368361
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 889368353}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1022529521
 GameObject:
   m_ObjectHideFlags: 0
@@ -4553,7 +4507,7 @@ GameObject:
   - component: {fileID: 1022529523}
   - component: {fileID: 1022529525}
   - component: {fileID: 1022529526}
-  - component: {fileID: 1022529527}
+  - component: {fileID: 1022529529}
   m_Layer: 0
   m_Name: Wall (7)
   m_TagString: Untagged
@@ -4664,33 +4618,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1022529527
-Rigidbody:
+--- !u!114 &1022529529
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1022529521}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1045514297 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 566153305108056124, guid: 1f7286d1736c0f742954118703490e11,
@@ -4722,7 +4671,7 @@ GameObject:
   - component: {fileID: 1045937263}
   - component: {fileID: 1045937265}
   - component: {fileID: 1045937266}
-  - component: {fileID: 1045937267}
+  - component: {fileID: 1045937269}
   m_Layer: 0
   m_Name: Wall (10)
   m_TagString: Untagged
@@ -4833,33 +4782,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1045937267
-Rigidbody:
+--- !u!114 &1045937269
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1045937261}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1050120325
 GameObject:
   m_ObjectHideFlags: 0
@@ -4907,7 +4851,7 @@ GameObject:
   - component: {fileID: 1061546200}
   - component: {fileID: 1061546202}
   - component: {fileID: 1061546203}
-  - component: {fileID: 1061546204}
+  - component: {fileID: 1061546206}
   m_Layer: 0
   m_Name: Wall (6)
   m_TagString: Untagged
@@ -5018,33 +4962,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1061546204
-Rigidbody:
+--- !u!114 &1061546206
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1061546198}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1063963603
 GameObject:
   m_ObjectHideFlags: 0
@@ -5320,7 +5259,7 @@ GameObject:
   - component: {fileID: 1220723088}
   - component: {fileID: 1220723090}
   - component: {fileID: 1220723091}
-  - component: {fileID: 1220723092}
+  - component: {fileID: 1220723094}
   m_Layer: 0
   m_Name: Wall (1)
   m_TagString: Untagged
@@ -5431,33 +5370,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1220723092
-Rigidbody:
+--- !u!114 &1220723094
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1220723086}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1235040961
 GameObject:
   m_ObjectHideFlags: 0
@@ -5881,7 +5815,7 @@ GameObject:
   - component: {fileID: 1404845909}
   - component: {fileID: 1404845911}
   - component: {fileID: 1404845912}
-  - component: {fileID: 1404845913}
+  - component: {fileID: 1404845915}
   m_Layer: 0
   m_Name: Wall (20)
   m_TagString: Untagged
@@ -5992,33 +5926,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1404845913
-Rigidbody:
+--- !u!114 &1404845915
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1404845907}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &1429341632
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6110,7 +6039,7 @@ GameObject:
   - component: {fileID: 1476147878}
   - component: {fileID: 1476147880}
   - component: {fileID: 1476147881}
-  - component: {fileID: 1476147882}
+  - component: {fileID: 1476147884}
   m_Layer: 0
   m_Name: Wall
   m_TagString: Untagged
@@ -6221,33 +6150,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1476147882
-Rigidbody:
+--- !u!114 &1476147884
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1476147876}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1556490536
 GameObject:
   m_ObjectHideFlags: 0
@@ -6261,7 +6185,7 @@ GameObject:
   - component: {fileID: 1556490538}
   - component: {fileID: 1556490540}
   - component: {fileID: 1556490541}
-  - component: {fileID: 1556490542}
+  - component: {fileID: 1556490544}
   m_Layer: 0
   m_Name: Wall (4)
   m_TagString: Untagged
@@ -6372,33 +6296,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1556490542
-Rigidbody:
+--- !u!114 &1556490544
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1556490536}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1570249015
 GameObject:
   m_ObjectHideFlags: 0
@@ -6412,7 +6331,7 @@ GameObject:
   - component: {fileID: 1570249017}
   - component: {fileID: 1570249019}
   - component: {fileID: 1570249020}
-  - component: {fileID: 1570249021}
+  - component: {fileID: 1570249023}
   m_Layer: 0
   m_Name: Wall (16)
   m_TagString: Untagged
@@ -6523,33 +6442,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1570249021
-Rigidbody:
+--- !u!114 &1570249023
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1570249015}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &1619926901 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1254337555214564131, guid: 1f7286d1736c0f742954118703490e11,
@@ -6569,7 +6483,7 @@ GameObject:
   - component: {fileID: 1691057014}
   - component: {fileID: 1691057016}
   - component: {fileID: 1691057017}
-  - component: {fileID: 1691057018}
+  - component: {fileID: 1691057020}
   m_Layer: 0
   m_Name: Wall (8)
   m_TagString: Untagged
@@ -6680,33 +6594,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1691057018
-Rigidbody:
+--- !u!114 &1691057020
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1691057012}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1693510996
 GameObject:
   m_ObjectHideFlags: 0
@@ -6720,7 +6629,7 @@ GameObject:
   - component: {fileID: 1693510998}
   - component: {fileID: 1693511000}
   - component: {fileID: 1693511001}
-  - component: {fileID: 1693511002}
+  - component: {fileID: 1693511004}
   m_Layer: 0
   m_Name: Wall (2)
   m_TagString: Untagged
@@ -6831,33 +6740,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1693511002
-Rigidbody:
+--- !u!114 &1693511004
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1693510996}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1869411630
 GameObject:
   m_ObjectHideFlags: 0
@@ -6871,7 +6775,7 @@ GameObject:
   - component: {fileID: 1869411632}
   - component: {fileID: 1869411634}
   - component: {fileID: 1869411635}
-  - component: {fileID: 1869411636}
+  - component: {fileID: 1869411638}
   m_Layer: 0
   m_Name: Wall (17)
   m_TagString: Untagged
@@ -6982,33 +6886,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1869411636
-Rigidbody:
+--- !u!114 &1869411638
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1869411630}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1875323865
 GameObject:
   m_ObjectHideFlags: 0
@@ -7091,7 +6990,7 @@ GameObject:
   - component: {fileID: 1932305456}
   - component: {fileID: 1932305458}
   - component: {fileID: 1932305459}
-  - component: {fileID: 1932305460}
+  - component: {fileID: 1932305462}
   m_Layer: 0
   m_Name: Wall (25)
   m_TagString: Untagged
@@ -7202,33 +7101,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1932305460
-Rigidbody:
+--- !u!114 &1932305462
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1932305454}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1937626303
 GameObject:
   m_ObjectHideFlags: 0
@@ -7295,7 +7189,7 @@ GameObject:
   - component: {fileID: 1961076808}
   - component: {fileID: 1961076810}
   - component: {fileID: 1961076811}
-  - component: {fileID: 1961076812}
+  - component: {fileID: 1961076814}
   m_Layer: 0
   m_Name: Wall (3)
   m_TagString: Untagged
@@ -7406,33 +7300,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &1961076812
-Rigidbody:
+--- !u!114 &1961076814
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1961076806}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &1988460663
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7491,77 +7380,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 722513475706035171, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-        type: 3}
-      propertyPath: uiBridgeBehaviour
-      value: 
-      objectReference: {fileID: 417420911}
     - target: {fileID: 2254641199151756008, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
         type: 3}
       propertyPath: m_Name
       value: Systems
       objectReference: {fileID: 0}
-    - target: {fileID: 2290687110030619531, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
+    - target: {fileID: 5547574472102287591, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
         type: 3}
-      propertyPath: currentStageData
+      propertyPath: cameraController
       value: 
-      objectReference: {fileID: 11400000, guid: 3b61fe2be83478d49b1811909f76c5cb,
-        type: 2}
-    - target: {fileID: 2290687110030619531, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-        type: 3}
-      propertyPath: uiBridgeBehaviour
-      value: 
-      objectReference: {fileID: 417420911}
-    - target: {fileID: 2324375151967864958, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-        type: 3}
-      propertyPath: uiBridgeBehaviour
-      value: 
-      objectReference: {fileID: 417420911}
-    - target: {fileID: 2979191761413928416, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-        type: 3}
-      propertyPath: uiBridgeBehaviour
-      value: 
-      objectReference: {fileID: 417420911}
-    - target: {fileID: 3249394034915852692, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-        type: 3}
-      propertyPath: uiBridgeBehaviour
-      value: 
-      objectReference: {fileID: 417420911}
-    - target: {fileID: 5282219686961745714, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-        type: 3}
-      propertyPath: uiBridgeBehaviour
-      value: 
-      objectReference: {fileID: 417420911}
-    - target: {fileID: 5325625319199939789, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-        type: 3}
-      propertyPath: uiBridgeBehaviour
-      value: 
-      objectReference: {fileID: 417420911}
-    - target: {fileID: 8045645235052137180, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-        type: 3}
-      propertyPath: uiBridgeBehaviour
-      value: 
-      objectReference: {fileID: 417420911}
-    - target: {fileID: 8239954638666244571, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-        type: 3}
-      propertyPath: uiBridgeBehaviour
-      value: 
-      objectReference: {fileID: 417420911}
+      objectReference: {fileID: 871133702}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 486003186954706881, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-        type: 3}
-      insertIndex: 0
-      addedObject: {fileID: 417420912}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03f092f9409f0ae4f81f0f6609fc3a19, type: 3}
---- !u!4 &1988460664 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 486003186954706881, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
-    type: 3}
-  m_PrefabInstance: {fileID: 1988460663}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2042339054
 GameObject:
   m_ObjectHideFlags: 0
@@ -7850,7 +7683,7 @@ GameObject:
   - component: {fileID: 2122416168}
   - component: {fileID: 2122416170}
   - component: {fileID: 2122416171}
-  - component: {fileID: 2122416172}
+  - component: {fileID: 2122416174}
   m_Layer: 0
   m_Name: Wall (12)
   m_TagString: Untagged
@@ -7961,33 +7794,28 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 0
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!54 &2122416172
-Rigidbody:
+--- !u!114 &2122416174
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2122416166}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba24636ee788be4188a4ebc5ded1308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  securityCanBreak: 1
+  breakMode: 2
+  breakDelay: 0
+  rootToDestroy: {fileID: 0}
+  collidersToDisable: []
+  navMeshObstaclesToDisable: []
+  objectsToDisable: []
+  onSecurityBreak:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2138324308 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4742970532720530934, guid: baa0abd34aacddb479a8cf3ab8a8f52a,
@@ -8292,6 +8120,11 @@ PrefabInstance:
       propertyPath: assignedSeat
       value: 
       objectReference: {fileID: 2138324308}
+    - target: {fileID: 4475174280683632785, guid: 052ee1c4d322eb347a71616709e52034,
+        type: 3}
+      propertyPath: m_AgentTypeID
+      value: 1479372276
+      objectReference: {fileID: 0}
     - target: {fileID: 5118122244331779871, guid: 052ee1c4d322eb347a71616709e52034,
         type: 3}
       propertyPath: m_Name
@@ -8456,6 +8289,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 795107306}
+  - {fileID: 740510876}
   - {fileID: 1988460663}
   - {fileID: 560467845}
   - {fileID: 2108984424}

@@ -27,13 +27,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2158027029971189066}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.19386755, y: -0.02874365, z: 0.0032542767, w: 0.98060113}
-  m_LocalPosition: {x: -0.019, y: 0.606, z: -0.106}
+  m_LocalRotation: {x: 0.121738635, y: -0.029897139, z: 0.0010783686, w: 0.9921112}
+  m_LocalPosition: {x: -0.019, y: 1.25, z: -0.18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6473064039931927648}
-  m_LocalEulerAnglesHint: {x: 22.358, y: -3.416, z: -0.295}
+  m_LocalEulerAnglesHint: {x: 14, y: -3.416, z: -0.295}
 --- !u!20 &4486241592912595866
 Camera:
   m_ObjectHideFlags: 0
@@ -103,8 +103,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_RenderShadows: 1
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
@@ -189,6 +189,7 @@ GameObject:
   - component: {fileID: 7118655816239863935}
   - component: {fileID: 3730411309382853356}
   - component: {fileID: 8609912834858573227}
+  - component: {fileID: 2806090590819915711}
   - component: {fileID: 1952967970955485409}
   m_Layer: 0
   m_Name: PlayerCat_animation
@@ -206,7 +207,7 @@ Transform:
   m_GameObject: {fileID: 5827777631391397180}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.65489155, y: -0.18198973, z: 0.21226129}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -261,10 +262,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.13
-  m_Height: 0.36
+  m_Radius: 0.37
+  m_Height: 1.05
   m_Direction: 1
-  m_Center: {x: 0, y: 0.18, z: 0}
+  m_Center: {x: 0, y: 0.525, z: 0}
 --- !u!114 &1842605720183738202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -291,8 +292,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerId: PlayerCat
-  animationController: {fileID: 0}
-  sfxController: {fileID: 0}
+  animationController: {fileID: 7447006991218412425}
+  sfxController: {fileID: 6386803916316461473}
 --- !u!114 &7447006991218412425
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,7 +306,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b844802dcce91a4b88fbe34e9417df7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelRoot: {fileID: 0}
+  modelRoot: {fileID: 8892319039641485186}
   animator: {fileID: 0}
   lockAnimatedRootPosition: 1
   animatedRoot: {fileID: 0}
@@ -334,7 +335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 039294dd352519e47a921ad42fa5eb7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerController: {fileID: 0}
+  playerController: {fileID: 7937356683041428372}
   uiManager: {fileID: 0}
   interactionOrigin: {fileID: 6473064039931927648}
   detectionRadius: 1.2
@@ -414,9 +415,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb1fdf4596e674048baf8f0c4c0a7c76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerController: {fileID: 0}
-  animationController: {fileID: 0}
-  sfxController: {fileID: 0}
+  playerController: {fileID: 7937356683041428372}
+  animationController: {fileID: 7447006991218412425}
+  sfxController: {fileID: 6386803916316461473}
   groundCheck: {fileID: 0}
   moveSpeed: 2.4
   sprintMultiplier: 1.55
@@ -457,6 +458,21 @@ MonoBehaviour:
   maxUpwardVelocity: 2.4
   minLifeTime: 1.5
   maxLifeTime: 3
+--- !u!114 &2806090590819915711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5827777631391397180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91c934aa130d40046bddd8d58447a437, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  modelScale: 1
+  groundCheckYOffset: 0.02
+  fitCapsuleToModel: 0
 --- !u!114 &1952967970955485409
 MonoBehaviour:
   m_ObjectHideFlags: 0

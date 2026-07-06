@@ -12,6 +12,8 @@ public class TrashCubeSpawner : MonoBehaviour
     [Header("Emission")]
     public float emissionDuration = 0.1f;
     [SerializeField] private bool requireEmissionArm = true;
+    [SerializeField] private CoreFacade coreFacade;
+    [SerializeField] private string actorId = "PlayerCat";
     public float minSpawnInterval = 0.035f;
     public float maxSpawnInterval = 0.09f;
 
@@ -38,6 +40,22 @@ public class TrashCubeSpawner : MonoBehaviour
     private float emitEndTime;
     private bool emissionArmed;
     private float armedEmissionDuration;
+    private CoreFacade subscribedCoreFacade;
+
+    private void OnEnable()
+    {
+        SubscribeToCoreFacade();
+    }
+
+    private void Start()
+    {
+        SubscribeToCoreFacade();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromCoreFacade();
+    }
 
     // Called by the cat action animation event.
     public void AE_SpawnTrashCubes()
@@ -64,6 +82,38 @@ public class TrashCubeSpawner : MonoBehaviour
     {
         emissionArmed = true;
         armedEmissionDuration = Mathf.Max(0f, duration);
+    }
+
+    private void SubscribeToCoreFacade()
+    {
+        if (subscribedCoreFacade != null)
+            return;
+
+        if (coreFacade == null)
+            coreFacade = FindObjectOfType<CoreFacade>();
+
+        if (coreFacade == null)
+            return;
+
+        subscribedCoreFacade = coreFacade;
+        subscribedCoreFacade.MischiefApplied += HandleMischiefApplied;
+    }
+
+    private void UnsubscribeFromCoreFacade()
+    {
+        if (subscribedCoreFacade == null)
+            return;
+
+        subscribedCoreFacade.MischiefApplied -= HandleMischiefApplied;
+        subscribedCoreFacade = null;
+    }
+
+    private void HandleMischiefApplied(MischiefContext context)
+    {
+        if (!string.IsNullOrWhiteSpace(actorId) && context.ActorId != actorId)
+            return;
+
+        ArmNextEmission(emissionDuration);
     }
 
     private void SpawnTrashCubes(float duration)

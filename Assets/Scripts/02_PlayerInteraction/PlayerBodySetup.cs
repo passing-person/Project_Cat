@@ -18,6 +18,9 @@ public class PlayerBodySetup : MonoBehaviour
     [Header("Ground Check")]
     public float groundCheckYOffset = 0.02f;
 
+    [Header("Collider")]
+    [SerializeField] private bool fitCapsuleToModel = true;
+
     public Transform ModelTransform => transform.Find(ModelChildName);
 
     private void Awake()
@@ -40,7 +43,8 @@ public class PlayerBodySetup : MonoBehaviour
 
         Transform model = EnsureModelChild();
         SanitizeModelBranch(model);
-        FitBodyCollider(model);
+        if (fitCapsuleToModel)
+            FitBodyCollider(model);
         PositionGroundCheck(model);
     }
 
@@ -121,6 +125,10 @@ public class PlayerBodySetup : MonoBehaviour
         if (modelObject.GetComponent<PlayerModel>() == null)
             modelObject.AddComponent<PlayerModel>();
 
+        bool hasChildRenderer = modelObject.GetComponentInChildren<Renderer>(true) != null;
+        if (hasChildRenderer)
+            return;
+
         if (modelObject.GetComponent<MeshFilter>() == null)
             modelObject.AddComponent<MeshFilter>();
 
@@ -143,7 +151,12 @@ public class PlayerBodySetup : MonoBehaviour
             if (component is Transform)
                 continue;
 
-            if (component is MeshFilter || component is MeshRenderer || component is PlayerModel || component is Animator)
+            if (component is MeshFilter
+                || component is MeshRenderer
+                || component is PlayerModel
+                || component is Animator
+                || component is PlayerAnimationEventRelay
+                || component is CatMaterialSlots)
                 continue;
 
             DestroySafe(component);

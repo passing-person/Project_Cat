@@ -138,7 +138,12 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        animationController.SetMoveSpeed(moving ? CurrentMoveSpeed : 0f);
+        float animationSpeed = moving ? CurrentMoveSpeed : 0f;
+        float localX = moving ? Vector3.Dot(transform.right, moveInput) * animationSpeed : 0f;
+        float localY = moving ? Vector3.Dot(transform.forward, moveInput) * animationSpeed : 0f;
+
+        animationController.SetMoveSpeed(animationSpeed);
+        animationController.SetMoveDirection(localX, localY);
         animationController.SetGrounded(grounded);
     }
 }

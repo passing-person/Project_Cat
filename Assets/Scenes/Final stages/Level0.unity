@@ -1130,11 +1130,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerController: {fileID: 31549966}
-  uiManager: {fileID: 0}
-  interactionOrigin: {fileID: 0}
+  uiManager: {fileID: 1698629751}
+  interactionOrigin: {fileID: 31549984}
   detectionRadius: 1.2
   interactionRange: 0.5
   logInteractionDebug: 1
+--- !u!4 &31549984 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6473064039931927648, guid: 2162d65336e8f204f97518c950bd891a,
+    type: 3}
+  m_PrefabInstance: {fileID: 197834571}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &38204363
 Mesh:
   m_ObjectHideFlags: 0

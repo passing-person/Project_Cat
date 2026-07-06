@@ -4213,6 +4213,24 @@ MonoBehaviour:
   onSecurityBreak:
     m_PersistentCalls:
       m_Calls: []
+--- !u!4 &871133687 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6554751704416298808, guid: deea916bee424354c9620fdbc24048ee,
+    type: 3}
+  m_PrefabInstance: {fileID: 185802410}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &871133698 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5149211570049907498, guid: deea916bee424354c9620fdbc24048ee,
+    type: 3}
+  m_PrefabInstance: {fileID: 185802410}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352935272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04d355f3432ba584fa724fbd3e38ee23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &871133701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4269,8 +4287,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4699314ad5cd64347ac80dddfb7f877c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  playerController: {fileID: 0}
+  target: {fileID: 871133687}
+  playerController: {fileID: 871133698}
   targetOffset: {x: 0, y: 0.75, z: 0}
   distance: 3.2
   minDistance: 1.2
@@ -7384,6 +7402,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Systems
+      objectReference: {fileID: 0}
+    - target: {fileID: 5282219686961745714, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
+        type: 3}
+      propertyPath: autoResolveOnAwake
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5282219686961745714, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
+        type: 3}
+      propertyPath: logValidationOnStart
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5547574472102287591, guid: 03f092f9409f0ae4f81f0f6609fc3a19,
         type: 3}

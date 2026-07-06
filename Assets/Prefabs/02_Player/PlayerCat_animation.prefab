@@ -369,9 +369,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerController: {fileID: 7937356683041428372}
   uiManager: {fileID: 0}
-  interactionOrigin: {fileID: 6473064039931927648}
-  detectionRadius: 1.2
-  interactionRange: 1
+  interactionOrigin: {fileID: 2340855935694183316}
+  detectionRadius: 1.6
+  interactionRange: 1.25
   logInteractionDebug: 1
 --- !u!114 &3823647580954608885
 MonoBehaviour:
@@ -601,8 +601,26 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7977360671217268354, guid: aaee2fed3f056204d9dedec4a1e8ad70,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 0}
+      addedObject: {fileID: 6143715097216223084}
   m_SourcePrefab: {fileID: 100100000, guid: aaee2fed3f056204d9dedec4a1e8ad70, type: 3}
+--- !u!1 &2159292664174427850 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7977360671217268354, guid: aaee2fed3f056204d9dedec4a1e8ad70,
+    type: 3}
+  m_PrefabInstance: {fileID: 2204875830132609978}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6143715097216223084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2159292664174427850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7d4f291a6c34e5d9f8e2c1a0b6d3f45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &8892319039641485186 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7349478695333260344, guid: aaee2fed3f056204d9dedec4a1e8ad70,

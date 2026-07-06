@@ -8,7 +8,7 @@ using UnityEngine;
 public class InteractableBodySetup : MonoBehaviour
 {
     [Header("Interaction Zone")]
-    public Vector3 zoneLocalCenter = new Vector3(0f, 10f, 0f);
+    public Vector3 zoneLocalCenter = Vector3.zero;
     public Vector3 zoneSize = new Vector3(1.4f, 1.4f, 1.4f);
 
     private void Awake()

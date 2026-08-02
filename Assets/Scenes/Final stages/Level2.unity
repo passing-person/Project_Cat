@@ -1524,6 +1524,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Staff (male)
       objectReference: {fileID: 0}
+    - target: {fileID: 886542780492264240, guid: 3bb2171abbb89584db76ed52ccad233c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6279325480808653306, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
       propertyPath: m_Controller
@@ -11335,6 +11340,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Staff (male) (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 886542780492264240, guid: 3bb2171abbb89584db76ed52ccad233c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8724847557545652109, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
@@ -30154,6 +30164,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Staff (female) (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 8421916815351662142, guid: 95e6daee840720a4ea61cdd5de2402ca,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -44834,6 +44849,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Supervisor
+      objectReference: {fileID: 0}
+    - target: {fileID: 3818878370075068231, guid: 9918fe0a1c263a2489207de9d58bf905,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -71668,6 +71688,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Staff (female) (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 8421916815351662142, guid: 95e6daee840720a4ea61cdd5de2402ca,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -82431,6 +82456,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Staff (male) (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 886542780492264240, guid: 3bb2171abbb89584db76ed52ccad233c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8724847557545652109, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
@@ -105208,6 +105238,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Staff (male) (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 886542780492264240, guid: 3bb2171abbb89584db76ed52ccad233c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8724847557545652109, guid: 3bb2171abbb89584db76ed52ccad233c,
         type: 3}
       propertyPath: assignedSeat
@@ -113431,6 +113466,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Cleaner
+      objectReference: {fileID: 0}
+    - target: {fileID: 526099987290802232, guid: 00b92b11e3c5ef94b8ccf4da01de1dfd,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 844031122040579570, guid: 00b92b11e3c5ef94b8ccf4da01de1dfd,
         type: 3}
@@ -145375,17 +145415,17 @@ PrefabInstance:
     - target: {fileID: 6473064039931927648, guid: 2162d65336e8f204f97518c950bd891a,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.624
       objectReference: {fileID: 0}
     - target: {fileID: 6473064039931927648, guid: 2162d65336e8f204f97518c950bd891a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 1.198
       objectReference: {fileID: 0}
     - target: {fileID: 6473064039931927648, guid: 2162d65336e8f204f97518c950bd891a,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -4.439
       objectReference: {fileID: 0}
     - target: {fileID: 6473064039931927648, guid: 2162d65336e8f204f97518c950bd891a,
         type: 3}
@@ -150041,6 +150081,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Staff (female)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8421916815351662142, guid: 95e6daee840720a4ea61cdd5de2402ca,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

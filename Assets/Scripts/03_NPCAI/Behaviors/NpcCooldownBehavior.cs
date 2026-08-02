@@ -7,6 +7,7 @@ public class NpcCooldownBehavior : MonoBehaviour
     private NpcNavigate nav;
     private NpcStateMachine stateMachine;
     private NpcAnimationMachine anim;
+    private NpcSfxPlayer sfx;
 
     private NpcTimerType? activeCooldownTimer;
 
@@ -67,6 +68,8 @@ public class NpcCooldownBehavior : MonoBehaviour
         nav.StopNav();
 
         anim.PlayCooldownFrom(sourceState);
+
+        sfx.PlaySfx("npc_cooldown");
 
 
         NpcTimerType cooldownType = ResolveCooldownTimerType(sourceState);
@@ -144,5 +147,8 @@ public class NpcCooldownBehavior : MonoBehaviour
 
         if (anim == null)
             anim = GetComponent<NpcAnimationMachine>();
+
+        if (sfx == null)
+            sfx = GetComponent<NpcSfxPlayer>();
     }
 }

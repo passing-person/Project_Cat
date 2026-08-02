@@ -121,13 +121,14 @@ GameObject:
   - component: {fileID: 1765192870206103294}
   - component: {fileID: 7275907408140421635}
   - component: {fileID: 6991205309943888576}
+  - component: {fileID: 5257760270318083095}
   m_Layer: 0
   m_Name: Cleaner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8984380887555776607
 Transform:
   m_ObjectHideFlags: 0
@@ -471,6 +472,18 @@ MonoBehaviour:
   bubblePopout: {fileID: 7390971530996207495}
   animationMachine: {fileID: 7275907408140421635}
   defaultDuration: 2
+--- !u!114 &5257760270318083095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 526099987290802232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcaf4f01591eddc43afb641e6ebec42a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &622489610109707252
 GameObject:
   m_ObjectHideFlags: 0

@@ -46,6 +46,7 @@ public class LevelSelectManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         GameInputGate.SetMenuOpen(false);
-        SceneManager.LoadScene(levelScenePrefix + levelIndex);
+        // SceneManager.LoadScene(levelScenePrefix + levelIndex);
+        SceneManager.LoadScene(levelScenePrefix + 2);
     }
 }

@@ -34,57 +34,77 @@ MonoBehaviour:
     pitch: 1
     spatial: 0
   - id: cat_mischief
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 6292eb5f11850044797668c5577ae941, type: 3}
     volume: 1
     pitch: 1
     spatial: 0
   - id: cat_cute
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 541c76c9aff244541980550f2fe48180, type: 3}
     volume: 1
     pitch: 1
     spatial: 0
   - id: cat_jump
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 86d0e7ddd96c3eb4995873d92cb48011, type: 3}
     volume: 1
     pitch: 1
     spatial: 0
   - id: cat_hide_enter
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 65aa5e9fe2341734d825144beeac21d0, type: 3}
     volume: 1
     pitch: 1
     spatial: 0
   - id: cat_hide_exit
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 65aa5e9fe2341734d825144beeac21d0, type: 3}
     volume: 1
     pitch: 1
     spatial: 0
   - id: cat_caught
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f689a3e27f4be4f4298f3d1a267d1d88, type: 3}
     volume: 1
     pitch: 1
     spatial: 0
   - id: cat_meow
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 541c76c9aff244541980550f2fe48180, type: 3}
     volume: 1
     pitch: 1
     spatial: 0
   - id: microphone_broadcast_meow
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1293b31d79d991b4aa544707b211e60a, type: 3}
     volume: 1
     pitch: 1
     spatial: 1
   - id: world_light_on
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 6292eb5f11850044797668c5577ae941, type: 3}
     volume: 1
     pitch: 1
     spatial: 1
   - id: world_mess_start
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: fdf246610a4eada48a72717810073772, type: 3}
     volume: 1
     pitch: 1
     spatial: 1
   - id: world_mess_clean
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d66130c43c47d2541a8ac0ba6e6bb791, type: 3}
+    volume: 1
+    pitch: 1
+    spatial: 1
+  - id: world_mess_clean
+    clip: {fileID: 8300000, guid: d66130c43c47d2541a8ac0ba6e6bb791, type: 3}
+    volume: 1
+    pitch: 1
+    spatial: 1
+  - id: npc_cooldown
+    clip: {fileID: 8300000, guid: 95ce13dc32eb5834bb2e2d4aef2fc79c, type: 3}
+    volume: 1
+    pitch: 1
+    spatial: 1
+  - id: npc_enraged
+    clip: {fileID: 8300000, guid: 70cbe75204131454392e4fd46a90157f, type: 3}
+    volume: 1
+    pitch: 1
+    spatial: 1
+  - id: npc_cute
+    clip: {fileID: 8300000, guid: 70cafdef012eeae40ab51487fff7a06e, type: 3}
     volume: 1
     pitch: 1
     spatial: 1

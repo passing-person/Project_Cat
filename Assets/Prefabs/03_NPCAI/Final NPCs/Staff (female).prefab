@@ -2990,13 +2990,14 @@ GameObject:
   - component: {fileID: 4910342722183395826}
   - component: {fileID: 1180418118802427364}
   - component: {fileID: 125269190174174145}
+  - component: {fileID: 8964731203346676624}
   m_Layer: 0
   m_Name: Staff (female)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2730247704177171638
 Transform:
   m_ObjectHideFlags: 0
@@ -3324,6 +3325,18 @@ MonoBehaviour:
   bubblePopout: {fileID: 874762678867590976}
   animationMachine: {fileID: 1180418118802427364}
   defaultDuration: 2
+--- !u!114 &8964731203346676624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8421916815351662142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcaf4f01591eddc43afb641e6ebec42a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8462063902150006078
 GameObject:
   m_ObjectHideFlags: 0

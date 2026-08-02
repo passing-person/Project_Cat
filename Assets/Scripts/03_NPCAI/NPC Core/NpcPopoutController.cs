@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class NpcPopoutController : MonoBehaviour
 {
+    private NpcSfxPlayer sfx;
+
     [SerializeField] private BubblePopoutLogic bubblePopout;
     [SerializeField] private NpcAnimationMachine animationMachine;
     [SerializeField] private float defaultDuration = 2f;
@@ -10,11 +12,21 @@ public class NpcPopoutController : MonoBehaviour
     private NpcRageState cachedRage = NpcRageState.Calm;
     private bool hasCache;
 
+    private void Awake()
+    {
+        if (sfx == null)
+            sfx = GetComponent<NpcSfxPlayer>();
+    }
+
     public void ShowPopout(PopoutType type,
     float duration,
     NpcAnchorMode anchorMode)
     {
         bubblePopout.Show(type, duration, anchorMode);
+        if (type == PopoutType.NpcCute)
+            sfx.PlaySfx("npc_cute");
+        else
+            sfx.PlaySfx("npc_enraged");
     }
 
     public void UpdatePopout(NpcStateSnapshot snapshot)

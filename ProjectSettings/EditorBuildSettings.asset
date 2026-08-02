@@ -15,11 +15,11 @@ EditorBuildSettings:
     path: Assets/Scenes/MainScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/Final stages/Level0.unity
-    guid: bfba7f53769dc3947a819f6a06b2dee4
-  - enabled: 1
     path: Assets/Scenes/Final stages/Level1.unity
     guid: 69a3968937be50141862d58c5478ff1d
+  - enabled: 1
+    path: Assets/Scenes/Final stages/Level0.unity
+    guid: bfba7f53769dc3947a819f6a06b2dee4
   - enabled: 1
     path: Assets/Scenes/Final stages/Level2.unity
     guid: bd20e4d0f8bbd734098238b17b9469cc

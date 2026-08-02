@@ -19,6 +19,7 @@ public class NpcIdleBehavior : MonoBehaviour
     private NpcController controller;
     private NpcNavigate nav;
     private NpcAnimationMachine anim;
+    private NpcSfxPlayer sfx;
 
     private Coroutine idleRoutine;
     private bool waitingForSeatDestination;
@@ -32,8 +33,6 @@ public class NpcIdleBehavior : MonoBehaviour
 
     private void OnEnable()
     {
-        LazyInstantiate();
-
         if (nav != null)
             nav.DestinationReached += ResolveSeatDestinationReached;
     }
@@ -229,5 +228,8 @@ public class NpcIdleBehavior : MonoBehaviour
 
         if (anim == null)
             anim = GetComponent<NpcAnimationMachine>();
+
+        if (sfx == null)
+            sfx = GetComponent<NpcSfxPlayer>();
     }
 }

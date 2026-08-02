@@ -1099,19 +1099,13 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &31549956 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5827777631391397180, guid: 2162d65336e8f204f97518c950bd891a,
-    type: 3}
-  m_PrefabInstance: {fileID: 197834571}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &31549966 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7937356683041428372, guid: 2162d65336e8f204f97518c950bd891a,
     type: 3}
   m_PrefabInstance: {fileID: 197834571}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 31549956}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 04d355f3432ba584fa724fbd3e38ee23, type: 3}
@@ -9840,12 +9834,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &491084427 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7837164955247182376, guid: 52c7734ee6c1a4a4a9874f2c3197ae14,
-    type: 3}
-  m_PrefabInstance: {fileID: 991435969}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &491084428 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7460464211887806610, guid: 52c7734ee6c1a4a4a9874f2c3197ae14,
@@ -42657,6 +42645,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Staff (female)
       objectReference: {fileID: 0}
+    - target: {fileID: 8421916815351662142, guid: 95e6daee840720a4ea61cdd5de2402ca,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -47302,7 +47295,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2085220166472082499, guid: 70313bd57503356459a94c419ac1eb9d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
